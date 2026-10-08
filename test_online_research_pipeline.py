@@ -9,7 +9,7 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.env_checker import check_env
 
 from causal_indicators import add_indicators
-from online_research_pipeline import SnapshotStream, prepare, shadow_poll
+from online_research_pipeline import LearningHistory, SnapshotStream, prepare, shadow_poll
 from research_environment import CandleEnv, PaperAccount, TrainScaler, evaluate
 from test_causal_indicators import rows
 
@@ -36,6 +36,36 @@ class ResearchTests(unittest.TestCase):
             model.save(path)
             restored = PPO.load(path)
             self.assertEqual(expected, restored.predict(obs, deterministic=True)[0])
+
+    def test_learning_checkpoints_keep_test_untouched(self):
+        import torch
+        torch.set_num_threads(1)
+        data = features()[:40]
+        scaler = TrainScaler().fit(data)
+        # No test partition supplied: callback must use only train/validation.
+        callback = LearningHistory({"train": data, "validation": data}, scaler, every=32)
+        model = PPO("MlpPolicy", CandleEnv(data, scaler), seed=42, n_steps=32,
+                    batch_size=16, n_epochs=1, policy_kwargs={"net_arch": [8, 8]}, verbose=0)
+        with patch("online_research_pipeline.evaluate", wraps=evaluate) as evaluator:
+            model.learn(total_timesteps=64, callback=callback)
+        self.assertEqual([p["step"] for p in callback.points], [0, 32, 64])
+        self.assertEqual(evaluator.call_count, 6)
+        self.assertEqual(len(callback.episodes), 1)
+        self.assertTrue(np.isfinite(callback.episodes[0]["reward"]))
+        self.assertNotIn("test", callback.points[-1])
+
+    def test_decision_trace_next_open_and_terminal_fills(self):
+        data = features()[:3]
+        scaler = TrainScaler().fit(data)
+        result = evaluate(data, scaler, lambda obs, row: 1, include_trace=True)
+        decisions = result["decisions"]
+        self.assertEqual(len(decisions), 2)
+        self.assertEqual(decisions[0]["signal_date"], data[0]["date"])
+        self.assertEqual(decisions[0]["execution_date"], data[1]["date"])
+        self.assertEqual([d["fills"] for d in decisions], [1, 1])
+        self.assertTrue(decisions[-1]["terminal_liquidation"])
+        self.assertEqual(result["trades"], sum(d["fills"] for d in decisions))
+        self.assertNotIn("decisions", evaluate(data, scaler, lambda obs, row: 0))
 
     def test_environment_contract(self):
         data = features()

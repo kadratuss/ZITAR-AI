@@ -9,11 +9,45 @@ from pathlib import Path
 import numpy as np
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_checker import check_env
+from stable_baselines3.common.callbacks import BaseCallback
 
 from causal_indicators import add_indicators
 from chronological_split import split_records
 from online_finrl_data import fetch_latest_records
 from research_environment import CandleEnv, PaperAccount, TrainScaler, evaluate
+
+
+class LearningHistory(BaseCallback):
+    """Evaluate train/validation after updates; never inspect test checkpoints."""
+    def __init__(self, parts, scaler, every=512):
+        super().__init__()
+        self.parts, self.scaler, self.every = parts, scaler, every
+        self.points, self.episodes = [], []
+        self.episode_reward = 0.
+
+    def _on_step(self):
+        self.episode_reward += float(self.locals["rewards"][0])
+        if self.locals["dones"][0]:
+            self.episodes.append({"step": self.num_timesteps, "reward": self.episode_reward})
+            self.episode_reward = 0.
+        return True
+
+    def record(self):
+        step = self.model.num_timesteps
+        if self.points and self.points[-1]["step"] == step:
+            return
+        policy = lambda obs, row: int(self.model.predict(obs, deterministic=True)[0])
+        point = {"step": step}
+        for name in ("train", "validation"):
+            point[name] = evaluate(self.parts[name], self.scaler, policy)
+        self.points.append(point)
+
+    def _on_rollout_start(self):
+        if self.model.num_timesteps % self.every == 0:
+            self.record()
+
+    def _on_training_end(self):
+        self.record()
 
 
 class SnapshotStream:
@@ -123,13 +157,14 @@ def run(symbol="BTCUSDT", count=1000, timesteps=2048, seed=42, paper_polls=2, po
     model = PPO("MlpPolicy", env, seed=seed, device="cpu", n_steps=128,
                 batch_size=64, n_epochs=4, verbose=0,
                 policy_kwargs={"net_arch": [32, 32]})
-    model.learn(total_timesteps=timesteps)
+    history = LearningHistory(parts, scaler)
+    model.learn(total_timesteps=timesteps, callback=history)
     policy = lambda obs, row: int(model.predict(obs, deterministic=True)[0])
     results = {}
     for name in ("validation", "test"):
         rows = parts[name]
         results[name] = {
-            "ppo": evaluate(rows, scaler, policy),
+            "ppo": evaluate(rows, scaler, policy, include_trace=True),
             "buy_hold": evaluate(rows, scaler, lambda obs, row: 1),
             "sma20_50": evaluate(rows, scaler, lambda obs, row: int(row["sma"] > row["sma50"])),
             "cash": evaluate(rows, scaler, lambda obs, row: 0)}
@@ -137,6 +172,9 @@ def run(symbol="BTCUSDT", count=1000, timesteps=2048, seed=42, paper_polls=2, po
     shadow = shadow_poll(stream, model, scaler, paper_polls, poll_seconds) if paper_polls else None
     serialized = json.dumps(snapshot, sort_keys=True, allow_nan=False).encode()
     report = {"mode": "research only", "symbol": symbol, "seed": seed,
+            "interval": "1h", "actions": {"0": "cash / sell existing position", "1": "long / buy or hold"},
+            "learning_history": {"checkpoints": history.points, "episodes": history.episodes,
+                                 "test_policy": "evaluated only after training; no checkpoint selection"},
             "requested_timesteps": timesteps, "actual_timesteps": model.num_timesteps,
             "snapshot_sha256": hashlib.sha256(serialized).hexdigest(),
             "snapshot": snapshot, "split": parts["metadata"],

@@ -50,3 +50,22 @@ loopback Host restriction and rejection of POST.
 
 This PR prepares the dashboard before installation. Production ZİTAR deployment,
 embedding in its existing dashboard and any public hosting remain separate.
+
+## Learning and action visibility
+
+New runs record deterministic train and validation evaluations at step 0,
+every 512 steps after completed PPO updates, and at the final step. No test
+partition is accessed by the callback and no best checkpoint is selected.
+Training episode rewards are recorded separately, including exploration.
+The dashboard shows both curves, the checkpoint values and the last 20 test
+decisions. Old runs explicitly show missing-history states.
+
+This research runner uses 1h BTCUSDT candles by default: one decision per
+closed hour, executed at the next open in simulation. Action 1 targets fully
+long; action 0 targets cash (selling existing holdings). Repeating a target
+does not create another fill. No shorts, leverage or real orders. Terminal
+liquidation is labeled in the decision trace. This is a completed bounded
+experiment, not continuous training or a running model service.
+
+Example longer bounded trial: --timesteps 8192 --paper-polls 0 with a new
+--output-dir. More steps are not guaranteed to improve unseen performance.
