@@ -1,0 +1,83 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*secret*
+*credential*
+*api_key*
+*apikey*
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+
+# Runtime and logs
+*.log
+logs/
+runtime/
+state/
+*.pid
+*.lock
+
+# Backups and archives
+deployment_backups/
+backups/
+*.zip
+*.rar
+*.7z
+
+# Models and large datasets
+models/
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.parquet
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+# ZITAR private security
+zitar_api_vault_v1.py
+*api_vault*
+*token*
+*private_key*
+*.db.backup
+*.bak
+*.bak-*
+*.TEST_BACKUP.*
+# ZITAR local data
+git_yukleme_adaylari.txt
+*.csv
+*.jsonl
+*.wav
+outputs/
+trade_reports/
+paper_reset_archives/
+paper_strategy_archives/
+multistrategy_live_journal_v3/
+zitar_voice_models/
+zitar_web_evidence_cache*/
+zitar_master_portfolio_v1.json
+zitar_model_config_v1.json
