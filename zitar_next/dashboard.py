@@ -48,6 +48,7 @@ def handler(root,port,history_root=None,prefix=""):
                 if self.path == '/':
                     return self.send(200,Path(__file__).with_name('dashboard.html').read_text(encoding='utf-8').replace('data-next-base=""','data-next-base="'+prefix+'"'),'text/html; charset=utf-8')
                 if self.path == '/api/state':
+                    from zitar_next.finrl_status import reports
                     status = json.loads((root/'status.json').read_text(encoding='utf-8')) if (root/'status.json').exists() else dict(state='NOT_STARTED')
                     from datetime import datetime,timezone
                     if status.get('updated'):
@@ -56,7 +57,7 @@ def handler(root,port,history_root=None,prefix=""):
                         status['stale']=not 0 <= age <= 660
                     market_path=root/'market_status.json'
                     markets=json.loads(market_path.read_text(encoding='utf-8')) if market_path.exists() else {}
-                    return self.send(200,dict(registry.all(),status=status,markets=markets,csrf=token,scope='NEXT_RESEARCH_ONLY'))
+                    return self.send(200,dict(registry.all(),status=status,markets=markets,csrf=token,scope='NEXT_RESEARCH_ONLY',finrlx=reports(root)))
                 if self.path == '/api/summary':
                     from zitar_next.bridge import summary
                     return self.send(200,summary(root))
@@ -99,3 +100,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

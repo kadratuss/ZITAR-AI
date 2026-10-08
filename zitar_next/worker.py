@@ -205,6 +205,9 @@ def train_round(root,market,symbol,steps=2048,seeds=(42,73),snapshot=None):
     issues = assess(results+[ensemble],baselines,rows,previous.get('test_end'))
     forward = walk_forward(root,market,snapshot,steps,seeds,rows[0]['date'])
     issues = sorted(set(issues+forward['issues']))
+    from zitar_next.finrl_pipeline import backtest
+    finrlx = backtest(market,rows,ensemble['test']['decisions'],ensemble['test'])
+    atomic(folder/'finrlx.json',finrlx)
     hypothesis=dict(market=market,interval='1h',algorithm='PPO_MLP',
                     claim='Learned hourly exposure improves net risk-controlled return versus cash, long and SMA',
                     failure_criteria=POLICY,generated_rules=False)
@@ -214,6 +217,9 @@ def train_round(root,market,symbol,steps=2048,seeds=(42,73),snapshot=None):
                 sizing='10% equity collateral per isolated position' if market=='futures' else 'full equity long/flat',
                 strategy='PPO_MLP',seeds=list(seeds),snapshot_sha256=digest(snapshot),scaler_sha256=digest(scaler_data),split=parts['metadata'],
                 policy=POLICY,seed_results=results,ensemble=ensemble,baselines=baselines,walk_forward=forward,issues=issues,eligible=not issues,
+                finrlx=dict(backend=finrlx['backend'],upstream_commit=finrlx['upstream_commit'],
+                            report_sha256=digest(finrlx),weight_backtest=finrlx['weight_backtest'],
+                            authoritative_net_metrics=finrlx['authoritative_net_metrics'],assumptions=finrlx['assumptions']),
                 paper_only=True,real_orders=False,automatic_activation=False,
                 limitations=['bounded hourly history; long-term live forward results not yet available',
                              'fixed slippage and full fills; no order book execution',
@@ -222,6 +228,12 @@ def train_round(root,market,symbol,steps=2048,seeds=(42,73),snapshot=None):
                              'all seeds are one candidate family; no best-seed selection'])
     identity = Registry(root).propose(body)
     atomic(folder/'report.json',dict(body,proposal_id=identity))
+    finrlx.update(run=run_id,proposal_id=identity,snapshot_sha256=body['snapshot_sha256'],eligible=not issues,issues=issues)
+    report_folder=root/'finrlx_reports'
+    report_folder.mkdir(exist_ok=True)
+    if report_folder.is_symlink():
+        raise ValueError('report symlink rejected')
+    atomic(report_folder/(run_id+'.json'),finrlx)
     cursors[key] = dict(cutoff=cutoff,test_end=rows[-1]['date'],record_hashes={r['date']:digest(r) for r in snapshot['records']})
     atomic(state_path,cursors)
     atomic(root/'status.json',dict(status,state='COMPLETED',updated=stamp(),proposal=identity,issues=issues,eligible=not issues))
@@ -269,3 +281,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

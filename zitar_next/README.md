@@ -9,7 +9,7 @@ it at a production directory. Source files under sources/ are not used.
 
 Use Python 3.12 and install the pinned requirements.txt into that environment.
 The existing research virtual environment already contains these dependencies;
-no new package or global installation was performed for Next.
+FinRL-X backtest dependencies are installed only in that research environment; no global or production installation is performed. The lock now includes bt, scipy and matplotlib and their transitive dependencies.
 
 From the repository root:
 
@@ -97,12 +97,28 @@ No fresh candle means no fill. All models/scalers are hash-checked before loadin
 
 ## FinRL-X and OpenClaw
 
-ZitarWeightStrategy subclasses the inspected official FinRL-X BaseStrategy and
-returns its StrategyResult. A pinned unmodified interface file and Apache-2.0
-license are vendored under vendor/. Only the strategy contract is integrated:
-spot weights 0/1 and futures entry exposure intents 0/+.3/-.3. The independent
-futures environment owns margin/funding/liquidation simulation. No claim is made
-that the upstream stock backtester implements isolated crypto margin.
+ZitarWeightStrategy subclasses the pinned official BaseStrategy. Model decisions
+now pass through StrategyResult into the official FinRL-X BacktestEngine / bt.
+Every new train_round writes a hash-bound finrlx.json and includes its summary
+in the proposal. The dashboard displays separate FinRL-X and authoritative net
+metrics. Existing immutable candidates can be replayed without changing their
+proposal, approval or model files:
+
+```text
+python -m zitar_next.finrl_pipeline --root research_artifacts/next-release --run RUN_ID
+```
+
+The engine is vendored with documented offline boundary modifications and the
+Apache-2.0 license. Data-provider imports, sys.path changes and example CLI startup
+are removed. The ZITAR subclass supplies local data, disables benchmark downloads,
+uses fractional positions and avoids stock-specific daily annualization. A cash
+leg preserves 0/1 spot and 0/+.3/-.3 futures entry exposure through upstream weight
+normalization. It runs a separate per-bar weight-rebalanced diagnostic; it is not
+execution-equivalent to the discrete-position net simulator. Futures margin,
+funding, slippage and liquidation are still evaluated in FuturesEnv. Strategy
+eligibility and human approval use those authoritative net tests. Upstream equity
+broker execution and daily stock selection modules are outside this crypto
+research integration; no claim is made that they support isolated crypto margin.
 
 No upstream paid data or Alpaca broker is installed or imported. OpenClaw is not
 needed for this bounded worker, approval registry and loopback console; adding
@@ -131,3 +147,4 @@ python -m unittest -q test_zitar_next test_research_dashboard test_online_resear
 
 This tests the standalone research stack, not the complete production ZİTAR.
 Model files, source snapshots, registry DB and mutable state are not committed.
+
