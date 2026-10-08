@@ -95,16 +95,27 @@ class CandleEnv(gym.Env):
         return self._obs(), reward, self.done, False, {"equity": equity, "trades": self.account.trades}
 
 
-def evaluate(records, scaler, policy, fee=.001, slippage=.001):
+def evaluate(records, scaler, policy, fee=.001, slippage=.001, include_trace=False):
     env = CandleEnv(records, scaler, fee, slippage)
     obs, _ = env.reset()
     done = False
+    decisions = []
     while not done:
         action = int(policy(obs, records[env.index]))
+        signal = records[env.index]
+        before = env.account.trades
         obs, _, done, _, info = env.step(action)
+        if include_trace:
+            decisions.append({"signal_date": signal["date"], "execution_date": records[env.index]["date"],
+                              "action": action, "target": "long" if action else "cash",
+                              "fills": info["trades"]-before, "equity": info["equity"],
+                              "terminal_liquidation": done})
     curve = np.asarray(env.curve)
     peaks = np.maximum.accumulate(curve)
-    return {"return_pct": float((curve[-1]/curve[0]-1)*100),
+    result = {"return_pct": float((curve[-1]/curve[0]-1)*100),
             "max_drawdown_pct": float(np.max((peaks-curve)/peaks)*100),
             "final_equity": float(curve[-1]), "trades": info["trades"],
             "transitions": len(records)-1}
+    if include_trace:
+        result["decisions"] = decisions
+    return result
