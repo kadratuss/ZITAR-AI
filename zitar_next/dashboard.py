@@ -8,7 +8,9 @@ from urllib.parse import urlsplit
 from zitar_next.store import Registry,workspace
 
 
-def handler(root,port):
+def handler(root,port,history_root=None,prefix=""):
+    from research_dashboard import ResearchStore
+    history = ResearchStore(history_root) if history_root else None
     root = workspace(root)
     registry = Registry(root)
     token = secrets.token_urlsafe(32)
@@ -34,8 +36,17 @@ def handler(root,port):
             if not self.local():
                 return self.send(403,dict(error='LOCAL_HOST_REQUIRED'))
             try:
+                parsed = urlsplit(self.path)
+                from urllib.parse import parse_qs
+                query = parse_qs(parsed.query)
+                if parsed.path == '/api/history/runs':
+                    return self.send(200,dict(runs=history.runs() if history else []))
+                if parsed.path == '/api/history/run' and history:
+                    return self.send(200,history.load(query.get('id',[''])[0]))
+                if parsed.path == '/api/history/market' and history:
+                    return self.send(200,history.market(query.get('symbol',[''])[0]))
                 if self.path == '/':
-                    return self.send(200,Path(__file__).with_name('dashboard.html').read_text(encoding='utf-8'),'text/html; charset=utf-8')
+                    return self.send(200,Path(__file__).with_name('dashboard.html').read_text(encoding='utf-8').replace('data-next-base=""','data-next-base="'+prefix+'"'),'text/html; charset=utf-8')
                 if self.path == '/api/state':
                     status = json.loads((root/'status.json').read_text(encoding='utf-8')) if (root/'status.json').exists() else dict(state='NOT_STARTED')
                     from datetime import datetime,timezone
@@ -50,7 +61,7 @@ def handler(root,port):
                     from zitar_next.bridge import summary
                     return self.send(200,summary(root))
                 return self.send(404,dict(error='NOT_FOUND'))
-            except (ValueError,OSError):
+            except (ValueError,OSError,KeyError,TypeError,RuntimeError):
                 return self.send(503,dict(error='RESEARCH_STATE_UNAVAILABLE'))
 
         def do_POST(self):
@@ -73,9 +84,10 @@ def handler(root,port):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root',required=True)
+    parser.add_argument('--history-root')
     parser.add_argument('--port',type=int,default=8768)
     args = parser.parse_args()
-    server = ThreadingHTTPServer(('127.0.0.1',args.port),handler(args.root,args.port))
+    server = ThreadingHTTPServer(('127.0.0.1',args.port),handler(args.root,args.port,args.history_root))
     print('Next preview: http://127.0.0.1:'+str(args.port),flush=True)
     try:
         server.serve_forever()
