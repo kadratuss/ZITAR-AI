@@ -1,0 +1,19 @@
+[Unit]
+Description=ZITAR read-only V3 dashboard data
+After=network-online.target
+
+[Service]
+User=zitar
+Group=zitar
+WorkingDirectory=/srv/zitar/runtime
+ExecStart=/srv/zitar/venv/bin/python -B -m zitar_next.legacy_data --base /srv/zitar/runtime --port 5017
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target

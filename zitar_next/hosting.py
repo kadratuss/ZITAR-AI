@@ -22,9 +22,8 @@ def check(base,next_root):
 
 def assert_stopped(base,next_root):
     from zitar_paper_supervisor_v1 import lock_held
-    for name in ('zitar_paper_supervisor_v1','zitar_full_paper_runtime_v1','zitar_research_runtime_v1','zitar_comparison_runtime_v1','zitar_futures_paper_v1'):
-        path=Path(base)/(name+'.lock')
-        if path.exists() and lock_held(path):raise ValueError('source owner still running: '+name)
+    for path in Path(base).glob('*.lock'):
+        if path.exists() and lock_held(path):raise ValueError('source owner still running: '+path.name)
     path=Path(next_root)/'worker.lock'
     if path.exists() and lock_held(path):raise ValueError('learning worker still running')
 

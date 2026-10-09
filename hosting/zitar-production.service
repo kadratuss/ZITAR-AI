@@ -1,7 +1,7 @@
 [Unit]
 Description=ZITAR paper application supervisor
-After=network-online.target
-Wants=network-online.target
+After=network-online.target zitar-v3-data.service
+Wants=network-online.target zitar-v3-data.service
 
 [Service]
 User=zitar

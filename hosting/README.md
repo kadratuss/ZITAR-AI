@@ -12,6 +12,13 @@ Gateway aynı origin ve CSRF kontrolünü korur. Tarayıcı geçerli insan onay�
 vermeyen adayları etkinleştiremez. Birleşik karar sadece onaylanan bağımsız
 paper hesapta yürütülür; mevcut ana hesabın işlem kararını değiştirmez.
 
+Ana ekranın mevcut 5017 V3 veri bağımlılığı salt okunur `zitar-v3-data`
+servisiyle sağlanır. Eski Windows saatlik V3 görevi sunucuda `zitar-v3.timer`
+ve tek sahip kilidiyle karşılanır; mevcut RSI14 ve diğer aktif sanal vadeli
+motorlardan ayrı referans deneyidir. İlgili geçmiş JSON/CSV durumları taşıma
+görüntüsünde korunmalıdır. Windows görev durumunun Linux'ta gerçek timer
+durumuyla gösterilmesi için okuma adaptörü vardır.
+
 Öğrenme her yeni kapanmış saatlik mumda çalışır. Spot ve 3x izole vadeli için
 iki sabit PPO tohumu, doğrulamada ağırlık seçimi, üç önceki walk-forward
 penceresi, maliyet stresi ve RSI14/PPO/nakit/SMA karşılaştırmaları vardır.
@@ -39,7 +46,8 @@ https://docs.ollama.com/faq
 1. Kod paketindeki `runtime/` klasörünü `/srv/zitar/runtime` olarak aktar.
    Python paketleri `hosting/requirements.txt` içindedir. `hosting/install.sh`
    bağımlılıkları ve servis tanımlarını hazırlar; servisleri başlatmaz.
-2. PC'deki sahip süreçler, mevcut denetleyiciler ve Next worker kontrollü
+2. PC'deki sahip süreçler, mevcut denetleyiciler, Windows'taki
+   `PortfolioAI_MultiStrategy_Live` görevi ve Next worker kontrollü
    durdurulur. Bu adım sunucu hazır olduğunda yapılır. Şimdilik çalışan PC
    hesapları taşınmadı ve durdurulmadı.
 3. Durdurulmuş kaynak üzerinde aşağıdaki komutla tutarlı hesap/DB/model
@@ -69,7 +77,8 @@ python -m zitar_next.hosting backup --base SOURCE_ZITAR --next-root SOURCE_NEXT 
    Ardından servisler etkinleştirilir. PC'deki ikinci sahip açılmaz.
 
 ```text
-systemctl enable --now zitar-production zitar-learning zitar-console zitar-gateway
+systemctl enable --now zitar-v3-data zitar-production zitar-learning zitar-console zitar-gateway
+systemctl enable --now zitar-v3.timer
 systemctl enable --now zitar-backup.timer
 ssh -N -L 8080:127.0.0.1:8080 USER@VPS_IP
 ```

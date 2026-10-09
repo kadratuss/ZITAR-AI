@@ -50,6 +50,21 @@ class HostingTests(unittest.TestCase):
         master['authorities']['real_order']=True
         (self.base/'zitar_master_portfolio_v1.json').write_text(json.dumps(master))
         with self.assertRaises(ValueError):check(self.base,self.root)
+
+    def test_legacy_adapter_exposes_reads_only(self):
+        from types import SimpleNamespace
+        from zitar_next.legacy_data import handler
+        class Original(BaseHTTPRequestHandler):
+            def log_message(self,*args):pass
+            def send_bytes(self,body,mime,status=200):
+                self.send_response(status);self.end_headers();self.wfile.write(body)
+            def do_GET(self):self.send_bytes(b'{"strategies":{}}','application/json')
+        server=self.server(lambda port:handler(SimpleNamespace(Handler=Original)))
+        origin='http://127.0.0.1:'+str(server.server_port)
+        with urlopen(origin+'/api/dashboard') as response:self.assertEqual(response.status,200)
+        for request in (Request(origin+'/api/chat-proxy/chat',data=b'{}',method='POST'),Request(origin+'/unknown')):
+            with self.assertRaises(HTTPError) as error:urlopen(request)
+            self.assertIn(error.exception.code,(404,405));error.exception.close()
     def test_backup_restore_preserves_registry_and_has_no_deletion(self):
         identity=Registry(self.root).propose(proposal(False))
         (self.base/'account.json').write_text('{"cash":"10000"}')
