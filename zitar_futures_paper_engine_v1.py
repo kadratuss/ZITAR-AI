@@ -122,11 +122,16 @@ def apply_cycle(state,market,ms,signal_interval_ms=3600000):
    value=number(p['margin'])+pnl(p,q['mark']);maintenance=number(p['quantity'])*number(q['mark'])*(number(POLICY['maintenance_rate'])+number(POLICY['liquidation_fee_rate']))
    if book.get('retired_ms') or book.get('reset_pending'):
     close_position(book,symbol,q,ms,'MODEL_LIQUIDATION' if value<=maintenance else ('USER_RESET' if book.get('reset_pending') else 'USER_STRATEGY_RETIRED'));closed_now.add((name,symbol));continue
+   from zitar_profit_lock_v1 import update as update_profit_lock
+   profit_hit=update_profit_lock(p,q,book.get('execution_policy',POLICY))
+   if profit_hit:
+    close_position(book,symbol,q,ms,'MODEL_LIQUIDATION' if value<=maintenance else 'PROFIT_LOCK_5PCT_80PCT');closed_now.add((name,symbol));continue
    if name in CONFLUENCE_NAMES or name in PIVOT_NAMES:
     if confluence_risk(book,symbol,q,ms,value,maintenance):closed_now.add((name,symbol))
     continue
    best=max(number(p.get('best_price',p['entry'])),number(q['mark'])) if p['direction']==1 else min(number(p.get('best_price',p['entry'])),number(q['mark']))
    stop=best*(1-number(POLICY['trailing_stop_price_pct'])*p['direction'])
+   if p.get('profit_lock_active'):stop=max(stop,number(p['profit_lock_stop'])) if p['direction']==1 else min(stop,number(p['profit_lock_stop']))
    p.update(best_price=str(best),trailing_stop=str(stop))
    hit=number(q['mark'])<=stop if p['direction']==1 else number(q['mark'])>=stop
    reason='MODEL_LIQUIDATION' if value<=maintenance else 'TRAILING_STOP_2PCT' if hit else None
