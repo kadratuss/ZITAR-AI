@@ -17,7 +17,7 @@ def blend(rule_action,ai_action,market,ai_weight):
     return 1 if score>=.5 else 2 if market=='futures' and score<=-.5 else 0
 
 
-def rule_map(snapshot,market):
+def rule_map(snapshot,market,rule_name=None):
     """Invoke exact pinned pure signal functions on each closed prefix."""
     result={};candles=[]
     for row in snapshot['records']:
@@ -28,7 +28,7 @@ def rule_map(snapshot,market):
         sig=signals(candles[-150:],opened+3600000)
         # Selected spot RSI14 roster is long below 30, otherwise flat.
         # Futures uses the explicit ZITAR_V1 hourly confluence reference.
-        d=sig['RSI14'] if market=='spot' else sig['ZITAR_V1']
+        d=sig[rule_name or ('RSI14' if market=='spot' else 'ZITAR_V1')]
         result[row['date']]=1 if d==1 else 2 if market=='futures' and d==-1 else 0
     return result
 
@@ -38,6 +38,32 @@ def choose(validation_results):
         raise ValueError('complete fixed validation grid required')
     # Fixed risk penalty and stable tie break; final test never enters selection.
     return max(WEIGHTS,key=lambda w:(validation_results[w]['return_pct']-.5*validation_results[w]['max_drawdown_pct'],-abs(w-.5)))
+
+
+def evaluate_combination(market,snapshot,parts,scaler,models,seeds,rule_name='RSI14'):
+    """Select on validation, then evaluate every arm on untouched test rows."""
+    from zitar_next.worker import env_for
+    from zitar_next.futures import evaluate
+    from zitar_next.paper import vote
+    rules=rule_map(snapshot,market,rule_name)
+    rule=lambda obs,row:rules[row['date']]
+    ai=lambda obs,row:vote(models,obs)
+    combined=lambda weight,fn:lambda obs,row:blend(rule(obs,row),fn(obs,row),market,weight)
+    validation={w:evaluate(env_for(market,parts['validation'],scaler),combined(w,ai)) for w in WEIGHTS}
+    weight=choose(validation)
+    policies=dict(zitar_hourly=rule,learned_ppo=ai,combined=combined(weight,ai))
+    test={name:evaluate(env_for(market,parts['test'],scaler),fn,trace=True) for name,fn in policies.items()}
+    stress={name:evaluate(env_for(market,parts['test'],scaler,True),fn) for name,fn in policies.items()}
+    seed_results=[]
+    for seed,model in zip(seeds,models):
+        fn=combined(weight,lambda obs,row,m=model:int(m.predict(obs,deterministic=True)[0]))
+        seed_results.append(dict(seed=seed,test=evaluate(env_for(market,parts['test'],scaler),fn),
+                                 stress=evaluate(env_for(market,parts['test'],scaler,True),fn)))
+    return dict(schema='ZITAR_AI_COMBINATION_V2',rule_name=rule_name,selected_ai_weight=weight,
+                validation=[dict(ai_weight=w,metrics=v) for w,v in validation.items()],test=test,stress=stress,
+                seed_results=seed_results,rule_sha256=digest(Path(__file__).with_name('vendor').joinpath('zitar_hourly_signals.py').read_text(encoding='utf-8')),
+                bridge_sha256=digest(Path(__file__).read_text(encoding='utf-8')),real_orders=False,
+                production_connected=False,scope='RSI14 hourly signal plus PPO, independent USDT paper account')
 
 
 def compare(root,run):
@@ -89,4 +115,3 @@ def main():
 
 if __name__=='__main__':
     main()
-

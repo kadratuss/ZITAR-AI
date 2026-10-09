@@ -7,6 +7,12 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from zitar_next.store import Registry,workspace
 
+def public_summary(value):
+    """Keep the console bounded; complete decision traces remain in run artifacts."""
+    if isinstance(value,dict):return {k:public_summary(v) for k,v in value.items() if k!='decisions'}
+    if isinstance(value,list):return [public_summary(v) for v in value]
+    return value
+
 
 def handler(root,port,history_root=None,prefix=""):
     from research_dashboard import ResearchStore
@@ -57,7 +63,7 @@ def handler(root,port,history_root=None,prefix=""):
                         status['stale']=not 0 <= age <= 660
                     market_path=root/'market_status.json'
                     markets=json.loads(market_path.read_text(encoding='utf-8')) if market_path.exists() else {}
-                    return self.send(200,dict(registry.all(),status=status,markets=markets,csrf=token,scope='NEXT_RESEARCH_ONLY',finrlx=reports(root),combinations=combinations(root)))
+                    return self.send(200,public_summary(dict(registry.all(),status=status,markets=markets,csrf=token,scope='NEXT_RESEARCH_ONLY',finrlx=reports(root),combinations=combinations(root))))
                 if self.path == '/api/summary':
                     from zitar_next.bridge import summary
                     return self.send(200,summary(root))
@@ -87,8 +93,9 @@ def main():
     parser.add_argument('--root',required=True)
     parser.add_argument('--history-root')
     parser.add_argument('--port',type=int,default=8768)
+    parser.add_argument('--prefix',default='')
     args = parser.parse_args()
-    server = ThreadingHTTPServer(('127.0.0.1',args.port),handler(args.root,args.port,args.history_root))
+    server = ThreadingHTTPServer(('127.0.0.1',args.port),handler(args.root,args.port,args.history_root,args.prefix))
     print('Next preview: http://127.0.0.1:'+str(args.port),flush=True)
     try:
         server.serve_forever()
@@ -100,4 +107,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

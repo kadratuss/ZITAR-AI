@@ -1,0 +1,27 @@
+[Unit]
+Description=ZITAR paper application supervisor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=zitar
+Group=zitar
+WorkingDirectory=/srv/zitar/runtime
+ExecStartPre=/srv/zitar/venv/bin/python -m zitar_next.hosting check --base /srv/zitar/runtime --next-root /srv/zitar/data/next
+ExecStart=/srv/zitar/venv/bin/python -B zitar_paper_supervisor_v1.py --base /srv/zitar/runtime --port 5020
+Restart=on-failure
+RestartSec=15
+KillMode=control-group
+Environment=PYTHONUNBUFFERED=1
+Environment=OMP_NUM_THREADS=1
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/zitar/runtime /srv/zitar/data
+MemoryHigh=2G
+MemoryMax=3G
+CPUQuota=75%
+
+[Install]
+WantedBy=multi-user.target

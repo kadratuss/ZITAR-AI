@@ -106,7 +106,7 @@ def walk_forward(root,market,snapshot,steps,seeds,test_start):
     first=len(ready)-3*width
     if first-202<300:
         return dict(folds=[],issues=['LONGER_WALK_FORWARD_HISTORY_REQUIRED'])
-    folds=[];issues=[]
+    folds=[];issues=[];combined_issues=[]
     for fold in range(3):
         start=first+fold*width
         train=ready[:start-202]
@@ -133,9 +133,14 @@ def walk_forward(root,market,snapshot,steps,seeds,test_start):
         long=evaluate(env_for(market,test,scaler),lambda obs,row:1)
         sma=evaluate(env_for(market,test,scaler),lambda obs,row:1 if row['sma']>row['sma50'] else (2 if market=='futures' else 0))
         issues.extend('WALK_FORWARD_'+v for v in assess(candidates+[ensemble],dict(cash=baseline,long=long,sma=sma),test))
+        from zitar_next.combination import evaluate_combination
+        combination=evaluate_combination(market,snapshot,dict(validation=validation,test=test),scaler,models,seeds)
+        combined_baselines=dict(cash=baseline,long=long,sma=sma,zitar=combination['test']['zitar_hourly'],ppo=combination['test']['learned_ppo'])
+        combined_ensemble=dict(test=combination['test']['combined'],stress=combination['stress']['combined'])
+        combined_issues.extend('COMBINED_WALK_FORWARD_'+v for v in assess(combination['seed_results']+[combined_ensemble],combined_baselines,test))
         folds.append(dict(train_end=train[-1]['date'],validation_start=validation[0]['date'],validation_end=validation[-1]['date'],
-                          test_start=test[0]['date'],test_end=test[-1]['date'],seeds=candidates,ensemble=ensemble,baselines=dict(cash=baseline,long=long,sma=sma)))
-    return dict(folds=folds,issues=sorted(set(issues)),selection='fixed policy and seeds; no best-fold or seed selection')
+                          test_start=test[0]['date'],test_end=test[-1]['date'],seeds=candidates,ensemble=ensemble,baselines=dict(cash=baseline,long=long,sma=sma),combination=combination))
+    return dict(folds=folds,issues=sorted(set(issues)),combined_issues=sorted(set(combined_issues)),selection='fixed policy and seeds; combination weights selected separately on each preceding validation window')
 
 
 def train_round(root,market,symbol,steps=2048,seeds=(42,73),snapshot=None):
@@ -150,6 +155,9 @@ def train_round(root,market,symbol,steps=2048,seeds=(42,73),snapshot=None):
     cursors = json.loads(state_path.read_text(encoding='utf-8')) if state_path.exists() else {}
     key = market+':'+symbol
     previous = cursors.get(key,{})
+    anchors_path=root/'heldout_anchors.json'
+    anchors=json.loads(anchors_path.read_text(encoding='utf-8')) if anchors_path.exists() else {}
+    previous_test_end=anchors.get(key,previous.get('test_end'))
     atomic(root/'status.json',dict(state='FETCHING',market=market,symbol=symbol,updated=stamp(),real_orders=False))
     snapshot = snapshot if snapshot is not None else fetch(market,symbol)
     if snapshot.get('market') != market or snapshot.get('interval') != '1h' or {r['tic'] for r in snapshot['records']} != {symbol}:
@@ -202,20 +210,24 @@ def train_round(root,market,symbol,steps=2048,seeds=(42,73),snapshot=None):
     ensemble_policy=lambda obs,row:vote(models,obs)
     ensemble=dict(test=evaluate(env_for(market,rows,scaler),ensemble_policy,trace=True),
                   stress=evaluate(env_for(market,rows,scaler,True),ensemble_policy))
-    issues = assess(results+[ensemble],baselines,rows,previous.get('test_end'))
+    from zitar_next.combination import evaluate_combination
+    combination=evaluate_combination(market,snapshot,parts,scaler,models,seeds)
+    ensemble=dict(test=combination['test']['combined'],stress=combination['stress']['combined'])
+    baselines.update(zitar_hourly=combination['test']['zitar_hourly'],learned_ppo=combination['test']['learned_ppo'])
+    issues = assess(combination['seed_results']+[ensemble],baselines,rows,previous_test_end)
     forward = walk_forward(root,market,snapshot,steps,seeds,rows[0]['date'])
-    issues = sorted(set(issues+forward['issues']))
+    issues = sorted(set(issues+forward.get('combined_issues',forward['issues'])))
     from zitar_next.finrl_pipeline import backtest
     finrlx = backtest(market,rows,ensemble['test']['decisions'],ensemble['test'])
     atomic(folder/'finrlx.json',finrlx)
-    hypothesis=dict(market=market,interval='1h',algorithm='PPO_MLP',
-                    claim='Learned hourly exposure improves net risk-controlled return versus cash, long and SMA',
+    hypothesis=dict(market=market,interval='1h',algorithm='PPO_ZITAR_RSI14',
+                    claim='Combined hourly exposure improves net risk-controlled return versus ZITAR RSI14, PPO, cash, long and SMA',
                     failure_criteria=POLICY,generated_rules=False)
     body = dict(schema='ZITAR_NEXT_PROPOSAL_V1',run=run_id,market=market,symbol=symbol,interval='1h',
                 hypothesis=hypothesis,hypothesis_id=digest(hypothesis),
                 leverage=3 if market=='futures' else 1,margin_mode='ISOLATED' if market=='futures' else 'SPOT',
                 sizing='10% equity collateral per isolated position' if market=='futures' else 'full equity long/flat',
-                strategy='PPO_MLP',seeds=list(seeds),snapshot_sha256=digest(snapshot),scaler_sha256=digest(scaler_data),split=parts['metadata'],
+                strategy='PPO_ZITAR_RSI14',combination=combination,seeds=list(seeds),snapshot_sha256=digest(snapshot),scaler_sha256=digest(scaler_data),split=parts['metadata'],
                 policy=POLICY,seed_results=results,ensemble=ensemble,baselines=baselines,walk_forward=forward,issues=issues,eligible=not issues,
                 finrlx=dict(backend=finrlx['backend'],upstream_commit=finrlx['upstream_commit'],
                             report_sha256=digest(finrlx),weight_backtest=finrlx['weight_backtest'],
@@ -228,6 +240,10 @@ def train_round(root,market,symbol,steps=2048,seeds=(42,73),snapshot=None):
                              'all seeds are one candidate family; no best-seed selection'])
     identity = Registry(root).propose(body)
     atomic(folder/'report.json',dict(body,proposal_id=identity))
+    combination=dict(combination,run=run_id,market=market,symbol=symbol,updated=stamp(),eligible=not issues,issues=issues,source_proposal=identity,snapshot_sha256=body['snapshot_sha256'])
+    combined_folder=root/'combination_reports';combined_folder.mkdir(exist_ok=True)
+    if combined_folder.is_symlink():raise ValueError('combination report symlink rejected')
+    atomic(combined_folder/(run_id+'.json'),combination)
     finrlx.update(run=run_id,proposal_id=identity,snapshot_sha256=body['snapshot_sha256'],eligible=not issues,issues=issues)
     report_folder=root/'finrlx_reports'
     report_folder.mkdir(exist_ok=True)
@@ -236,6 +252,9 @@ def train_round(root,market,symbol,steps=2048,seeds=(42,73),snapshot=None):
     atomic(report_folder/(run_id+'.json'),finrlx)
     cursors[key] = dict(cutoff=cutoff,test_end=rows[-1]['date'],record_hashes={r['date']:digest(r) for r in snapshot['records']})
     atomic(state_path,cursors)
+    # Overlapping exploratory rounds must not keep moving the fresh-test boundary.
+    anchors[key]=rows[-1]['date'] if not previous_test_end or rows[0]['date']>previous_test_end else previous_test_end
+    atomic(anchors_path,anchors)
     atomic(root/'status.json',dict(status,state='COMPLETED',updated=stamp(),proposal=identity,issues=issues,eligible=not issues))
     from zitar_next.bridge import summary
     atomic(root/'next_summary.json',summary(root))
@@ -281,4 +300,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

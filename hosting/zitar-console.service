@@ -1,0 +1,20 @@
+[Unit]
+Description=ZITAR learning console
+After=network-online.target
+
+[Service]
+User=zitar
+Group=zitar
+WorkingDirectory=/srv/zitar/runtime
+ExecStart=/srv/zitar/venv/bin/python -B -m zitar_next.dashboard --root /srv/zitar/data/next --port 8768 --prefix /zitar-next
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/zitar/data/next
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target

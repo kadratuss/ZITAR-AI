@@ -23,6 +23,13 @@ def approved(root,market,symbol):
     if item['state']!='ACTIVE_PAPER' or item['body'].get('eligible') is not True:
         raise ValueError('approved active paper proposal required')
     body=item['body']
+    combination=body.get('combination')
+    if combination:
+        from zitar_next import combination as bridge
+        from pathlib import Path
+        if (combination['bridge_sha256']!=digest(Path(bridge.__file__).read_text(encoding='utf-8')) or
+            combination['rule_sha256']!=digest(Path(bridge.__file__).with_name('vendor').joinpath('zitar_hourly_signals.py').read_text(encoding='utf-8'))):
+            raise ValueError('approved combination code changed; new approval required')
     run=body['run']
     if not re.fullmatch('(spot|futures)-[a-f0-9]{32}',run):
         raise ValueError('invalid run identity')
@@ -52,6 +59,15 @@ def vote(models,observation):
     return actions[0] if len(set(actions))==1 else 0
 
 
+def decision(body,models,observation,row,rules):
+    action=vote(models,observation)
+    combination=body.get('combination')
+    if combination:
+        from zitar_next.combination import blend
+        action=blend(rules[row['date']],action,body['market'],combination['selected_ai_weight'])
+    return action
+
+
 def tick(root,market,symbol,snapshot):
     root=workspace(root)
     if snapshot['market']!=market or snapshot['interval']!='1h' or {r['tic'] for r in snapshot['records']}!={symbol}:
@@ -60,6 +76,9 @@ def tick(root,market,symbol,snapshot):
     if selected is None:
         return dict(state='WAITING_HUMAN_APPROVAL',market=market,real_orders=False)
     item,scaler,models=selected
+    body=item.get('body',dict(market=market))
+    from zitar_next.combination import rule_map
+    rules=rule_map(snapshot,market,body.get('combination',{}).get('rule_name')) if body.get('combination') else {}
     featured=add_indicators(snapshot['records'],as_of_ms=snapshot['server_time_ms'])
     if not featured[-1]['features_ready']:
         raise ValueError('features not ready')
@@ -93,14 +112,14 @@ def tick(root,market,symbol,snapshot):
             p=account.position if market=='futures' else None
             position=p['direction']*p['qty']*mark/equity if p and equity else (account.qty*mark/equity if market=='spot' and equity else 0.)
             observation=np.concatenate((scaler.transform(row),np.clip([account.cash/max(equity,1e-12),position],-10,10).astype(np.float32)))
-            next_action=vote(models,observation)
+            next_action=decision(body,models,observation,row,rules)
             state['events'].append(dict(date=row['date'],event='SIMULATED_AFTER_CLOSE',action=state['pending'],fills=account.trades-before,equity=equity,next_action=next_action))
             state['pending']=next_action
         state['events']=state['events'][-500:]
     else:
         row=featured[-1]
         observation=np.concatenate((scaler.transform(row),np.asarray([1.,0.],dtype=np.float32)))
-        state=dict(proposal=item['id'],market=market,symbol=symbol,interval='1h',pending=vote(models,observation),events=[],
+        state=dict(proposal=item['id'],market=market,symbol=symbol,interval='1h',pending=decision(body,models,observation,row,rules),events=[],
                    started=stamp(),mode='SHADOW_AFTER_CLOSE_NO_BROKER',real_orders=False)
         fresh=[]
     last=featured[-1]
