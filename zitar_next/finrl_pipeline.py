@@ -73,8 +73,8 @@ def backtest(market, rows, decisions, authoritative):
                              'No daily stock annualization; cash leg prevents short/partial exposure normalization.'])
 
 
-def replay(root, run):
-    """Read immutable trained artifacts, produce a separate research report."""
+def load_run(root, run):
+    """Hash-verified offline model loading; grants no execution authority."""
     root=workspace(root)
     if not re.fullmatch(r'(spot|futures)-[a-f0-9]{32}',run):
         raise ValueError('invalid run')
@@ -102,6 +102,17 @@ def replay(root, run):
             raise ValueError('model hash mismatch')
         models.append(PPO.load(str(path),device='cpu'))
     scaler=TrainScaler();scaler.mean=np.asarray(scaler_data['mean']);scaler.scale=np.asarray(scaler_data['scale'])
+    return report,snapshot,scaler,models
+
+
+def replay(root, run):
+    """Read immutable trained artifacts, produce a separate research report."""
+    root=workspace(root)
+    report,snapshot,scaler,models=load_run(root,run)
+    from online_research_pipeline import prepare
+    from zitar_next.worker import env_for
+    from zitar_next.futures import evaluate
+    from zitar_next.paper import vote
     rows=prepare(snapshot)['test']
     metric=evaluate(env_for(report['market'],rows,scaler),lambda obs,row:vote(models,obs),trace=True)
     result=backtest(report['market'],rows,metric['decisions'],metric)
