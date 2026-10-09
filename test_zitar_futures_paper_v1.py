@@ -24,7 +24,7 @@ class FuturesPaperTests(unittest.TestCase):
    apply_cycle(self.s,{'BTCUSDT':dict(quote=q,funding=[],candles=[],contract=self.c)},self.t+offset)
   tick(110,1);stop=self.b['positions']['BTCUSDT']['trailing_stop'];tick(109,2)
   self.assertEqual(stop,self.b['positions']['BTCUSDT']['trailing_stop']);tick(107,3)
-  self.assertFalse(self.b['positions']);self.assertEqual(self.b['closed'][0]['exit_reason'],'TRAILING_STOP_2PCT')
+  self.assertFalse(self.b['positions']);self.assertEqual(self.b['closed'][0]['exit_reason'],'PROFIT_LOCK_5PCT_80PCT')
  def test_stale_price_cannot_close(self):
   open_position(self.b,'BTCUSDT',1,self.q,self.c,self.t,'test')
   apply_cycle(self.s,{'BTCUSDT':dict(quote=dict(self.q,mark='1'),candles=[],funding=[],contract=self.c)},self.t+31000)
