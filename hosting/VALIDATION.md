@@ -1,6 +1,6 @@
 # Yerel kabul sonuçları — 9 Ekim 2026
 
-- 142 unittest testi geçti: eğitim, registry onayı, paper yürütme, veri,
+- 149 unittest testi geçti: eğitim, registry onayı, paper yürütme, veri,
   FinRL-X, birleştirme, gateway, yedekten registry dönüşü ve vadeli kâr stopu.
 - Gerçek Binance BTCUSDT saatlik spot ve vadeli snapshot'larıyla iki PPO
   tohumu, 2048 eğitim adımı ve üç ayrı önceki walk-forward penceresi çalıştı.
@@ -30,7 +30,7 @@ okuma adaptörüyle bağlantı yeniden sağlandı ve üç stratejili V3 dashboar
 cevabı doğrulandı. POST ve diğer yollar adapter tarafından reddedilir.
 Saatlik Windows V3 görevinin Linux timer karşılığı da pakete eklendi.
 
-Python bağımlılık kontrolü başarılı. KVM2 henüz satın alınmadı. Linux servis
+Python bağımlılık kontrolü başarılı. KVM4 henüz satın alınmadı. Linux servis
 başlatma/reboot, gerçek kaynak yükü, Ollama 7B performansı, veri bölgesi erişimi,
 24 saat koşusu ve sunucudaki yedekten servis dönüşü henüz doğrulanmadı.
 Gerçek emir bağlantısı yoktur; bu paket o bağlantıyı eklemez.

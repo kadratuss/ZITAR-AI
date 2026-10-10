@@ -33,7 +33,7 @@ def build(workspace,production,output):
     copy(production);copy(workspace,True)
     for source in sorted(target.rglob('*')):
         if source.is_file():inventory.append(dict(path=source.relative_to(output).as_posix(),sha256=hashlib.sha256(source.read_bytes()).hexdigest(),bytes=source.stat().st_size))
-    manifest=dict(schema='ZITAR_HOSTING_CODE_BUNDLE_V1',target='Hostinger KVM2 / Ubuntu 24.04',files=inventory,
+    manifest=dict(schema='ZITAR_HOSTING_CODE_BUNDLE_V1',target='Hostinger KVM4 / Ubuntu 24.04',files=inventory,
                   contains_account_state=False,contains_databases=False,contains_secrets_files=False,real_orders=False,
                   installation_status='PREPARED_NOT_DEPLOYED',linux_runtime_validated=False)
     (output/'manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')

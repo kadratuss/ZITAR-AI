@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import tarfile
+import shutil
 from datetime import datetime,timezone
 from pathlib import Path
 from zitar_next.store import workspace
@@ -36,7 +37,11 @@ def backup(base,next_root,output):
     filename='zitar-'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')+'.tar.gz'
     path=output/filename
     skipped=('.git','.venv','venv','__pycache__','.cache','.research-venv')
-    with tarfile.open(path,'x:gz') as archive:
+    needed=sum(f.stat().st_size for root in (base,next_root) for f in root.rglob('*') if f.is_file() and not f.is_symlink() and not any(p in skipped for p in f.relative_to(root).parts))
+    if shutil.disk_usage(output).free < needed + 2*1024**3:
+        raise ValueError('insufficient backup space: source size plus 2 GiB reserve required')
+    partial=path.with_suffix(path.suffix+'.partial')
+    with tarfile.open(partial,'x:gz') as archive:
         for root,label in ((base,'runtime'),(next_root,'next')):
             for file in sorted(root.rglob('*')):
                 relative=file.relative_to(root)
@@ -46,7 +51,13 @@ def backup(base,next_root,output):
                 if not file.is_file():continue
                 if '.env' in file.name or any(word in file.name.lower() for word in ('credential','secret','api_key')):continue
                 archive.add(file,arcname=str(Path(label)/relative),recursive=False)
-    path.chmod(0o600)
+    partial.chmod(0o600)
+    with tarfile.open(partial,'r:gz') as archive:
+        for member in archive:
+            if member.isfile():
+                stream=archive.extractfile(member)
+                while stream.read(1024*1024):pass
+    partial.replace(path)
     with path.open('rb') as stream:checksum=hashlib.file_digest(stream,'sha256').hexdigest()
     path.with_suffix(path.suffix+'.sha256').write_text(checksum+'  '+filename+'\n',encoding='utf-8')
     return dict(path=str(path),sha256=checksum,automatic_deletion=False)

@@ -2,7 +2,7 @@
 Description=Daily ZITAR backup
 
 [Timer]
-OnCalendar=*-*-* 03:30:00
+OnCalendar=*-*-* 03:30:00 Europe/Istanbul
 Persistent=true
 RandomizedDelaySec=300
 

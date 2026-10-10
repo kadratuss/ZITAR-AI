@@ -1,0 +1,6 @@
+[Unit]
+Description=Record ZITAR backup failure for operator monitoring
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'mkdir -p /srv/zitar/backups; date -u > /srv/zitar/backups/BACKUP_FAILED; logger -p user.err "ZITAR backup failed: inspect zitar-backup.service"'

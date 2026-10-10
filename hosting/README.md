@@ -1,4 +1,4 @@
-# ZİTAR — Hostinger KVM2 geçiş paketi
+# ZİTAR — Hostinger KVM4 geçiş paketi
 
 Hedef: Ubuntu 24.04, Python 3.12, aynı sunucuda mevcut ZİTAR paper motoru,
 RSI14 + PPO birleşik öğrenme, FinRL-X raporları ve tek dashboard girişi.
@@ -26,9 +26,9 @@ penceresi, maliyet stresi ve RSI14/PPO/nakit/SMA karşılaştırmaları vardır.
 Yeni bağımsız test penceresi birikmesi zaman alır; saatlik eğitim bu şartı
 ortadan kaldırmaz. Başarılı yatırım stratejisi elde edildiği henüz kanıtlanmadı.
 
-## KVM2 kaynak planı
+## KVM4 kaynak planı
 
-Hostinger KVM2: 2 vCPU, 8 GB RAM, 100 GB NVMe. Kaynak bilgisi:
+Hostinger KVM4: 4 vCPU, 16 GB RAM, 200 GB NVMe. Kaynak bilgisi:
 https://www.hostinger.com/vps/ubuntu-hosting
 Öğrenme tek iş parçacığı ve %50 CPU sınırıyla çalışır; paper motoru önceliklidir.
 Bu bir kapasite garantisi değildir. Gerçek VPS'te bellek/CPU, veri erişimi,
@@ -36,7 +36,7 @@ yeniden başlatma ve saatlik eğitim süresi ölçülecektir.
 
 Mevcut sohbet modeli `qwen2.5:7b` olarak korunur. Ollama ayrı kurulur;
 `ollama-kvm2.conf` tek istek, küçük context ve yanıt sonrası bellek boşaltma
-ayarları içerir. 7B model + öğrenme aynı anda 8 GB için sıkışabilir. Yük testinde
+ayarları içerir. 7B model + öğrenme için 16 GB hedeflenir. Yük testinde
 kararlılık sağlanamazsa aynı modeli korumak için daha büyük VPS gerekir veya
 senin seçiminle daha küçük sohbet modeli denenir. Model sessizce değiştirilmez.
 https://docs.ollama.com/faq
@@ -79,7 +79,7 @@ python -m zitar_next.hosting backup --base SOURCE_ZITAR --next-root SOURCE_NEXT 
 ```text
 systemctl enable --now zitar-v3-data zitar-production zitar-learning zitar-console zitar-gateway
 systemctl enable --now zitar-v3.timer
-systemctl enable --now zitar-backup.timer
+systemctl enable --now zitar-backup.timer zitar-backup-monitor.timer
 ssh -N -L 8080:127.0.0.1:8080 USER@VPS_IP
 ```
 
@@ -89,13 +89,4 @@ ve HTTPS ayrıca kurulup test edilir. SSH tüneli mevcut hazırlığın erişim 
 
 ## Yedekleme ve geri dönüş
 
-Günlük timer 03:30'da motorları kısa süre durdurur, hesap/registry/model
-görüntüsü ve checksum alır, hata olsa da servisleri yeniden başlatır.
-SQLite dahil çok dosyalı durum çalışırken kopyalanmaz.
-Yedekten boş klasöre geri açma ve registry bütünlüğü unittest ile doğrulandı.
-Otomatik arşiv silme yoktur. 100 GB disk için saklama süresi ve dış sunucu
-yedeği kurulumda belirlenmelidir; model ve onay kanıtları gelişigüzel silinmez.
-
-Sunucuda yeniden başlatma, 24 saat çalışma, disk doluluğu, Ollama yanıt süresi,
-Binance erişimi, veri kesintisi, tek sahip ve yedekten gerçek servis geri dönüşü
-başarılı olmadan "hosting geçişi tamamlandı" denmez. Gerçek emirler kapalıdır.
+Güncel yedekleme, şifreli dış kopya ve güvenli saklama politikası BACKUP_POLICY.md içindedir. Dış hedef bağlantısı ve gerçek sunucuda geri yükleme testi tamamlanmadan geçiş kabul edilmez. Gerçek emirler kapalıdır.

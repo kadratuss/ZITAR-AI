@@ -1,5 +1,6 @@
 [Unit]
 Description=Quiesced ZITAR snapshot with recovery restart
+OnFailure=zitar-backup-alert.service
 
 [Service]
 Type=oneshot
