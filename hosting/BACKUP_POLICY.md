@@ -1,6 +1,6 @@
 # KVM4 yedekleme ve kabul şartları
 
-Hedef KVM4: 4 vCPU, 16 GB RAM, 200 GB NVMe. Gerçek sunucu yük testi bekliyor.
+Hedef KVM4: 4 vCPU, 16 GB RAM, 200 GB NVMe. Sunucu kuruldu; uzun çalışma kabulü sürüyor.
 
 Günlük yedek 03:30 İstanbul saatinde alınır. Aynı anda ikinci yedek çalışamaz.
 Kaynak boyutu + 2 GiB boş alan yoksa başlamaz. Motorlar tutarlı görüntü için
@@ -25,8 +25,9 @@ ZITAR_RCLONE_CONFIG='/etc/zitar/rclone.conf'
 Bağlantı yoksa servis başarı bildirmez, eski yedekleri silmez.
 Yedi yerel kopya tutulur; yalnızca doğrulanmış dış kopya makbuzu olan eski
 arşivler temizlenir. Başarısız/eksik yedekler otomatik silinmez.
-Dış depolamada otomatik silme henüz yoktur; kapasite ve saklama süresi hedef
-seçilince belirlenmelidir. Geçmiş veriler / modeller kaynakta bu işlemle silinmez.
+Dış depolamada da yedi kopya tutulur; yalnızca ayrı şifreli yedek klasöründe,
+yeni kopya tamamen doğrulandıktan sonra eski kopyalar temizlenir.
+Geçmiş veriler / modeller kaynakta bu işlemle silinmez.
 Disk ihtiyacı yaklaşık: uygulama/veri + 7 sıkıştırılmış yedek + yeni yedek alanı.
 
 Başarısızlık systemd journal ve BACKUP_FAILED dosyasına yazılır; başarı zamanı
@@ -34,6 +35,11 @@ BACKUP_LAST_SUCCESS dosyasında tutulur. Bunlar kayıt mekanizmasıdır;
 telefona/e-postaya bildirim henüz bağlı değildir. Sunucu izleyicisi disk %80,
 başarısız servis ve 26 saatten eski başarı durumunda bildirim vermelidir.
 Bu izleyici ve bildirim hedefi kurulmadan gözetimsiz üretim kabulü verilmez.
+
+10 Ekim: Google Drive drive.file/crypt bağlantısı, günlük yedek timer'ı ve
+15 dakikalık yerel kontrol etkin. Gerçek dış arşiv ayrı alana indirilip açıldı;
+SHA256, 35 SQLite ve 29 model arşivi bütünlük kontrolü geçti. Dış bildirim
+kanalı ve özel ayarlarla tam servis geri dönüşü hâlâ ayrı kabul şartıdır.
 
 ## Geri yükleme ve gerçek emir güvenliği
 

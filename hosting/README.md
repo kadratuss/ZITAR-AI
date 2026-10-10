@@ -2,6 +2,13 @@
 
 Hedef: Ubuntu 24.04, Python 3.12, aynı sunucuda mevcut ZİTAR paper motoru,
 RSI14 + PPO birleşik öğrenme, FinRL-X raporları ve tek dashboard girişi.
+
+10 Ekim güncel durum: KVM4'e kod/durum aktarıldı, sunucu servisleri etkin,
+PC işlem sahipleri kapalı. Telefon salt okunur Tailscale HTTPS kullanıyor.
+Günlük şifreli Google Drive yedeği ve ayrı alanda gerçek geri dönüş doğrulandı.
+Güncel kabul/sınırlamalar SERVER_ACCEPTANCE.md ve AI_ROADMAP.md içindedir.
+Aşağıdaki yeni kurulum prosedürü mevcut hesapları tekrar aktarmak/sıfırlamak
+için uygulanmaz.
 Bu paket henüz sunucuya kurulmuş değildir. Linux ve kaynak yükü kabul testleri,
 sunucu satın alınıp SSH bağlantısı sağlandığında yapılacaktır.
 
@@ -48,8 +55,7 @@ https://docs.ollama.com/faq
    bağımlılıkları ve servis tanımlarını hazırlar; servisleri başlatmaz.
 2. PC'deki sahip süreçler, mevcut denetleyiciler, Windows'taki
    `PortfolioAI_MultiStrategy_Live` görevi ve Next worker kontrollü
-   durdurulur. Bu adım sunucu hazır olduğunda yapılır. Şimdilik çalışan PC
-   hesapları taşınmadı ve durdurulmadı.
+   durdurulur. Mevcut KVM4 geçişinde bu adım ve durum aktarımı tamamlandı.
 3. Durdurulmuş kaynak üzerinde aşağıdaki komutla tutarlı hesap/DB/model
    görüntüsü alınır. Komut kilitli motor tespit ederse işlemi reddeder.
    Bu özel yedek yalnızca SSH üzerinden aktarılır; GitHub'a eklenmez.

@@ -1,6 +1,7 @@
 """Single loopback entrance for production paper UI and Next research console."""
 import argparse
 import json
+from pathlib import Path
 from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
 from urllib.error import HTTPError
 from urllib.request import Request,build_opener,HTTPRedirectHandler
@@ -8,7 +9,7 @@ from urllib.request import Request,build_opener,HTTPRedirectHandler
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self,*args):return None
 
-def handler(port=8080,production_port=5020,research_port=8768):
+def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv/zitar/data/next/studies/20261010-v1/forward-status.json',filter_root='/srv/zitar/data/next/entry_filter_studies/20261010-v2'):
     class Gateway(BaseHTTPRequestHandler):
         def log_message(self,*args):pass
         def reply(self,status,raw,mime='application/json'):
@@ -23,6 +24,32 @@ def handler(port=8080,production_port=5020,research_port=8768):
             if self.command=='POST' and self.headers.get('Origin')!='http://'+host:
                 return self.reply(403,b'{"error":"ORIGIN_REJECTED"}')
             path=self.path
+            if path=='/api/entry-filter':
+                if self.command!='GET':
+                    return self.reply(405,b'{"error":"READ_ONLY"}')
+                try:
+                    folder=Path(filter_root)
+                    if folder.is_symlink():raise ValueError('symlink')
+                    status=folder/'status.json'
+                    if status.is_symlink():raise ValueError('symlink')
+                    data=json.loads(status.read_text(encoding='utf-8'))
+                    if data.get('state')=='COMPLETE':
+                        summary=folder/'summary.json'
+                        if summary.is_symlink():raise ValueError('symlink')
+                        data=json.loads(summary.read_text(encoding='utf-8'))
+                    return self.reply(200,json.dumps(data,ensure_ascii=False).encode('utf-8'))
+                except (OSError,ValueError):
+                    return self.reply(503,b'{"error":"FILTER_STATUS_UNAVAILABLE"}')
+            if path=='/api/forward-study':
+                if self.command!='GET':
+                    return self.reply(405,b'{"error":"READ_ONLY"}')
+                try:
+                    source=Path(study_status)
+                    if source.is_symlink():raise ValueError('symlink')
+                    data=json.loads(source.read_text(encoding='utf-8'))
+                    return self.reply(200,json.dumps(data,ensure_ascii=False).encode('utf-8'))
+                except (OSError,ValueError):
+                    return self.reply(503,b'{"error":"STUDY_STATUS_UNAVAILABLE"}')
             if path=='/zitar-next':
                 self.send_response(302);self.send_header('Location','/zitar-next/');self.end_headers();return
             next_panel=path.startswith('/zitar-next/')
@@ -49,8 +76,8 @@ def handler(port=8080,production_port=5020,research_port=8768):
                 if status==200 and 'text/html' in mime and next_panel:
                     raw=raw.replace(b'data-next-base=""',b'data-next-base="/zitar-next"')
                 if status==200 and 'text/html' in mime and not next_panel and path=='/':
-                    link='<a href="/zitar-next/" style="display:block;padding:12px;color:#5eead4;background:#101827">Araştırma ve öğrenme · ZİTAR Next</a>'
-                    raw=raw.replace(b'</body>',link.encode('utf-8')+b'</body>')
+                    integration=Path(__file__).with_name('proposal_menu.html').read_bytes()
+                    raw=raw.replace(b'</body>',integration+b'</body>')
                 self.reply(status,raw,mime)
             except (ValueError,OSError):self.reply(503,b'{"error":"UPSTREAM_UNAVAILABLE"}')
         do_GET=proxy

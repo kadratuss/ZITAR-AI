@@ -616,4 +616,3 @@ def run_multiple_backtests(strategies: List, price_data: pd.DataFrame,
     return results
 
 
-

@@ -58,5 +58,26 @@ class BackupGuardTests(unittest.TestCase):
         with patch('zitar_next.hosting.assert_stopped'),patch('zitar_next.hosting.shutil.disk_usage',return_value=SimpleNamespace(free=0)):
             with self.assertRaises(ValueError):backup(base,root,self.root/'out')
         self.assertFalse(list((self.root/'out').glob('*.tar.gz')))
+    def test_cloud_shortage_never_deletes(self):
+        self.archive(0);calls=[]
+        def run(args,**kwargs):
+            calls.append(args)
+            return SimpleNamespace(stdout=b'{"free":0}' if 'about' in args else b'type = crypt')
+        with self.assertRaises(ValueError):deliver(self.root,'zitarcrypt:daily','private',runner=run,cloud_keep=7)
+        self.assertFalse(any('deletefile' in c or 'copyto' in c for c in calls))
+    def test_remote_retention_is_scoped_and_follows_verification(self):
+        source=self.archive(0);latest=self.root/'zitar-20261010T200000000000Z.tar.gz'
+        source.rename(latest);source.with_suffix('.gz.sha256').rename(latest.with_suffix('.gz.sha256'))
+        old='zitar-20261001T200000000000Z.tar.gz';calls=[]
+        def run(args,**kwargs):
+            calls.append(args)
+            if 'about' in args:return SimpleNamespace(stdout=b'{"free":99999999999}')
+            if 'lsjson' in args:return SimpleNamespace(stdout=json.dumps([{'Name':old},{'Name':'personal.doc'},{'Name':'zitar-20261009T200000000000Z.tar.gz'},{'Name':latest.name}]).encode())
+            return SimpleNamespace(stdout=b'type = crypt')
+        deliver(self.root,'zitarcrypt:daily','private',runner=run,cloud_keep=2)
+        deletes=[c for c in calls if 'deletefile' in c]
+        self.assertEqual(len(deletes),2)
+        self.assertTrue(all(old in ' '.join(c) and 'personal.doc' not in c for c in deletes))
+        self.assertLess(next(i for i,c in enumerate(calls) if 'check' in c),next(i for i,c in enumerate(calls) if 'deletefile' in c))
 
 if __name__=='__main__':unittest.main()

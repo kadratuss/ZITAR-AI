@@ -51,6 +51,18 @@ class HostingTests(unittest.TestCase):
         (self.base/'zitar_master_portfolio_v1.json').write_text(json.dumps(master))
         with self.assertRaises(ValueError):check(self.base,self.root)
 
+    def test_entry_filter_report_is_read_only_and_cannot_be_redirected(self):
+        folder=Path(self.temp.name)/'filter';folder.mkdir()
+        (folder/'status.json').write_text(json.dumps(dict(state='COMPLETE')))
+        (folder/'summary.json').write_text(json.dumps(dict(state='COMPLETE',real_orders=False)))
+        entrance=self.server(lambda port:gateway(port,filter_root=folder))
+        origin='http://127.0.0.1:'+str(entrance.server_port)
+        with urlopen(origin+'/api/entry-filter') as response:
+            self.assertFalse(json.load(response)['real_orders'])
+        request=Request(origin+'/api/entry-filter',data=b'{}',headers={'Origin':origin},method='POST')
+        with self.assertRaises(HTTPError) as error:urlopen(request)
+        self.assertEqual(error.exception.code,405);error.exception.close()
+
     def test_legacy_adapter_exposes_reads_only(self):
         from types import SimpleNamespace
         from zitar_next.legacy_data import handler

@@ -147,4 +147,3 @@ python -m unittest -q test_zitar_next test_research_dashboard test_online_resear
 
 This tests the standalone research stack, not the complete production ZİTAR.
 Model files, source snapshots, registry DB and mutable state are not committed.
-

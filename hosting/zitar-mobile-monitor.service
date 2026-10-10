@@ -1,0 +1,20 @@
+[Unit]
+Description=ZITAR private read-only mobile monitor
+After=zitar-gateway.service
+Wants=zitar-gateway.service
+
+[Service]
+User=zitar
+Group=zitar
+WorkingDirectory=/srv/zitar/runtime
+ExecStart=/srv/zitar/venv/bin/python -B -m zitar_next.mobile_monitor
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+MemoryMax=128M
+
+[Install]
+WantedBy=multi-user.target

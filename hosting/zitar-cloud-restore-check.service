@@ -1,0 +1,17 @@
+[Unit]
+Description=Isolated recovery acceptance from encrypted Google Drive backup
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/zitar/runtime
+ExecStart=/srv/zitar/venv/bin/python -m hosting.cloud_restore_check
+TimeoutStartSec=3600
+CPUQuota=50%
+MemoryMax=2G
+Nice=15
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/zitar/restore-tests
+PrivateTmp=true

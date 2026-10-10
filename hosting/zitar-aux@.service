@@ -1,0 +1,18 @@
+[Unit]
+Description=ZITAR guarded paper auxiliary task %i
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=zitar
+Group=zitar
+WorkingDirectory=/srv/zitar/runtime
+ExecStart=/srv/zitar/venv/bin/python -B -m zitar_next.auxiliary %i
+TimeoutStartSec=1900
+KillMode=control-group
+MemoryMax=1G
+CPUQuota=25%
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/zitar/runtime

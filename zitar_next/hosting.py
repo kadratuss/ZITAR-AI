@@ -4,6 +4,7 @@ import hashlib
 import json
 import tarfile
 import shutil
+import os
 from datetime import datetime,timezone
 from pathlib import Path
 from zitar_next.store import workspace
@@ -37,13 +38,20 @@ def backup(base,next_root,output):
     filename='zitar-'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')+'.tar.gz'
     path=output/filename
     skipped=('.git','.venv','venv','__pycache__','.cache','.research-venv')
-    needed=sum(f.stat().st_size for root in (base,next_root) for f in root.rglob('*') if f.is_file() and not f.is_symlink() and not any(p in skipped for p in f.relative_to(root).parts))
+    def files(root):
+        for directory,dirs,names in os.walk(root):
+            dirs[:]=[name for name in dirs if name not in skipped and not name.endswith('venv') and not Path(directory,name).is_symlink()]
+            for name in dirs:yield Path(directory,name)
+            for name in names:
+                path=Path(directory,name)
+                if path.is_file() and not path.is_symlink():yield path
+    needed=sum(f.stat().st_size for root in (base,next_root) for f in files(root) if f.is_file())
     if shutil.disk_usage(output).free < needed + 2*1024**3:
         raise ValueError('insufficient backup space: source size plus 2 GiB reserve required')
     partial=path.with_suffix(path.suffix+'.partial')
     with tarfile.open(partial,'x:gz') as archive:
         for root,label in ((base,'runtime'),(next_root,'next')):
-            for file in sorted(root.rglob('*')):
+            for file in files(root):
                 relative=file.relative_to(root)
                 if any(part in skipped for part in relative.parts) or file.is_symlink():continue
                 if file.is_dir():
@@ -52,7 +60,7 @@ def backup(base,next_root,output):
                 if '.env' in file.name or any(word in file.name.lower() for word in ('credential','secret','api_key')):continue
                 archive.add(file,arcname=str(Path(label)/relative),recursive=False)
     partial.chmod(0o600)
-    with tarfile.open(partial,'r:gz') as archive:
+    with tarfile.open(partial,'r|gz') as archive:
         for member in archive:
             if member.isfile():
                 stream=archive.extractfile(member)

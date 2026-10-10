@@ -49,4 +49,3 @@ Next development: fresh disjoint comparison windows, earlier walk-forward
 selection of the combiner, wider strategy diversity and symbols, then full
 isolated runtime integration with an explicitly captured roster/configuration.
 The currently running ZITAR must remain untouched until that evidence is reviewed.
-

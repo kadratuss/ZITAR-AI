@@ -27,4 +27,3 @@ def signals(candles,ms,interval_ms=3600000):
  return {'SMA20_50':sma,'EMA12_26':em,'RSI14':rs,'BASELINE':baseline,'ZITAR_V1':candidate,'candle_close_ms':int(rows[-1][6]),'rsi_simple':str(rsi)}
 
 
-
