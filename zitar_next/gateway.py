@@ -18,7 +18,8 @@ def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv
             self.send_response(status)
             for k,v in [('Content-Type',mime),('Content-Length',str(len(raw))),('Cache-Control','no-store'),
                         ('X-Content-Type-Options','nosniff'),('X-Frame-Options','DENY')]:self.send_header(k,v)
-            self.end_headers();self.wfile.write(raw)
+            try:self.end_headers();self.wfile.write(raw)
+            except (BrokenPipeError,ConnectionResetError):pass
         def proxy(self):
             host=f'127.0.0.1:{port}'
             if self.headers.get('Host')!=host:
@@ -91,7 +92,8 @@ def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv
                     if key in self.headers:headers[key]=self.headers[key]
                 if self.command=='POST':headers['Origin']=f'http://127.0.0.1:{upstream}'
                 request=Request(f'http://127.0.0.1:{upstream}'+path,data=body,headers=headers,method=self.command)
-                try:response=build_opener(NoRedirect()).open(request,timeout=30)
+                timeout=240 if self.command=='POST' and path=='/api/chat-proxy/chat' else 30
+                try:response=build_opener(NoRedirect()).open(request,timeout=timeout)
                 except HTTPError as exc:response=exc
                 with response:
                     raw=response.read(20000001);status=response.code;mime=response.headers.get('Content-Type','application/json')
