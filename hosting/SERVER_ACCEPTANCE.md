@@ -15,12 +15,16 @@ arşivi ayrı alana indirilip açıldı: SHA256, 35 SQLite bütünlük kontrolü
 Özel bağlantı ayarları, venv ve işletim sistemi bu arşiv dışındadır.
 
 Dört BTC/ETH spot/vadeli, bir yıllık saatlik giriş filtresi deneyi tamamlandı;
-hiçbiri uygun değil. Sonuçlar Strateji önerileri menüsünde. 171 yerel unittest
-üretim modüllerinin salt okunur bağımlılığıyla geçti; Linux'ta 23 odaklı test geçti.
+hiçbiri uygun değil. Sonuçlar Strateji önerileri menüsünde. 177 yerel unittest
+üretim modüllerinin salt okunur bağımlılığıyla geçti; Linux'ta 29 odaklı test geçti.
 30 günlük yeni veri gözlemi sürüyor, 9 Kasım 23:00 İstanbul'da biter.
 
-Kalan kabul: kontrollü reboot raporu, 24 saat çalışma, özel ayarlar/venv ile
-tam servis geri dönüşü ve dış bildirim kanalı. Gerçek emir izni verilmedi.
+Kontrollü reboot geçti: 10 temel servis otomatik döndü; reset makbuzu,
+öneri geçmişi, etkin strateji durumu ve araştırma raporu korundu. Reboot
+kanıtı sunucuda restore-tests/reboot-acceptance.json içindedir.
+24 saatlik servis örneklemesi ve panelde ilerleme kaydı başladı.
+Kalan kabul: 24 saat gözlem süresi, özel ayarlar/venv ile tam servis geri
+dönüşü ve dış bildirim kanalı. Gerçek emir izni verilmedi.
 
 ## İlk hazırlık günlüğü — aşağıdaki eksik durumlar eski kayıttır
 

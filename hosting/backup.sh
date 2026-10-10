@@ -10,7 +10,7 @@ flock -n 9 || exit 1
 case "$(systemctl show zitar-entry-filter.service -p ActiveState --value)" in
     active|activating) echo 'Bounded research experiment running; defer snapshot' >&2; exit 1 ;;
 esac
-services='zitar-gateway zitar-console zitar-learning zitar-production zitar-v3-data zitar-v3.timer zitar-chat zitar-rag zitar-aux-forward.timer zitar-aux-history.timer zitar-aux-intelligence.timer zitar-aux-liquidity.timer zitar-forward-study.timer'
+services='zitar-gateway zitar-console zitar-learning zitar-production zitar-v3-data zitar-v3.timer zitar-chat zitar-rag zitar-aux-forward.timer zitar-aux-history.timer zitar-aux-intelligence.timer zitar-aux-liquidity.timer zitar-forward-study.timer zitar-operations-watch.timer'
 active=''
 for service in $services; do
     if systemctl is-active --quiet "$service"; then active="$active $service"; fi
@@ -23,6 +23,7 @@ systemctl stop $active
 systemctl stop zitar-v3.service
 systemctl stop zitar-aux@forward.service zitar-aux@history.service zitar-aux@intelligence.service zitar-aux@liquidity.service
 systemctl stop zitar-forward-study.service
+systemctl stop zitar-operations-watch.service
 cd /srv/zitar/runtime
 /srv/zitar/venv/bin/python -m zitar_next.hosting backup --base /srv/zitar/runtime --next-root /srv/zitar/data/next --output /srv/zitar/backups
 # Resume trading simulation before potentially slow offsite upload.

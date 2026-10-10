@@ -6,6 +6,7 @@ nav.append(button);
 const view=document.createElement('section');view.id='strategyProposalsView';view.className='section';view.style.display='none';
 view.innerHTML='<div class="panel"><h2>AI strateji önerileri</h2><p class="summaryline">Spot ve 3x izole vadeli · İnsan onayı gerekli · Gerçek emir kapalı</p><p id="proposalMenuStatus" role="status">Yükleniyor…</p></div><div class="panel"><h2>30 günlük bağımsız ileri araştırma</h2><p class="summaryline">Sabit modeller · Saatlik yeni veri · Araştırma amaçlıdır; işlem hesabına etkinleştirme değildir.</p><div id="forwardStudyStatus">Yükleniyor…</div></div><div id="proposalMenuCards"></div>';
 const filterPanel=document.createElement('div');filterPanel.className='panel';filterPanel.innerHTML='<h2>RSI giriş filtresi deneyi</h2><p class="summaryline">BTC ve ETH · Bir yıllık saatlik geçmiş · Spot ve 3x izole vadeli · 2.048 / 8.192 eğitim adımı karşılaştırması</p><div id="entryFilterStatus">Yükleniyor…</div>';view.insertBefore(filterPanel,view.lastChild);
+const opsPanel=document.createElement('div');opsPanel.className='panel';opsPanel.innerHTML='<h2>Sunucu çalışma kontrolü</h2><p class="summaryline">15 dakikada bir servis kontrolü · 24 saatlik gözlem · Ara kontroller kesintisiz erişim garantisi değildir.</p><div id="operationsWatchStatus">Yükleniyor…</div>';view.insertBefore(opsPanel,filterPanel);
 nav.after(view);views.push('strategyProposals');
 const nativeShow=showView;showView=function(v){nativeShow(v);button.classList.toggle('active',v==='strategyProposals')};
 button.onclick=()=>{showView('strategyProposals');load()};
@@ -23,6 +24,14 @@ MODEL_LIQUIDATION_OCCURRED:'Vadeli testte tasfiye oluştu; risk koşulu sağlanm
 LONGER_WALK_FORWARD_HISTORY_REQUIRED:'Farklı geçmiş dönemlerde sınamak için daha uzun veri geçmişi gerekiyor.'};
 function explain(code){let context='Geçmiş veri testi';let key=code;if(key.startsWith('COMBINED_WALK_FORWARD_')){context='Birleşik strateji · farklı dönem testleri';key=key.slice(22)}else if(key.startsWith('WALK_FORWARD_')){context='Farklı dönem testleri';key=key.slice(13)}return context+': '+(reasons[key]||'Bu kontrolün açıklaması henüz tanımlanmamış; ayrıntılarda kontrol kodunu inceleyin.');}
 let token='',busy=false;
+async function loadOperations(){
+const box=document.getElementById('operationsWatchStatus');
+try{const response=await fetch('/api/operations-study',{cache:'no-store'});if(!response.ok)throw Error('Sunucu gözlem kaydı şu anda alınamıyor.');const data=await response.json();
+const names={OBSERVING_24H:'Gözlem sürüyor',ATTENTION_REQUIRED:'Kontrol gerekli',PLANNED_BACKUP:'Planlı yedekleme', '24H_SAMPLED_CHECKS_PASSED':'24 saatlik periyodik kontroller geçti'};
+box.replaceChildren(node('p',`${names[data.status]||'Durum bilinmiyor'} · ${data.observed_hours.toFixed(1)} / 24 saat`),node('p',`Son kontrol: ${new Date(data.updated_epoch*1000).toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})} · ${(data.errors||[]).length} kontrol sorunu`));
+if(Date.now()/1000-data.updated_epoch>1800)box.append(node('p','Kontrol kaydı eski; güncel sağlıklı durum varsayılmamalı.'));
+}catch(e){box.replaceChildren(node('p',e.message));}
+}
 async function loadFilter(){
 const box=document.getElementById('entryFilterStatus');
 try{
@@ -64,8 +73,7 @@ const status=document.getElementById('proposalMenuStatus'),cards=document.getEle
 try{
 const response=await fetch('/zitar-next/api/state',{cache:'no-store'});if(!response.ok)throw Error('Öneriler alınamadı.');
 const data=await response.json();token=data.csrf;
-await loadStudy();
-await loadFilter();
+await Promise.all([loadStudy(),loadFilter(),loadOperations()]);
 status.textContent=`${(data.proposals||[]).length} aday · ${(data.proposals||[]).filter(p=>p.body.eligible&&p.state==='PENDING').length} onaya uygun · ${(data.active||[]).length} etkin sürüm`;
 cards.replaceChildren();
 for(const p of data.proposals||[]){

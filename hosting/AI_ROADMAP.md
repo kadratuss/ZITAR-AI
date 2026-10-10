@@ -103,6 +103,13 @@ Canlı hesaplara yazılmadı; özel ayarlar/venv ile tam servis dönüşü deği
 Günlük 03:30 İstanbul yedeği ve 15 dakikalık sağlık kontrolü etkin;
 dış bildirim kanalı henüz bağlı değil.
 
+Kontrollü reboot geçti: 10 temel servis otomatik döndü; sıfırlama makbuzu,
+öneri geçmişi, etkin strateji durumu ve giriş filtresi raporu korundu.
+15 dakikalık operasyon gözlemi başladı; 24 saat henüz dolmadı. Beklenmeyen
+kesinti, boot değişimi veya 30 dakikadan uzun örnekleme boşluğu süreyi sıfırlar.
+Planlı yedek duruşu ayrı gösterilir. Bu örneklem kontrolü kesintisiz erişim
+garantisi değildir; sonuç Strateji önerileri > Sunucu çalışma kontrolü içindedir.
+
 24 saat çalışma, kontrollü yeniden başlatma, gerçek bulut yedeğinden ayrı alana
 geri yükleme, disk/kota kontrolü ve seçilecek dış bildirim kanalı doğrulanır.
 Servislerin aktif olması bunların tamamının geçtiği anlamına gelmez.

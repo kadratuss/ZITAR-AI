@@ -9,7 +9,7 @@ from urllib.request import Request,build_opener,HTTPRedirectHandler
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self,*args):return None
 
-def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv/zitar/data/next/studies/20261010-v1/forward-status.json',filter_root='/srv/zitar/data/next/entry_filter_studies/20261010-v2'):
+def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv/zitar/data/next/studies/20261010-v1/forward-status.json',filter_root='/srv/zitar/data/next/entry_filter_studies/20261010-v2',ops_status='/srv/zitar/data/next/operations/status.json'):
     class Gateway(BaseHTTPRequestHandler):
         def log_message(self,*args):pass
         def reply(self,status,raw,mime='application/json'):
@@ -24,6 +24,16 @@ def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv
             if self.command=='POST' and self.headers.get('Origin')!='http://'+host:
                 return self.reply(403,b'{"error":"ORIGIN_REJECTED"}')
             path=self.path
+            if path=='/api/operations-study':
+                if self.command!='GET':
+                    return self.reply(405,b'{"error":"READ_ONLY"}')
+                try:
+                    source=Path(ops_status)
+                    if source.is_symlink():raise ValueError('symlink')
+                    data=json.loads(source.read_text(encoding='utf-8'))
+                    return self.reply(200,json.dumps(data,ensure_ascii=False).encode('utf-8'))
+                except (OSError,ValueError):
+                    return self.reply(503,b'{"error":"OPERATIONS_STATUS_UNAVAILABLE"}')
             if path=='/api/entry-filter':
                 if self.command!='GET':
                     return self.reply(405,b'{"error":"READ_ONLY"}')

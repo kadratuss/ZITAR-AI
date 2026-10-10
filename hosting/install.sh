@@ -11,7 +11,8 @@ python3 -m venv /srv/zitar/venv
 /srv/zitar/venv/bin/python -m pip install -r /srv/zitar/runtime/hosting/requirements.txt
 /srv/zitar/venv/bin/python -m pip check
 chown -R zitar:zitar /srv/zitar/runtime /srv/zitar/data /srv/zitar/backups
-for service in production learning console gateway v3-data v3; do
+install -d -m 700 /srv/zitar/restore-tests
+for service in production learning console gateway v3-data v3 chat rag mobile-monitor forward-study entry-filter cloud-restore-check operations-watch; do
     install -m 644 "/srv/zitar/runtime/hosting/zitar-$service.service" /etc/systemd/system/
 done
 install -m 644 /srv/zitar/runtime/hosting/zitar-backup.service /etc/systemd/system/
@@ -20,5 +21,7 @@ install -m 644 /srv/zitar/runtime/hosting/zitar-backup-monitor.service /etc/syst
 install -m 644 /srv/zitar/runtime/hosting/zitar-backup-monitor.timer /etc/systemd/system/
 install -m 644 /srv/zitar/runtime/hosting/zitar-backup.timer /etc/systemd/system/
 install -m 644 /srv/zitar/runtime/hosting/zitar-v3.timer /etc/systemd/system/
+install -m 644 /srv/zitar/runtime/hosting/zitar-forward-study.timer /etc/systemd/system/
+install -m 644 /srv/zitar/runtime/hosting/zitar-operations-watch.timer /etc/systemd/system/
 systemctl daemon-reload
 echo 'Prepared only. Transfer state, verify dependencies and source-owner shutdown before enabling services.'

@@ -63,6 +63,17 @@ class HostingTests(unittest.TestCase):
         with self.assertRaises(HTTPError) as error:urlopen(request)
         self.assertEqual(error.exception.code,405);error.exception.close()
 
+    def test_operations_observation_endpoint_is_read_only(self):
+        status=Path(self.temp.name)/'ops.json'
+        status.write_text(json.dumps(dict(status='OBSERVING_24H',real_orders=False)))
+        entrance=self.server(lambda port:gateway(port,ops_status=status))
+        origin='http://127.0.0.1:'+str(entrance.server_port)
+        with urlopen(origin+'/api/operations-study') as response:
+            self.assertEqual(json.load(response)['status'],'OBSERVING_24H')
+        with self.assertRaises(HTTPError) as error:
+            urlopen(Request(origin+'/api/operations-study',data=b'{}',headers={'Origin':origin},method='POST'))
+        self.assertEqual(error.exception.code,405);error.exception.close()
+
     def test_legacy_adapter_exposes_reads_only(self):
         from types import SimpleNamespace
         from zitar_next.legacy_data import handler

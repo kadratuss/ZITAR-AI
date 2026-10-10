@@ -1,0 +1,15 @@
+[Unit]
+Description=Read-only 24-hour ZITAR service observation
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=zitar
+WorkingDirectory=/srv/zitar/runtime
+ExecStart=/srv/zitar/venv/bin/python -B -m zitar_next.operations_watch --root /srv/zitar/data/next
+TimeoutStartSec=180
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/zitar/data/next/operations
+PrivateTmp=true
