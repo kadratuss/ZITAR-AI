@@ -8,6 +8,15 @@ view.innerHTML='<div class="panel"><h2>AI strateji önerileri</h2><p class="summ
 const filterPanel=document.createElement('div');filterPanel.className='panel';filterPanel.innerHTML='<h2>RSI giriş filtresi deneyi</h2><p class="summaryline">BTC ve ETH · Bir yıllık saatlik geçmiş · Spot ve 3x izole vadeli · 2.048 / 8.192 eğitim adımı karşılaştırması</p><div id="entryFilterStatus">Yükleniyor…</div>';view.insertBefore(filterPanel,view.lastChild);
 const opsPanel=document.createElement('div');opsPanel.className='panel';opsPanel.innerHTML='<h2>Sunucu çalışma kontrolü</h2><p class="summaryline">15 dakikada bir servis kontrolü · 24 saatlik gözlem · Ara kontroller kesintisiz erişim garantisi değildir.</p><div id="operationsWatchStatus">Yükleniyor…</div>';view.insertBefore(opsPanel,filterPanel);
 nav.after(view);views.push('strategyProposals');
+const chronology=document.createElement('div');chronology.className='panel';
+const dayLabel=document.createElement('label');dayLabel.textContent='Öneri günü (Türkiye saati) ';const dayFilter=document.createElement('input');dayFilter.type='date';dayFilter.setAttribute('aria-label','Öneri günü');dayLabel.append(dayFilter);
+const orderLabel=document.createElement('label');orderLabel.textContent=' Sıralama ';const dateOrder=document.createElement('select');dateOrder.setAttribute('aria-label','Öneri tarih sıralaması');
+for(const [value,text]of [['newest','En yeni önce'],['oldest','En eski önce']]){const option=document.createElement('option');option.value=value;option.textContent=text;dateOrder.append(option);}orderLabel.append(dateOrder);
+const clearDay=document.createElement('button');clearDay.className='btn';clearDay.textContent='Tüm günler';clearDay.onclick=()=>{dayFilter.value='';load();};dayFilter.onchange=()=>load();dateOrder.onchange=()=>load();chronology.append(dayLabel,orderLabel,clearDay);view.insertBefore(chronology,view.lastChild);
+const proposalTime=x=>{const t=Date.parse(x);return Number.isFinite(t)?t:null;};
+const localDay=x=>{const t=proposalTime(x);return t==null?'Tarih kaydı yok':new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Istanbul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(t));};
+const dateText=x=>{const t=proposalTime(x);return t==null?'Tarih kaydı yok':new Date(t).toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'});};
+const historyDate=x=>x?dateText(x.includes('T')?x:x.replace(' ','T')+'Z'):'Kaydedilmemiş';
 const nativeShow=showView;showView=function(v){nativeShow(v);button.classList.toggle('active',v==='strategyProposals')};
 button.onclick=()=>{showView('strategyProposals');load()};
 const node=(tag,text)=>{const n=document.createElement(tag);n.textContent=text;return n};
@@ -76,11 +85,21 @@ const data=await response.json();token=data.csrf;
 await Promise.all([loadStudy(),loadFilter(),loadOperations()]);
 status.textContent=`${(data.proposals||[]).length} aday · ${(data.proposals||[]).filter(p=>p.body.eligible&&p.state==='PENDING').length} onaya uygun · ${(data.active||[]).length} etkin sürüm`;
 cards.replaceChildren();
-for(const p of data.proposals||[]){
+const proposals=(data.proposals||[]).filter(p=>!dayFilter.value||localDay(p.created)===dayFilter.value).sort((a,b)=>{const at=proposalTime(a.created),bt=proposalTime(b.created);if(at==null)return bt==null?0:1;if(bt==null)return -1;return dateOrder.value==='oldest'?at-bt:bt-at;});
+status.textContent+=` · Gösterilen: ${proposals.length} · Tarihler Türkiye saatidir`;
+const newest=new Map();for(const p of data.proposals||[]){const k=[p.body.market,p.body.symbol,p.body.interval,p.body.strategy].join(':');const t=proposalTime(p.created);if(t!=null&&(!newest.has(k)||t>newest.get(k)))newest.set(k,t);}
+let lastDay=null;
+for(const p of proposals){
+const day=localDay(p.created);if(day!==lastDay){cards.append(node('h2',day));lastDay=day;}
 const b=p.body,card=node('article','');card.className='panel';
+card.dataset.created=p.created||'';
 const eligible=b.eligible===true&&!(b.issues||[]).length;
 card.style.borderColor=eligible?'#22c55e':'#d69e36';
 card.append(node('h3',`${b.market==='futures'?'Vadeli · 3x izole':'Spot'} · ${b.symbol} · ${b.interval}`),node('p',`${b.strategy} · ${stateNames[p.state]||'Durum bilinmiyor'}`));
+const created=proposalTime(p.created),age=created==null?null:Math.max(0,Date.now()-created),latest=created!=null&&created===newest.get([b.market,b.symbol,b.interval,b.strategy].join(':'));
+const ageText=age==null?'Yaşı bilinmiyor':age<3600000?Math.floor(age/60000)+' dakika önce':age<86400000?Math.floor(age/3600000)+' saat önce':Math.floor(age/86400000)+' gün önce';
+const calendar=node('p','Öneri oluşturuldu: '+dateText(p.created)+' · '+ageText+(latest?' · Bu stratejinin en son önerisi':'')+(age!=null&&age<86400000?' · Yeni (son 24 saat)':''));calendar.style.color='#93c5fd';calendar.style.fontWeight='700';card.append(calendar);
+const testPeriod=b.split?.partitions?.test;if(testPeriod)card.append(node('p','Geçmiş test dönemi: '+historyDate(testPeriod.first_date)+' → '+historyDate(testPeriod.last_date)+' · '+testPeriod.retained_timestamps+' mum · '+b.interval+' · Türkiye saati. Bu dönem önerinin oluşturulma tarihi değildir.'));
 const verdict=node('p',eligible?'● Geçmiş test eşiklerini geçti · Sanal test için uygun aday':'● Henüz uygun değil · Test koşulları karşılanmadı');verdict.style.color=eligible?'#4ade80':'#fbbf24';verdict.style.fontWeight='700';card.append(verdict);
 card.append(node('p','Yeşil durum geçmiş testlere dayanır; canlı piyasa başarısı veya kazanç garantisi değildir.'));
 const stages=node('div','');stages.className='panel';stages.append(node('h4','Test ve onay aşamaları'),node('p','1. Eğitim ve doğrulama → Ayrı geçmiş veri testi → Farklı dönemler ve artırılmış maliyetlerle sınama: '+(eligible?'eşikler geçti.':'tamamlanan değerlendirmede eşikler karşılanmadı.')),node('p','2. İnsan onayı: '+(['ACCEPTED','ACTIVE_PAPER','ARCHIVED'].includes(p.state)?'kabul kaydı mevcut.':p.state==='REJECTED'?'aday reddedildi.':'bekliyor; uygun olmayan aday kabul edilemez.')),node('p','3. Yeni piyasa verileriyle bağımsız sanal işlem testi: '+(p.state==='ACTIVE_PAPER'?'etkin; gerçek emir verilmez.':'bu aday için etkin değil.')),node('p','4. Gerçek işlem: kapalı. Sanal testi etkinleştirmek gerçek işlem izni vermez.'));card.append(stages);
@@ -96,7 +115,7 @@ const action=node('button',label);action.className='btn';action.disabled=!enable
 action.onclick=async()=>{if(!note.value.trim()){status.textContent='Karar açıklaması girin.';return;}busy=true;action.disabled=true;try{const result=await fetch('/zitar-next/api/decision',{method:'POST',headers:{'Content-Type':'application/json','X-Next-CSRF':token},body:JSON.stringify({id:p.id,decision:kind,note:note.value})});const answer=await result.json();if(!result.ok)throw Error(answer.error||'Karar kaydedilemedi.');note.value='';note.blur();}catch(e){status.textContent=e.message;return;}finally{busy=false;action.disabled=!enabled;}await load();};actions.append(action);
 }card.append(actions);cards.append(card);
 }
-if(!data.proposals?.length)cards.append(node('p','Henüz tamamlanmış aday yok.'));
+if(!proposals.length)cards.append(node('p',dayFilter.value?'Seçilen günde öneri kaydı yok.':'Henüz tamamlanmış aday yok.'));
 }catch(e){status.textContent=e.message;}
 }
 setInterval(()=>{if(activeView==='strategyProposals')load()},15000);
