@@ -5,6 +5,8 @@ from pathlib import Path
 from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
 from urllib.error import HTTPError
 from urllib.request import Request,build_opener,HTTPRedirectHandler
+from urllib.parse import urlsplit,parse_qs
+from zitar_next.position_charts import candles,positions
 
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self,*args):return None
@@ -24,6 +26,17 @@ def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv
             if self.command=='POST' and self.headers.get('Origin')!='http://'+host:
                 return self.reply(403,b'{"error":"ORIGIN_REJECTED"}')
             path=self.path
+            if urlsplit(path).path in ('/api/position-chart','/api/chart-positions'):
+                if self.command!='GET':return self.reply(405,b'{"error":"READ_ONLY"}')
+                try:
+                    if path=='/api/chart-positions':data=positions(production_port)
+                    else:
+                        query=parse_qs(urlsplit(path).query,strict_parsing=True)
+                        if set(query)!= {'market','symbol','interval'} or any(len(v)!=1 for v in query.values()):raise ValueError('invalid query')
+                        data=candles(query['market'][0],query['symbol'][0],query['interval'][0])
+                    return self.reply(200,json.dumps(data,ensure_ascii=False).encode())
+                except ValueError:return self.reply(400,b'{"error":"INVALID_CHART_DATA"}')
+                except OSError:return self.reply(503,b'{"error":"CHART_SOURCE_UNAVAILABLE"}')
             if path=='/api/operations-study':
                 if self.command!='GET':
                     return self.reply(405,b'{"error":"READ_ONLY"}')
@@ -87,6 +100,7 @@ def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv
                     raw=raw.replace(b'data-next-base=""',b'data-next-base="/zitar-next"')
                 if status==200 and 'text/html' in mime and not next_panel and path=='/':
                     integration=Path(__file__).with_name('proposal_menu.html').read_bytes()
+                    integration+=Path(__file__).with_name('position_charts.html').read_bytes()
                     raw=raw.replace(b'</body>',integration+b'</body>')
                 self.reply(status,raw,mime)
             except (ValueError,OSError):self.reply(503,b'{"error":"UPSTREAM_UNAVAILABLE"}')

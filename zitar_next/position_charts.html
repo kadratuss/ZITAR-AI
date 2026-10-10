@@ -1,0 +1,51 @@
+<script>(()=>{
+const nav=document.querySelector('.nav');if(!nav||document.getElementById('positionChartsBtn'))return;
+const add=(parent,tag,text)=>{const e=document.createElement(tag);e.textContent=text;parent.append(e);return e;};
+const view=add(nav.parentElement,'section','');view.id='positionChartsView';view.className='panel';view.style.display='none';views.push('positionCharts');
+nav.after(view);
+add(view,'h2','Pozisyon grafikleri · Spot ve vadeli');
+add(view,'p','Giriş, güncel stop ve hesap değerleme fiyatı aynı grafikte. Vadeli mumlar mark fiyatıdır; spot mumlar işlem fiyatıdır. Günlük piyasa değişimi pozisyon kârı değildir.');
+const controls=add(view,'div','');controls.className='actions';
+const label=add(controls,'label','Pozisyon '),select=add(label,'select','');select.setAttribute('aria-label','Grafikteki pozisyon');select.className='market-filter';
+const il=add(controls,'label','Mum süresi '),interval=add(il,'select','');interval.setAttribute('aria-label','Grafik mum süresi');interval.className='btn';
+for(const v of ['5m','15m','1h','4h','1d']){const o=add(interval,'option',v);o.value=v;}interval.value='1h';
+const rl=add(controls,'label','Gösterim '),range=add(rl,'select','');range.className='btn';range.setAttribute('aria-label','Grafik mum sayısı');
+for(const v of [72,240,1000]){const o=add(range,'option',v+' mum');o.value=v;}range.value='240';
+const refresh=add(controls,'button','Yenile');refresh.className='btn';
+const status=add(view,'p','');status.setAttribute('role','status');const info=add(view,'div','');const plot=add(view,'div','');plot.style.overflowX='auto';
+const btn=add(nav,'button','Pozisyon grafikleri');btn.id='positionChartsBtn';btn.className='btn';
+const previous=showView;showView=function(v){previous(v);btn.classList.toggle('active',v==='positionCharts');};
+let items=[],bars=null,busy=false,loaded=0,requestNo=0;
+const fmt=x=>x==null?'Kaydedilmemiş':Number(x).toLocaleString('tr-TR',{maximumFractionDigits:10});
+const date=x=>x==null?'Kaydedilmemiş':new Date(x).toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'});
+const current=()=>items.find(x=>x.id===select.value);
+async function list(){const r=await fetch('/api/chart-positions',{cache:'no-store',signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('Pozisyon verisi alınamadı.');const d=await r.json(),old=select.value;items=d.positions;select.replaceChildren();
+for(const p of items){const o=add(select,'option',`${p.market==='futures'?'Vadeli':'Spot'} · ${p.account} · ${p.symbol} · ${p.direction===-1?'SHORT':'LONG'}`);o.value=p.id;}
+if(items.some(p=>p.id===old))select.value=old;
+status.textContent=items.length+' açık pozisyon'+(d.unavailable.length?' · Verisi alınamayan bölümler: '+d.unavailable.join(', '):'');}
+function draw(){const p=current();info.replaceChildren();plot.replaceChildren();if(!p){add(info,'p','Bu hesaplarda açık pozisyon yok.');return;}
+add(info,'h3',p.symbol+' · '+(p.market==='futures'?'Vadeli mark':'Spot')+' · '+(p.direction===-1?'SHORT':'LONG'));
+add(info,'p',`Giriş ${fmt(p.entry)} · Güncel stop ${p.stop==null?'Bu hesapta stop kaydı yok':fmt(p.stop)} · Hesap fiyatı ${fmt(p.mark)} ${p.currency}`);
+const profit=add(info,'p','Hesaptaki açık K/Z: '+fmt(p.pnl)+' '+p.currency);profit.style.color=Number(p.pnl)>0?'#22c55e':Number(p.pnl)<0?'#ef4444':'inherit';
+add(info,'p','Giriş: '+date(p.opened)+' · Fiyat zamanı: '+date(p.quote_time)+' · Strateji süresi: '+p.timeframe+' · Grafik süresi: '+interval.value+' (stratejiyi değiştirmez)');
+const quote=p.quote_time==null?NaN:new Date(p.quote_time).getTime();if(!Number.isFinite(quote)||Date.now()-quote>120000)add(info,'p','⚠ Hesap fiyatının güncelliği doğrulanmıyor; görünen kâr eski olabilir.').style.color='#f59e0b';
+if(p.market==='futures'){const gross=Number(p.quantity)*(Number(p.mark)-Number(p.entry))*Number(p.direction);add(info,'p','Mark ile brüt hesap: '+fmt(gross)+' USDT · Giriş komisyonu '+fmt(p.entry_fee)+' · Funding '+fmt(p.funding)+'. Olası kapanış maliyeti açık brüt K/Z’ye dahil değildir.');}
+if(!bars)return;const rows=bars.rows.slice(-Number(range.value));const values=rows.flatMap(x=>[x.low,x.high]);for(const v of [p.entry,p.stop,p.mark])if(v!=null&&Number.isFinite(Number(v)))values.push(Number(v));
+let lo=Math.min(...values),hi=Math.max(...values);const padding=Math.max((hi-lo)*.08,hi*.0001);lo-=padding;hi+=padding;
+const W=1100,H=470,L=90,R=175,T=28,B=65,w=W-L-R,h=H-T-B;const x=i=>L+(i+.5)/rows.length*w,y=v=>T+(hi-v)/(hi-lo)*h;
+const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.style.width='100%';svg.style.minWidth='760px';svg.setAttribute('role','img');svg.setAttribute('aria-label',p.symbol+' mum grafiği, giriş ve güncel stop');plot.append(svg);
+const shape=(tag,attrs,text)=>{const e=document.createElementNS(svg.namespaceURI,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);if(text)e.textContent=text;svg.append(e);return e;};
+for(let i=0;i<=5;i++){const v=lo+(hi-lo)*i/5;shape('line',{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:'#26344c'});shape('text',{x:4,y:y(v)+4,fill:'#94a3b8','font-size':12},fmt(v));}
+rows.forEach((r,i)=>{const color=r.close>=r.open?'#22c55e':'#ef4444';shape('line',{x1:x(i),x2:x(i),y1:y(r.high),y2:y(r.low),stroke:color});const candle=shape('rect',{x:x(i)-Math.max(.5,w/rows.length*.3),y:Math.min(y(r.open),y(r.close)),width:Math.max(1,w/rows.length*.6),height:Math.max(1,Math.abs(y(r.close)-y(r.open))),fill:color,opacity:r.closed?1:.5});const title=document.createElementNS(svg.namespaceURI,'title');title.textContent=`${date(r.time)} · Açılış ${fmt(r.open)} · Yüksek ${fmt(r.high)} · Düşük ${fmt(r.low)} · Kapanış ${fmt(r.close)}${r.closed?'':' · Açık mum'}`;candle.append(title);});
+let lastLabel=T-20;const levels=[['Giriş',p.entry,'#60a5fa'],['Güncel stop',p.stop,'#f59e0b'],['Hesap fiyatı',p.mark,'#e2e8f0']].filter(x=>x[1]!=null).sort((a,b)=>Number(b[1])-Number(a[1]));
+for(const[name,value,color]of levels){const actual=y(Number(value)),labelY=Math.max(actual,lastLabel+18);lastLabel=labelY;shape('line',{x1:L,x2:W-R,y1:actual,y2:actual,stroke:color,'stroke-dasharray':'6 4'});shape('line',{x1:W-R,x2:W-R+8,y1:actual,y2:labelY,stroke:color});shape('text',{x:W-R+10,y:labelY+4,fill:color,'font-size':12},name+' '+fmt(value));}
+const opened=new Date(p.opened).getTime(),first=rows[0].time,last=rows.at(-1).time,step=rows.length>1?rows[1].time-first:3600000;
+if(Number.isFinite(opened)&&opened>=first&&opened<=last+step){const px=L+(opened-first)/(rows.length*step)*w;shape('line',{x1:px,x2:px,y1:T,y2:H-B,stroke:'#60a5fa','stroke-dasharray':'3 4'});shape('text',{x:px,y:H-B+18,fill:'#60a5fa','font-size':12},'Pozisyon açıldı');}else add(info,'p','Giriş zamanı gösterilen mumların dışında. Daha geniş gösterim veya 4h / 1d seçin.');
+shape('text',{x:L,y:H-12,fill:'#94a3b8','font-size':12},date(first));shape('text',{x:W-R,y:H-12,fill:'#94a3b8','font-size':12,'text-anchor':'end'},date(last));
+add(info,'p',`${rows.length} mum · ${bars.price_type} · Mum verisi alındı: ${date(bars.fetched_ms)}. Sarı çizgi yalnızca güncel stop; geçmiş stop hareketleri gösterilmez. Soluk mum henüz kapanmadı.`);
+}
+async function chart(){const p=current(),n=++requestNo;bars=null;draw();if(!p)return;try{const r=await fetch('/api/position-chart?'+new URLSearchParams({market:p.market,symbol:p.symbol,interval:interval.value}),{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('Mum kaynağı kullanılamıyor; başka piyasa fiyatına geçilmedi.');const d=await r.json();if(n!==requestNo)return;bars=d;loaded=Date.now();draw();}catch(e){if(n===requestNo)add(plot,'p',e.message);}}
+async function update(force=false){if(busy)return;busy=true;try{await list();if(force||!bars||bars.symbol!==current()?.symbol||bars.market!==current()?.market||Date.now()-loaded>60000)await chart();else draw();}catch(e){status.textContent=e.message;}finally{busy=false;}}
+btn.onclick=()=>{showView('positionCharts');update(true);};select.onchange=chart;interval.onchange=chart;range.onchange=draw;refresh.onclick=()=>update(true);
+setInterval(()=>{if(view.style.display!=='none')update();},15000);
+})();</script>
