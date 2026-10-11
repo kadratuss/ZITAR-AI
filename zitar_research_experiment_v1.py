@@ -152,9 +152,6 @@ def overview(base):
         s['books']={k:b for k,b in s['books'].items() if b.get('market')=='futures'}
     s['heartbeat_age_seconds']=(ms-s.get('heartbeat_ms',0))/1000
     if not 0<=s['heartbeat_age_seconds']<=30:s['state']='STALE'
-    if (Path(base)/'zitar_comparison_supervisor.pause').exists():
-        s.update(state='PAUSED',supervisor_paused=True,message='Deney motoru duraklatıldı. Gösterilen sonuçlar son kayıtlı vadeli sonuçlardır; yeni işlem ve açık pozisyon takibi yapılmıyor.')
-        s['entry_control']=dict(paused=True)
     s['evaluation']={k:metrics(b,ms) for k,b in s['books'].items()}
     for m in s['evaluation'].values():
         if s['state']!='RUNNING' or s.get('recording_error'):
