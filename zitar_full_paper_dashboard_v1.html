@@ -1,0 +1,1119 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ZİTAR · Birleşik Kontrol Merkezi</title>
+<style>
+:root{--bg:#070b14;--panel:#101827;--panel2:#151f31;--line:#26344c;--text:#eef4ff;--muted:#94a3b8;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--blue:#60a5fa;--purple:#a78bfa}*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at top,#14203a 0,var(--bg) 42%);color:var(--text)}button{font:inherit}.wrap{max-width:1600px;margin:auto;padding:20px}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:14px}.brand h1{margin:0;font-size:34px;letter-spacing:1px}.brand small{color:var(--muted)}.actions,.badges{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.badge,.btn{padding:8px 12px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid var(--line);background:#111827;color:var(--text)}.btn{cursor:pointer}.btn:hover{border-color:var(--blue)}.btn.disabled{opacity:.5;cursor:not-allowed}.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}.blue{color:var(--blue)}.purple{color:var(--purple)}.muted{color:var(--muted)}.nav{display:flex;gap:7px;overflow:auto;padding:9px 0 16px}.nav button{white-space:nowrap}.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}.panel,.stat,.card,.module{background:rgba(16,24,39,.94);border:1px solid var(--line);border-radius:16px}.panel{padding:18px}.total{font-size:34px;font-weight:900;margin-top:6px}.subgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.mini{background:#0b1220;border:1px solid #202d43;border-radius:12px;padding:11px}.label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.7px}.value{margin-top:6px;font-size:18px;font-weight:800}.health{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.healthitem{display:flex;justify-content:space-between;gap:10px;background:#0b1220;border:1px solid #202d43;border-radius:10px;padding:10px;font-size:12px}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}.stat{padding:14px}.section{margin-top:20px}.section h2{font-size:17px;margin:0 0 11px}.strategies{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.card{padding:16px;background:linear-gradient(180deg,rgba(21,31,49,.96),rgba(12,18,30,.96))}.card h3{margin:0 0 12px}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px}.metric{background:#0b1220;border:1px solid #202d43;border-radius:11px;padding:10px}.metric .v{font-weight:800;font-size:16px;margin-top:4px}.position{margin-top:11px;background:#0a111e;border:1px solid #26344c;border-radius:12px;padding:12px}.position-title{display:flex;justify-content:space-between;gap:8px;font-weight:800;margin-bottom:8px}.posgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.positem{font-size:11px;color:var(--muted)}.positem strong{display:block;color:var(--text);font-size:13px;margin-top:2px}.modules{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.module{padding:15px}.modulehead{display:flex;justify-content:space-between;align-items:center;gap:8px}.module h3{font-size:14px;margin:0}.module p{color:var(--muted);font-size:12px;line-height:1.5;margin:9px 0 0}.tables{display:grid;grid-template-columns:1fr 1fr;gap:12px}.tablebox{overflow:auto;background:rgba(16,24,39,.94);border:1px solid var(--line);border-radius:14px}table{width:100%;border-collapse:collapse;min-width:560px}th,td{padding:10px 11px;border-bottom:1px solid #202c40;text-align:left;font-size:12px;white-space:nowrap}th{color:var(--muted);background:#0d1524;position:sticky;top:0}.signal-buy{color:var(--green);font-weight:900}.signal-sell{color:var(--red);font-weight:900}.signal-none{color:var(--muted)}.controlnote{font-size:11px;color:var(--yellow);margin-top:8px}.footer{margin:18px 0 5px;text-align:center;color:var(--muted);font-size:11px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px;box-shadow:0 0 10px var(--green)}
+.research-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.research-toolbar select{background:#0b1220;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 12px}.research-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.research-wide{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.evidence-list,.change-list{max-height:330px;overflow:auto}.research-row{padding:9px 0;border-bottom:1px solid #202c40;font-size:12px}.research-row:last-child{border-bottom:0}.research-k{color:var(--muted);font-size:11px}.research-v{font-weight:800;margin-top:3px}.conflict{color:var(--yellow)}.research-status{font-size:12px;margin-left:auto}@media(max-width:1100px){.research-grid{grid-template-columns:1fr 1fr}.research-wide{grid-template-columns:1fr}.hero{grid-template-columns:1fr}.grid,.modules{grid-template-columns:1fr 1fr}.strategies{grid-template-columns:1fr}.tables{grid-template-columns:1fr}}@media(max-width:650px){.research-grid{grid-template-columns:1fr}.wrap{padding:12px}.top{align-items:flex-start;flex-direction:column}.grid,.modules,.subgrid{grid-template-columns:1fr}.posgrid{grid-template-columns:1fr 1fr}.total{font-size:28px}}
+
+.chat-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px}
+.chat-box{height:520px;overflow:auto;background:#0b1220;border:1px solid #202d43;border-radius:14px;padding:14px}
+.chat-msg{max-width:88%;margin:9px 0;padding:12px 14px;border-radius:14px;white-space:pre-wrap;line-height:1.55;font-size:13px}
+.chat-user{margin-left:auto;background:#1d4ed8}.chat-zitar{background:#151f31;border:1px solid #26344c}
+.chat-compose{display:flex;gap:9px;margin-top:10px}.chat-compose textarea{flex:1;min-height:72px;resize:vertical;background:#0b1220;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit}
+.chat-side .mini{margin-bottom:9px}.chat-hint{font-size:11px;color:var(--muted);line-height:1.5}
+@media(max-width:900px){.chat-layout{grid-template-columns:1fr}.chat-box{height:430px}}
+
+.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:12px}.small{font-size:12px}.v3summary{margin-top:0}.nav .active{border-color:var(--blue);background:#172942}.module button{margin-top:12px}.module .badge{font-size:10px;padding:5px 7px}.detail-panel{margin-top:14px}.detail-row{padding:12px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.detail-row h4{margin:0 0 8px}.detail-row p{font-size:13px;line-height:1.65;margin:6px 0}.filedetail{white-space:pre-wrap;overflow-wrap:anywhere;max-height:500px;overflow:auto;font:12px/1.65 Consolas,monospace;color:#cbd5e1}.module-list{display:flex;gap:8px;flex-wrap:wrap}.summaryline{font-size:12px;color:var(--muted);line-height:1.7;margin:10px 0}.inline-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.market-filter{padding:10px;border-radius:10px;border:1px solid var(--line);background:#0b1220;color:var(--text);font:inherit;width:270px;max-width:100%;margin:12px 0}.runtime-cards{grid-template-columns:repeat(3,1fr)}.position .positem strong{overflow-wrap:anywhere}.masterpositions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}#connectionAlert{margin:0 0 12px}#masterStats .value{font-size:20px}.module .modulehead{align-items:flex-start}button:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:3px}.tablebox{max-height:530px}details>summary{cursor:pointer;color:var(--blue);padding:10px 0}a{color:var(--blue)}
+@media(max-width:1100px){.masterpositions,.inline-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.strategies{grid-template-columns:repeat(3,minmax(0,1fr))}.card{padding:12px}.posgrid{grid-template-columns:repeat(2,1fr)}.position-title{flex-wrap:wrap}.metric .v{font-size:14px}}
+.hero>*,.tables>*,.grid>*,.strategies>*,.modules>*{min-width:0}.health{grid-template-columns:repeat(2,minmax(0,1fr))}.healthitem{min-width:0;flex-wrap:wrap}.healthitem strong{overflow-wrap:anywhere;max-width:100%}.stat .value{overflow-wrap:anywhere}.modulehead h3{overflow-wrap:anywhere}
+@media(max-width:800px){.strategies,.masterpositions,.runtime-cards{grid-template-columns:1fr}.inline-metrics{grid-template-columns:1fr 1fr}.sectionhead{align-items:flex-start;flex-direction:column}}
+@media(max-width:650px){.nav{flex-wrap:wrap;overflow:visible}.health{grid-template-columns:1fr}.chat-compose{flex-wrap:wrap}.chat-compose textarea{min-width:0;width:100%}.tables{grid-template-columns:minmax(0,1fr)}.hero{grid-template-columns:minmax(0,1fr)}}
+</style><style id="paper-card-layout">.paper-accounts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start;margin-top:18px}.paper-accounts .card{min-width:0}.paper-accounts .posgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.paper-accounts .positem strong{overflow-wrap:anywhere}.paper-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0}.paper-summary .stat{min-width:0}.paper-accounts h4{margin:14px 0 8px}.paper-accounts details{font-size:12px}.paper-accounts .position-title{flex-wrap:wrap}.paper-accounts p{line-height:1.5}@media(max-width:1100px){.paper-accounts{grid-template-columns:repeat(2,minmax(0,1fr))}.paper-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:680px){.paper-accounts{grid-template-columns:1fr}.paper-accounts .posgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}</style><style>#paperSpotHome,#masterView,#paV1View,#masterBtn{display:none!important}</style></head><body><div class="wrap">
+<div class="top"><div class="brand"><h1>ZİTAR</h1><small data-i18n="subtitle">Personal Market Intelligence • Control Center V2.3.1 TEST</small></div><div class="actions"><span class="badge green">● PAPER</span><span class="badge" data-i18n="v3off">V3 WRITE OFF</span><span class="badge" data-i18n="futuresoff">FUTURES OFF</span><span class="badge red" data-i18n="realoff">REAL ORDERS: OFF</span><button class="btn" id="langBtn">TR | EN</button><span class="badge blue" id="clock">--</span></div></div>
+<div class="nav" aria-label="Ana bölümler"><button class="btn" id="dashBtn" data-i18n="navDash">Dashboard</button><button class="btn" id="marketsBtn" data-i18n="navMarkets">Markets</button><button class="btn" id="masterBtn" hidden style="display:none">Master</button><button class="btn" id="researchBtn" data-i18n="navResearch">Research</button><button class="btn" id="experimentsBtn" data-i18n="navExperiments">Experiments</button><button class="btn" id="chatBtn">ZİTAR Chat</button><button class="btn" id="systemBtn" data-i18n="navSystem">System</button></div>
+<div id="connectionAlert" class="controlnote" role="status"></div><div id="dashboardView"><div class="hero"><div class="panel"><div class="label" data-i18n="totalPortfolio">TOTAL PAPER PORTFOLIO</div><div class="total" id="masterEquity">--</div><div class="subgrid"><div class="mini"><div class="label" data-i18n="totalPnl">Total P/L</div><div class="value" id="masterPnl">--</div></div><div class="mini"><div class="label" data-i18n="return">Return</div><div class="value" id="masterReturn">--</div></div><div class="mini"><div class="label" data-i18n="positions">Open Positions</div><div class="value" id="masterPositionCount">--</div></div></div></div>
+<div class="panel"><div class="modulehead"><div><div class="label" data-i18n="master">ZİTAR MASTER CONTROL</div><div class="value" id="systemState">--</div></div><div class="actions"><button class="btn disabled" disabled title="Salt okunur kontrol merkezi">▶ <span data-i18n="start">START</span></button><button class="btn disabled" disabled title="Salt okunur kontrol merkezi">■ <span data-i18n="safeStop">SAFE STOP</span></button></div></div><div class="controlnote" data-i18n="preview">Preview only — controls are intentionally not connected to execution yet.</div><div class="health"><div class="healthitem"><span>Master runtime</span><strong id="runtimeHealth">--</strong></div><div class="healthitem"><span>MTM / Rollover</span><strong id="mtmHealth">--</strong></div><div class="healthitem"><span data-i18n="marketData">Market Data</span><strong id="marketHealth">--</strong></div><div class="healthitem"><span>V3 Paper Engine</span><strong id="engineHealth">--</strong></div><div class="healthitem"><span>Scheduler</span><strong id="schedulerHealth">--</strong></div><div class="healthitem"><span>Binance TR API</span><strong id="apiHealth">--</strong></div></div></div></div>
+<div class="grid"><div class="stat"><div class="label">V3 Status</div><div class="value" id="status">--</div></div><div class="stat"><div class="label" data-i18n="lastCandle">Last Processed Candle</div><div class="value" id="candle">--</div></div><div class="stat"><div class="label" data-i18n="runs">Prospective Runs</div><div class="value" id="runs">--</div></div><div class="stat"><div class="label" data-i18n="nextRun">Next Scheduled Run</div><div class="value" id="nextRun">--</div></div></div>
+<div class="section"><div class="sectionhead"><h2 data-i18n="v3Title">V3 · Bağımsız strateji hesapları</h2><span class="muted small" data-i18n="v3Note">Master'dan ayrı · 3 × 10.000 TRY başlangıç</span></div><div class="grid v3summary"><div class="stat"><div class="label" data-i18n="v3Total">V3 toplam equity</div><div class="value" id="totalEquity">--</div></div><div class="stat"><div class="label" data-i18n="totalPnl">Toplam K/Z</div><div class="value" id="totalPnl">--</div></div><div class="stat"><div class="label" data-i18n="return">Getiri</div><div class="value" id="totalReturn">--</div></div><div class="stat"><div class="label" data-i18n="positions">Açık pozisyon</div><div class="value" id="totalPositions">--</div></div></div></div><div class="section"><h2 data-i18n="strategyAccounts">Strategy Accounts</h2><div class="strategies" id="strategies"></div></div>
+<div class="section"><h2 data-i18n="modules">ZİTAR Zeka Modülleri</h2><div class="modules" id="moduleCards"></div></div><div class="section"><h2 data-i18n="activeSignals">Latest Candle — Active Signals</h2><div class="tablebox"><table><thead><tr><th data-i18n="strategy">Strategy</th><th data-i18n="pair">Pair</th><th data-i18n="signal">Signal</th><th data-i18n="candle">Candle</th></tr></thead><tbody id="activeSignals"></tbody></table></div></div>
+<div class="section"><div class="tables"><div><h2 data-i18n="tradeHistory">Paper Trade History</h2><div class="tablebox"><table><thead><tr><th data-i18n="strategy">Strategy</th><th data-i18n="pair">Pair</th><th data-i18n="trade">Trade</th><th data-i18n="time">Time</th></tr></thead><tbody id="trades"></tbody></table></div></div><div><h2 data-i18n="runHistory">V3 Run History</h2><div class="tablebox"><table><thead><tr><th data-i18n="candle">Candle</th><th data-i18n="signal">Signal</th><th>Trade</th><th>Status</th></tr></thead><tbody id="runHistory"></tbody></table></div></div></div></div>
+
+</div>
+<div id="researchView" style="display:none">
+  <div class="section">
+    <div class="panel">
+      <div class="modulehead">
+        <div><div class="label">ZİTAR RESEARCH / RAG</div><div class="value">Piyasa analiz hafızası</div><div id="researchExplanation" style="line-height:1.7;max-width:1100px"></div><p id="researchFreshness" role="status" style="color:#ffbf47;line-height:1.6">Kayıt tarihi kontrol ediliyor; güncellik doğrulanmadı.</p></div>
+        <span class="badge green">READ ONLY</span>
+      </div>
+      <div class="research-toolbar">
+        <label class="muted">Parite / Symbol</label>
+        <select id="researchSymbol"></select>
+        <button class="btn" id="researchRefresh">↻ Kayıtları yenile</button>
+        <span id="researchApiStatus" class="research-status muted">5012: --</span>
+      </div>
+      <div class="research-grid">
+        <div class="mini"><div class="label">KISA VADE · 1dk–30dk</div><div class="value" id="rShort">--</div></div>
+        <div class="mini"><div class="label">ORTA VADE · 1sa–4sa</div><div class="value" id="rMedium">--</div></div>
+        <div class="mini"><div class="label">UZUN VADE · 1g–1hft</div><div class="value" id="rLong">--</div></div>
+        <div class="mini"><div class="label">AYLIK · EK BAĞLAM</div><div class="value" id="rMonthly">--</div></div>
+        <div class="mini"><div class="label">YÖNLER ARASINDA UYUM</div><div class="value" id="rAgree">--</div></div>
+        <div class="mini"><div class="label">KAYITTAKİ VERİ KALİTESİ</div><div class="value" id="rConfidence">--</div></div>
+        <div class="mini"><div class="label">HAFIZA SÜRÜMÜ</div><div class="value" id="rVersion">--</div></div>
+        <div class="mini"><div class="label">UYUŞMAZLIK SAYISI</div><div class="value" id="rConflictCount">--</div></div>
+      </div>
+      <div class="research-wide">
+        <div class="card"><h3>Göstergeler ve veri kaynakları</h3><div id="rEvidence" class="evidence-list"></div></div>
+        <div class="card"><h3>Kayıt geçmişi · ne değişti?</h3><div id="rChanges" class="change-list"></div></div>
+      </div>
+      <div class="research-wide">
+        <div class="card"><h3>Zaman dilimleri arasındaki uyuşmazlıklar</h3><div id="rConflicts"></div></div>
+        <div class="card"><h3>Bu analizin sınırları</h3><div class="muted" style="line-height:1.6">Bu ekran piyasa gözlemlerini açıklar; alım/satım sinyali üretmez. Yüksek veri kalitesi, fiyatın yükseleceği veya verinin güncel olduğu anlamına gelmez. Aylık gözlem ek bağlamdır; ana yön uyumu hesabına katılmaz. Önceki hafıza kayıtları korunur.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="chatView" style="display:none">
+  <div class="section"><div class="panel">
+    <div class="modulehead"><div><div class="label">ZİTAR CHAT</div><div class="value">Sohbet ve hafıza</div></div><span class="badge green">READ ONLY</span></div>
+    <div class="chat-layout" style="margin-top:14px">
+      <div>
+        <div id="chatMessages" class="chat-box"><div class="chat-msg chat-zitar">ZİTAR Chat hazır. Araştırma, memory ve event/news kanıtları üzerinden soru sorabilirsin.</div></div>
+        <div class="chat-compose"><textarea id="chatInput" placeholder="Örn: BTC hakkında ne görüyorsun? Fikrin değişti mi?"></textarea><button class="btn" id="chatSend">Gönder</button></div>
+      </div>
+      <div class="chat-side">
+        <div class="mini"><div class="label">CHAT API</div><div class="value" id="chatApiStatus">Ortak Chat: --</div></div>
+        <div class="mini"><div class="label">LAST SYMBOL</div><div class="value" id="chatSymbol">--</div></div>
+        <div class="mini"><div class="label">INTENT</div><div class="value" id="chatIntent">--</div></div>
+        <div class="mini"><div class="label">ANSWER MODE</div><div class="value" id="chatMode">--</div></div>
+        <div class="chat-hint">Sohbet yanıtları ZİTAR model profiliyle oluşturulur. Sohbet geçmişi saklanır; model yanıtları doğrulanmış öğrenme sayılmaz. Finans kayıtları ayrı sunulur. Gerçek işlem yetkisi yoktur.</div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<div id="masterView" style="display:none"><div class="section"><div class="sectionhead"><h2 data-i18n="masterTitle">Master · Ana paper portföy</h2><span class="badge green">PAPER ONLY</span></div><div class="grid" id="masterStats"></div><div class="section"><h2 data-i18n="masterPositions">Master pozisyonları</h2><div class="masterpositions" id="masterPositions"></div></div><div class="section"><h2 data-i18n="masterEvents">Master olayları</h2><div class="tablebox" id="masterEvents"></div></div><div class="section"><h2 data-i18n="rollover">Günlük muhasebe / Rollover</h2><div class="tablebox" id="dailyArchive"></div></div></div></div>
+<div id="marketsView" style="display:none"><div class="section"><h2 data-i18n="marketTitle">Piyasalar · V3 pozisyonlarının canlı fiyatları</h2><p class="summaryline" data-i18n="marketNote">V3'te açık pozisyon taşıyan pariteler. Kaynak: mevcut Control Center'ın public bookTicker görünümü.</p><input class="market-filter" id="marketFilter" aria-label="Parite filtrele" placeholder="Parite ara · BTC, ETH…"><div class="tablebox" id="marketTable"></div></div></div>
+<div id="experimentsView" style="display:none"><div class="section"><h2 data-i18n="experimentsTitle">Deneyler ve regression kayıtları</h2><p class="summaryline" data-i18n="experimentsNote">Kaydedilmiş test sonuçları; bu ekran testleri veya paper işlemleri tetiklemez. Tarihler kayıt zamanıdır.</p><div class="modules" id="experimentCards"></div></div></div>
+<div id="systemView" style="display:none"><div class="section"><h2 data-i18n="systemTitle">Sistem · Runtime ve pipeline</h2><div class="grid" id="pipelineStats"></div><div class="section"><div class="tables"><div><h2 data-i18n="runtimeSteps">Runtime adımları</h2><div class="tablebox" id="runtimeSteps"></div></div><div><h2 data-i18n="lastErrors">Son hatalar</h2><div class="tablebox" id="runtimeErrors"></div></div></div></div><div class="section"><h2 data-i18n="services">Bağlı servisler</h2><div class="modules" id="serviceCards"></div></div><div class="section"><h2 data-i18n="memoryTitle">Memory → Learning → Research → Evidence</h2><div class="modules" id="memoryCards"></div></div></div></div>
+<div id="moduleDetailView" style="display:none"><div class="section"><button class="btn" id="backModule" data-i18n="back">← Geri</button><div class="panel detail-panel"><h2 id="moduleTitle"></h2><div id="moduleInfo" class="summaryline"></div><div id="moduleContent"></div></div></div></div>
+<div class="footer"><span class="dot"></span><span data-i18n="footer">ZİTAR V2.3.1 TEST • read-only • no order endpoint • auto refresh 5s</span></div></div>
+<script>
+let lang=localStorage.getItem('zitar_lang')||'tr';
+const I={tr:{subtitle:'Personal Market Intelligence • Kontrol Merkezi V2.2',realoff:'GERÇEK EMİRLER: KAPALI',navDash:'Panel',navMarkets:'Piyasalar',navResearch:'Araştırma',navExperiments:'Deneyler',navSystem:'Sistem',totalPortfolio:'TOPLAM PAPER PORTFÖY',totalPnl:'Toplam K/Z',return:'Getiri',positions:'Açık Pozisyon',master:'ZİTAR ANA KONTROL',start:'BAŞLAT',safeStop:'GÜVENLİ DURDUR',preview:'Önizleme — kontrol tuşları henüz execution sistemine bilinçli olarak bağlı değil.',marketData:'Piyasa Verisi',lastCandle:'Son İşlenen Mum',runs:'Prospective Tur',nextRun:'Sonraki Otomatik Çalışma',strategyAccounts:'Strateji Hesapları',modules:'ZİTAR Zeka Modülleri',mtfDesc:'1m → 1M piyasa yapısı ve zaman dilimleri arası araştırma katmanı.',aiDesc:'Versiyonlu hipotezler, kanıtlar, forward doğrulama ve araştırma hafızası.',radarDesc:'Ana evren dışındaki haber, hacim ivmesi ve anomali takibi.',futuresDesc:'OI, funding, basis, likidasyon ve spot/futures ayrışma araştırması.',voiceDesc:'ZİTAR’ın araştırma gelişimini açıklamaya odaklı yerel sesli iletişim.',integrityDesc:'Overfitting, küçük örneklem, look-ahead ve deney bütünlüğü uyarıları.',liqDesc:'Hacim, spread, işlem sayısı, derinlik, price impact ve likidite sürekliliği.',agentsDesc:'Master Plan sonrasında tek ZİTAR arayüzünün arkasındaki uzman ajanlar.',activeSignals:'Son Mum — Aktif Sinyaller',strategy:'Strateji',pair:'Parite',signal:'Sinyal',candle:'Mum',tradeHistory:'Paper İşlem Geçmişi',trade:'İşlem',time:'Zaman',runHistory:'V3 Çalışma Geçmişi',footer:'ZİTAR V2.2 • salt-okunur • emir endpoint’i yok • 5 sn otomatik yenileme',noPos:'Açık pozisyon yok',cost:'Maliyet',entry:'Model Giriş',bid:'Canlı Bid',ask:'Canlı Ask',posValue:'Pozisyon Değeri',qty:'Miktar',cash:'Nakit',equity:'Equity',unreal:'Gerçekleşmemiş K/Z',realized:'Gerçekleşmiş K/Z',noSignal:'Aktif BUY/SELL sinyali yok',noTrade:'Henüz V3 paper işlem yok',noRun:'Çalışma kaydı yok'},en:{subtitle:'Personal Market Intelligence • Control Center V2.2',realoff:'REAL ORDERS: OFF',navDash:'Dashboard',navMarkets:'Markets',navResearch:'Research',navExperiments:'Experiments',navSystem:'System',totalPortfolio:'TOTAL PAPER PORTFOLIO',totalPnl:'Total P/L',return:'Return',positions:'Open Positions',master:'ZİTAR MASTER CONTROL',start:'START',safeStop:'SAFE STOP',preview:'Preview only — controls are intentionally not connected to execution yet.',marketData:'Market Data',lastCandle:'Last Processed Candle',runs:'Prospective Runs',nextRun:'Next Scheduled Run',strategyAccounts:'Strategy Accounts',modules:'ZİTAR Intelligence Modules',mtfDesc:'1m → 1M market structure and cross-timeframe research layer.',aiDesc:'Versioned hypotheses, evidence, forward validation and research memory.',radarDesc:'News, volume velocity and anomaly watch beyond the core universe.',futuresDesc:'OI, funding, basis, liquidations and spot/futures divergence research.',voiceDesc:"Local voice conversation focused on explaining ZİTAR's research development.",integrityDesc:'Overfitting, small-sample, look-ahead and experiment-integrity warnings.',liqDesc:'Volume, spread, trades, depth, price impact and liquidity persistence.',agentsDesc:'Specialist agents behind one ZİTAR interface after the Master Plan.',activeSignals:'Latest Candle — Active Signals',strategy:'Strategy',pair:'Pair',signal:'Signal',candle:'Candle',tradeHistory:'Paper Trade History',trade:'Trade',time:'Time',runHistory:'V3 Run History',footer:'ZİTAR V2.3.1 TEST • read-only • no order endpoint • auto refresh 5s',noPos:'No open position',cost:'Cost',entry:'Modeled Entry',bid:'Live Bid',ask:'Live Ask',posValue:'Position Value',qty:'Quantity',cash:'Cash',equity:'Equity',unreal:'Unrealized P/L',realized:'Realized P/L',noSignal:'No active BUY/SELL signal',noTrade:'No V3 paper trade yet',noRun:'No run record'}};
+function tr(k){return (I[lang]&&I[lang][k])||k}function applyLang(){document.documentElement.lang=lang;document.querySelectorAll('[data-i18n]').forEach(e=>e.textContent=tr(e.dataset.i18n));document.getElementById('langBtn').textContent=lang==='tr'?'TR | EN':'EN | TR';refresh()}document.getElementById('langBtn').onclick=()=>{lang=lang==='tr'?'en':'tr';localStorage.setItem('zitar_lang',lang);applyLang()};
+const fmt=n=>Number(n||0).toLocaleString(lang==='tr'?'tr-TR':'en-US',{minimumFractionDigits:2,maximumFractionDigits:2});const pct=n=>Number(n||0).toFixed(2)+'%';const pc=n=>Number(n||0)>=0?'green':'red';const get=(o,ks,f='')=>{for(const k of ks){if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=='')return o[k]}return f};const strategyName=r=>get(r,['strategy','strategy_name']);const symbolName=r=>get(r,['symbol','pair']);const signalName=r=>String(get(r,['signal','action'],'NONE')).toUpperCase();const candleName=r=>get(r,['candle_close_utc','signal_candle_close_utc']);
+function renderStrategy(name,s){let p=!s.positions.length?`<div class="position muted">${tr('noPos')}</div>`:s.positions.map(x=>`<div class="position"><div class="position-title"><span>${x.symbol}</span><span class="${pc(x.unrealized_try)}">${fmt(x.unrealized_try)} TRY (${pct(x.unrealized_pct)})</span></div><div class="posgrid"><div class="positem">${tr('cost')}<strong>${fmt(x.cost_try)} TRY</strong></div><div class="positem">${tr('entry')}<strong>${x.modeled_entry}</strong></div><div class="positem">${tr('bid')}<strong class="blue">${x.bid}</strong></div><div class="positem">${tr('ask')}<strong>${x.ask}</strong></div><div class="positem">${tr('posValue')}<strong>${fmt(x.value_try)} TRY</strong></div><div class="positem">${tr('qty')}<strong>${x.quantity}</strong></div></div></div>`).join('');return `<div class="card"><h3>${name}</h3><div class="metrics"><div class="metric"><div class="label">${tr('equity')}</div><div class="v">${fmt(s.equity)} TRY</div></div><div class="metric"><div class="label">${tr('cash')}</div><div class="v">${fmt(s.cash)} TRY</div></div><div class="metric"><div class="label">${tr('unreal')}</div><div class="v ${pc(s.unrealized)}">${fmt(s.unrealized)} TRY</div></div><div class="metric"><div class="label">${tr('return')}</div><div class="v ${pc(s.return_pct)}">${pct(s.return_pct)}</div></div><div class="metric"><div class="label">${tr('realized')}</div><div class="v ${pc(s.realized)}">${fmt(s.realized)} TRY</div></div><div class="metric"><div class="label">${tr('positions')}</div><div class="v">${s.positions.length}</div></div></div>${p}</div>`}
+function signalRow(r){const s=signalName(r),c=s==='BUY'?'signal-buy':s==='SELL'?'signal-sell':'signal-none';return `<tr><td>${strategyName(r)}</td><td>${symbolName(r)}</td><td class="${c}">${s}</td><td>${candleName(r)}</td></tr>`}
+let v3Busy=false,latestV3=null;
+async function refresh(){
+  if(v3Busy)return;v3Busy=true;
+  try {
+    const response = await fetch('/api/dashboard', {cache:'no-store',signal:AbortSignal.timeout(18000)});
+    if(!response.ok)throw Error('V3 veri servisi '+response.status);
+    const d = await response.json();
+    latestV3=d; renderMarkets();
+    sanitizeLegacy(d);
+
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString(
+      lang === 'tr' ? 'tr-TR' : 'en-US', {timeZone:'Europe/Istanbul'}
+    );
+    document.getElementById('status').textContent = d.state_status || 'OK';
+    document.getElementById('status').className = 'value green';
+    document.getElementById('candle').textContent = d.latest_candle || '--';
+    document.getElementById('runs').textContent = d.runs_total || 0;
+
+    const sc = d.scheduler || {};
+    const ss = sc.State || 'UNKNOWN';
+    document.getElementById('nextRun').textContent = sc.NextRunTime || '--';
+    document.getElementById('schedulerHealth').textContent = ss;
+    document.getElementById('schedulerHealth').className = ss === 'Ready' ? 'green' : 'yellow';
+    document.getElementById('engineHealth').textContent = (d.protocol || 'V3') + ' ' + (d.state_status || 'UNKNOWN');
+    document.getElementById('engineHealth').className = d.state_status ? 'green' : 'yellow';
+    document.getElementById('marketHealth').textContent = String(d.universe_count || 0) + '/21';
+    document.getElementById('marketHealth').className = d.universe_count === 21 ? 'green' : 'yellow';
+    document.getElementById('apiHealth').textContent = d.book_error ? 'DEGRADED' : 'ONLINE';
+    document.getElementById('apiHealth').className = d.book_error ? 'yellow' : 'green';
+
+    let init = 0, eq = 0, pos = 0;
+    Object.values(d.strategies || {}).forEach(function(s){
+      init += Number(s.initial || 0);
+      eq += Number(s.equity || 0);
+      pos += (s.positions || []).length;
+    });
+    const pl = eq - init;
+    const ret = init ? (pl / init * 100) : 0;
+    document.getElementById('totalEquity').textContent = fmt(eq) + ' TRY';
+    document.getElementById('totalPnl').textContent = fmt(pl) + ' TRY';
+    document.getElementById('totalPnl').className = 'value ' + pc(pl);
+    document.getElementById('totalReturn').textContent = pct(ret);
+    document.getElementById('totalReturn').className = 'value ' + pc(ret);
+    document.getElementById('totalPositions').textContent = pos;
+
+
+    const order = ['SMA20_50','EMA12_26','RSI14'];
+    document.getElementById('strategies').innerHTML = order
+      .filter(function(x){ return d.strategies && d.strategies[x]; })
+      .map(function(x){ return renderStrategy(x, d.strategies[x]); })
+      .join('');
+
+    const active = d.active_signals || [];
+    document.getElementById('activeSignals').innerHTML = active.length
+      ? active.map(signalRow).join('')
+      : '<tr><td colspan="4" class="muted">' + tr('noSignal') + '</td></tr>';
+
+    const trades = d.recent_trades || [];
+    document.getElementById('trades').innerHTML = trades.length
+      ? trades.map(function(r){
+          return '<tr><td>' + strategyName(r) + '</td><td>' + symbolName(r) +
+                 '</td><td>' + get(r,['side','action','signal']) + '</td><td>' +
+                 get(r,['executed_at_utc','execution_utc','run_utc']) + '</td></tr>';
+        }).join('')
+      : '<tr><td colspan="4" class="muted">' + tr('noTrade') + '</td></tr>';
+
+    const runs = d.recent_runs || [];
+    document.getElementById('runHistory').innerHTML = runs.length
+      ? runs.map(function(r){
+          return '<tr><td>' + get(r,['candle_close_utc']) + '</td><td>' +
+                 get(r,['signal_rows']) + '</td><td>' + get(r,['paper_trades']) +
+                 '</td><td class="green">' + get(r,['status']) + '</td></tr>';
+        }).join('')
+      : '<tr><td colspan="4" class="muted">' + tr('noRun') + '</td></tr>';
+  } catch(e) {
+    console.error('ZITAR refresh error:', e);
+    document.getElementById('status').textContent = 'DASHBOARD ERROR';
+    document.getElementById('status').className = 'value red';
+    document.getElementById('apiHealth').textContent='V3 BAĞLANTISI YOK';
+    document.getElementById('apiHealth').className='red';
+  } finally {v3Busy=false}
+}
+
+let researchLoaded=false;
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+async function apiJson(url){const r=await fetch(url,{cache:'no-store',signal:AbortSignal.timeout(18000)});const j=await r.json();if(!r.ok)throw new Error(j.detail||j.error||('HTTP '+r.status));return j}
+function ctxObs(c,k){return c&&c[k]&&c[k].observation?c[k].observation:'--'}
+async function loadResearchSymbols(){
+  const h=await apiJson('/api/research-proxy/health');
+  const x=await apiJson('/api/research-proxy/symbols');
+  const sel=document.getElementById('researchSymbol');
+  const old=sel.value||'BTCTRY';
+  sel.innerHTML=(x.symbols||[]).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
+  sel.value=(x.symbols||[]).includes(old)?old:((x.symbols||[]).includes('BTCTRY')?'BTCTRY':(x.symbols||[])[0]||'');
+  document.getElementById('researchApiStatus').textContent='Servis: '+(h.status||'UNKNOWN')+' · Kayıt zinciri: '+(h.chain_valid?'tutarlı':'hatalı')+' · Güncellik göstergesi değildir';
+  document.getElementById('researchApiStatus').className='research-status '+(h.chain_valid?'green':'red');
+  researchLoaded=true;
+}
+function researchLabel(v){return ({CHANGED:'Özet gözlemler değişti',EVIDENCE_REFRESH:'Kaynaklar yenilendi; özet aynı',overall:'Genel görünüm',short:'Kısa vade',medium:'Orta vade',long:'Uzun vade',monthly:'Aylık',agreement:'Yön uyumu',confidence:'Veri kalitesi',positive_momentum:'Pozitif momentum görülen dönemler',negative_momentum:'Negatif momentum görülen dönemler',high_volume:'Yüksek hacimli dönemler',high_volatility:'Yüksek oynaklıklı dönemler',conflicts:'Yön uyuşmazlıkları',UP:'Yukarı yönlü',DOWN:'Aşağı yönlü',MIXED:'Karışık / net yön yok',HIGH:'Yüksek',MEDIUM:'Orta',LOW:'Düşük',OK:'Yeterli örnek',LIMITED:'Sınırlı örnek',INSUFFICIENT:'Yetersiz veri',MISSING:'Veri yok',INITIAL_OBSERVATION:'İlk kayıt',NO_MEANINGFUL_CHANGE:'Anlamlı yön değişimi yok'})[v]||v||'Bilinmiyor';}
+function researchValue(v){if(Array.isArray(v))return v.length?v.map(x=>typeof x==='object'?x.timeframe_a+' '+researchLabel(x.observation_a)+' / '+x.timeframe_b+' '+researchLabel(x.observation_b):researchLabel(x)).join(', '):'Yok';return researchLabel(v);}
+function researchDate(v){const n=typeof v==='number'?v:Date.parse(v);return Number.isFinite(n)?new Date(n).toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})+' İstanbul':'Tarih kaydedilmemiş';}
+function renderResearchExplanation(d,m,latest){
+ const box=document.getElementById('researchExplanation');box.replaceChildren();
+ const p=t=>{const e=document.createElement('p');e.textContent=t;box.appendChild(e);};
+ p('Sonuç: '+d.symbol+' için kısa vade '+researchLabel(ctxObs(m.contexts,'SHORT')).toLowerCase()+', orta vade '+researchLabel(ctxObs(m.contexts,'MEDIUM')).toLowerCase()+', uzun vade '+researchLabel(ctxObs(m.contexts,'LONG')).toLowerCase()+'. Bunlar kayıtlı mumlardan hesaplanan gözlemlerdir.');
+ const conflicts=m.explicit_conflicts||[];
+ p(conflicts.length?'Uyuşmazlık: '+conflicts.map(x=>x.timeframe_a+' '+researchLabel(x.observation_a)+'; '+x.timeframe_b+' '+researchLabel(x.observation_b)).join(' | ')+'. Zaman dilimleri aynı yönde değil.':'Kayıtta açık yukarı/aşağı yön çatışması bulunmuyor; bu tek başına alım veya satım gerekçesi değildir.');
+ const change=latest.change_from_previous||{},fields=change.changed_fields||[];
+ p('Hafızaya kaydedilen değişim: '+(d.memory_versions<2?'Bu parite için yalnız ilk kayıt var; önceki kayıtla karşılaştırma yapılamıyor.':fields.length?fields.map(x=>researchLabel(x.field)+': '+researchValue(x.before)+' → '+researchValue(x.after)).join(' | '):'Gösterge veya kaynak ayrıntıları yenilenmiş olabilir; özet yön alanlarında değişim kaydı yok.'));
+ const times=(m.evidence||[]).filter(x=>!x.last_open_time_ms).length;
+ p('Veri kapsamı: '+(m.evidence||[]).length+' zaman dilimi. '+times+' zaman diliminde son mum tarihi eksik. Aşağıdaki zamanlar mumun açılış zamanıdır; kapanmış veya kesintisiz veri garantisi değildir.');
+ const r=d.refresh_status;
+ p(r?'Otomatik analiz: '+({UPDATED:'Son döngü tamamlandı',ERROR:'Son döngü hata verdi',RUNNING:'Çalışıyor',NOT_RUN:'Henüz çalışmadı'})[r.state]+' · Son başarılı çalışma: '+researchDate(r.last_success_utc)+' · Kontrol aralığı: 15 dakika.'+(r.error?' Hata: '+r.error:''):'Otomatik döngü durumu API’de henüz yok; servis yeni kodla başlatılmalı.');
+ p('Bu panelin öğrendiği şey, kaydedilmiş piyasa gözlemleri ve aralarındaki farklardır. Model eğitimi veya kanıtlanmış strateji iyileşmesi göstermez. “Kayıtları yenile” yeni veri indirmez; son analiz kaydını ekrana getirir.');
+}
+
+async function loadResearch(){
+  try{
+    if(!researchLoaded)await loadResearchSymbols();
+    const symbol=document.getElementById('researchSymbol').value;
+    if(!symbol)return;
+    const d=await apiJson('/api/research-proxy/context?symbol='+encodeURIComponent(symbol));
+    const m=d.current_mtf_research||{}, c=m.contexts||{}, latest=d.latest_memory||{};
+
+    const stamp=latest.source_generated_utc||latest.observed_utc;
+    const parsed=stamp?Date.parse(stamp):NaN;
+    const age=Date.now()-parsed;
+    const freshness=document.getElementById('researchFreshness');
+    freshness.textContent=Number.isFinite(parsed)&&age>=0?
+      'Analiz üretim zamanı: '+new Date(parsed).toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})+' (İstanbul) · Kayıt yaşı: '+Math.floor(age/3600000)+' saat '+Math.floor(age%3600000/60000)+' dakika. '+(age>86400000?'Eski kayıt (24 saatten eski). ':'')+'Canlı piyasa güncelliği doğrulanmadı. Veri kalitesi etiketi bu kayda aittir.':
+      'Geçerli analiz tarihi bulunamadı. Veri güncelliği bilinmiyor.';
+    document.getElementById('rShort').textContent=ctxObs(c,'SHORT');
+    document.getElementById('rMedium').textContent=ctxObs(c,'MEDIUM');
+    document.getElementById('rLong').textContent=ctxObs(c,'LONG');
+    document.getElementById('rMonthly').textContent=ctxObs(c,'MONTHLY_CONTEXT');
+    document.getElementById('rAgree').textContent=get(m.cross_timeframe_agreement||{},['level'],'--');
+    document.getElementById('rConfidence').textContent=get(m.data_confidence||{},['level'],'--');
+    document.getElementById('rVersion').textContent='v'+String(latest.symbol_version||d.memory_versions||0);
+    renderResearchExplanation(d,m,latest);
+    ['rShort','rMedium','rLong','rMonthly','rAgree','rConfidence'].forEach(id=>{const e=document.getElementById(id);e.textContent=researchLabel(e.textContent);});
+    const conflicts=m.explicit_conflicts||[];
+    document.getElementById('rConflictCount').textContent=conflicts.length;
+    document.getElementById('rConflicts').innerHTML=conflicts.length?conflicts.map(x=>`<div class="research-row conflict">${esc(x.timeframe_a)} ${esc(x.observation_a)} ↔ ${esc(x.timeframe_b)} ${esc(x.observation_b)}</div>`).join(''):'<div class="muted">Açık yukarı/aşağı yön çatışması yok.</div>';
+    const ev=m.evidence||[];
+    document.getElementById('rEvidence').innerHTML=ev.length?ev.map(x=>`<div class="research-row"><div><strong>${esc(x.timeframe)}</strong> · ${esc(researchLabel(x.trend))} · RSI ${esc(x.rsi14_simple??'--')}</div><div class="research-k">Kaynak: ${esc(x.source)} · ${esc(researchLabel(x.quality))} · ${esc(x.candle_count)} mum<br>Son mum açılışı: ${esc(researchDate(x.last_open_time_ms))}</div></div>`).join(''):'<div class="muted">Evidence yok.</div>';
+    const vh=d.version_history||[];
+    document.getElementById('rChanges').innerHTML=vh.length?vh.slice().reverse().map(x=>{const ch=x.change||{};const fs=(ch.changed_fields||[]).map(y=>researchLabel(y.field)).join(', ');return `<div class="research-row"><strong>v${esc(x.version)}</strong> · ${esc(researchLabel(ch.change_type))}<div class="research-k">${esc(researchDate(x.observed_utc))} ${fs?'· '+esc(fs):''}</div></div>`}).join(''):'<div class="muted">Memory history yok.</div>';
+  }catch(e){
+    document.getElementById('researchFreshness').textContent='Veri alınamadı. Görünen önceki kayıt güncel kabul edilmemeli.';
+    console.error('Research error',e);
+    document.getElementById('researchApiStatus').textContent='5012: OFFLINE / ERROR';
+    document.getElementById('researchApiStatus').className='research-status red';
+  }
+}
+
+async function chatHealth(){
+  try{
+    const h=await apiJson('/api/chat-proxy/health');
+    const el=document.getElementById('chatApiStatus');
+    el.textContent='Ortak Chat: '+(h.ok?'BAĞLI':'HATA');
+    el.className='value '+(h.ok?'green':'red');
+  }catch(e){
+    const el=document.getElementById('chatApiStatus');el.textContent='Ortak Chat: BAĞLANTI YOK';el.className='value red';
+  }
+}
+function addChat(role,text){
+  const box=document.getElementById('chatMessages');
+  const d=document.createElement('div');d.className='chat-msg '+(role==='user'?'chat-user':'chat-zitar');d.textContent=text;
+  box.appendChild(d);box.scrollTop=box.scrollHeight;
+}
+async function sendChat(){
+  const input=document.getElementById('chatInput');const q=input.value.trim();if(!q)return;
+  addChat('user',q);input.value='';const btn=document.getElementById('chatSend');btn.disabled=true;btn.textContent='...';
+  try{
+    const r=await fetch('/api/chat-proxy/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,use_qwen:true,session_id:zitarSession})});
+    const d=await r.json();if(!r.ok)throw new Error(d.detail||d.error||('HTTP '+r.status));
+    addChat('zitar',d.answer||'Cevap yok.'); if(d.council_job_id) watchCouncil(d.council_job_id);
+    document.getElementById('chatSymbol').textContent=d.symbol||'--';
+    document.getElementById('chatIntent').textContent=d.intent||'--';
+    document.getElementById('chatMode').textContent=d.mode||'--';
+  }catch(e){addChat('zitar','CHAT ERROR: '+e.message)}
+  finally{btn.disabled=false;btn.textContent='Gönder'}
+}
+function legacyShowView(v){
+  document.getElementById('dashboardView').style.display=v==='dashboard'?'block':'none';
+  document.getElementById('researchView').style.display=v==='research'?'block':'none';
+  document.getElementById('chatView').style.display=v==='chat'?'block':'none';
+  if(v==='research')loadResearch();
+  if(v==='chat')chatHealth();
+}
+document.getElementById('dashBtn').onclick=()=>showView('dashboard');
+document.getElementById('researchBtn').onclick=()=>showView('research');
+document.getElementById('chatBtn').onclick=()=>showView('chat');
+document.getElementById('chatSend').onclick=sendChat;
+document.getElementById('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}});
+document.getElementById('researchRefresh').onclick=loadResearch;
+document.getElementById('researchSymbol').onchange=loadResearch;
+
+
+
+Object.assign(I.tr,{subtitle:'Personal Market Intelligence • Birleşik Kontrol Merkezi',totalPortfolio:'MASTER PAPER PORTFÖY',totalPnl:'Toplam K/Z',preview:'Salt okunur görünüm • Master paper runtime çalışması Sistem sekmesinden izlenir.',strategyAccounts:'V3 · Strateji Hesapları',footer:'ZİTAR • Master + V3 + Araştırma • gerçek emirler kapalı • 5 sn yenileme',v3Title:'V3 · Bağımsız strateji hesapları',v3Note:'Master’dan ayrı · 3 × 10.000 TRY başlangıç',v3Total:'V3 toplam equity',v3off:'V3 · REFERANS',futuresoff:'VADELİ GERÇEK EMİR: KAPALI',masterTitle:'Master · Ana paper portföy',masterPositions:'Master pozisyonları',masterEvents:'Master olayları',rollover:'Günlük muhasebe / Rollover',marketTitle:'Piyasalar · V3 pozisyonlarının canlı fiyatları',marketNote:'V3’te açık pozisyon taşıyan pariteler. Kaynak: mevcut Control Center’ın public bookTicker görünümü.',experimentsTitle:'Deneyler ve regression kayıtları',experimentsNote:'Kaydedilmiş test sonuçları; bu ekran testleri veya paper işlemleri tetiklemez. Tarihler kayıt zamanıdır.',systemTitle:'Sistem · Runtime ve pipeline',runtimeSteps:'Runtime adımları',lastErrors:'Son hatalar',services:'Bağlı servisler',memoryTitle:'Memory → Learning → Research → Evidence',back:'← Geri'});
+Object.assign(I.en,{subtitle:'Personal Market Intelligence • Unified Control Center',totalPortfolio:'MASTER PAPER PORTFOLIO',preview:'Read-only view • Monitor the Master paper runtime in System.',strategyAccounts:'V3 · Strategy Accounts',footer:'ZİTAR • Master + V3 + Research • real orders off • refresh 5s',v3Title:'V3 · Independent strategy accounts',v3Note:'Separate from Master · 3 × 10,000 TRY initial capital',v3Total:'V3 total equity',v3off:'V3 WRITE: OFF',futuresoff:'FUTURES: OFF',masterTitle:'Master · Main paper portfolio',masterPositions:'Master positions',masterEvents:'Master events',rollover:'Daily accounting / Rollover',marketTitle:'Markets · Live prices of V3 positions',marketNote:'Symbols with open V3 positions. Source: existing Control Center public bookTicker view.',experimentsTitle:'Experiments and regression records',experimentsNote:'Saved results only. This view does not run tests or execute trades. Dates show when results were recorded.',systemTitle:'System · Runtime and pipeline',runtimeSteps:'Runtime stages',lastErrors:'Recent errors',services:'Connected services',memoryTitle:'Memory → Learning → Research → Evidence',back:'← Back'});
+const E=id=>document.getElementById(id);
+const label=(trText,enText)=>lang==='tr'?trText:enText;
+const timeText=x=>x?new Date(x).toLocaleString(lang==='tr'?'tr-TR':'en-GB',{timeZone:'Europe/Istanbul'}):'—';
+const display=x=>x===null||x===undefined||x===''?'—':String(x);
+function sanitizeLegacy(obj){for(const k of Object.keys(obj)){if(typeof obj[k]==='string')obj[k]=esc(obj[k]);else if(obj[k]&&typeof obj[k]==='object')sanitizeLegacy(obj[k]);}}
+function stat(k,v,cls=''){return `<div class="stat"><div class="label">${esc(k)}</div><div class="value ${cls}">${esc(display(v))}</div></div>`}
+function metric(k,v,cls=''){return `<div class="metric"><div class="label">${esc(k)}</div><div class="v ${cls}">${esc(display(v))}</div></div>`}
+function table(id,heads,rows){E(id).innerHTML='<table><thead><tr>'+heads.map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+(rows.length?rows.map(r=>'<tr>'+r.map(x=>'<td>'+esc(display(x))+'</td>').join('')+'</tr>').join(''):`<tr><td colspan="${heads.length}" class="muted">${label('Kayıt yok','No records')}</td></tr>` )+'</tbody></table>'}
+let masterData=null,modulesData=[],activeView='dashboard',detailBack='dashboard',masterBusy=false;
+const views=['dashboard','master','markets','research','experiments','chat','system','moduleDetail'];
+function showView(v){
+  activeView=v;views.forEach(x=>E(x+'View').style.display=x===v?'block':'none');
+  const buttons={dashboard:'dashBtn',master:'masterBtn',markets:'marketsBtn',research:'researchBtn',experiments:'experimentsBtn',chat:'chatBtn',system:'systemBtn'};
+  Object.entries(buttons).forEach(([key,id])=>{E(id).classList.toggle('active',v===key);E(id).setAttribute('aria-current',v===key?'page':'false')});
+  if(v==='research')loadResearch();if(v==='chat')chatHealth();if(v==='markets')renderMarkets();if(v==='system')loadServices();if(v==='experiments')loadModules();
+}
+function renderMaster(){
+ if(!masterData)return;const {master:m,runtime:r}=masterData,a=m.account,p=m.current_period,pipe=r.pipeline||{};
+ const eq=Number(a.equity_try),initial=Number(m.lifetime.initial_capital_try),pnl=eq-initial;
+ E('masterEquity').textContent=fmt(eq)+' TRY';E('masterPnl').textContent=fmt(pnl)+' TRY';E('masterPnl').className='value '+pc(pnl);
+ E('masterReturn').textContent=pct(initial?pnl/initial*100:0);E('masterReturn').className='value '+pc(pnl);E('masterPositionCount').textContent=a.open_position_count+' / '+m.rules.max_spot_positions;
+ const health=r.live_health;E('systemState').textContent=health;E('systemState').className='value '+(health==='RUNNING'?'green':'yellow');
+ E('runtimeHealth').textContent=health+' · '+Number(r.heartbeat_age_seconds).toFixed(0)+'s';E('runtimeHealth').className=health==='RUNNING'?'green':'yellow';
+ E('mtmHealth').textContent=(r.stages?.mtm?.status||'—')+' / '+(r.stages?.rollover?.status||'—');E('mtmHealth').className=r.stages?.mtm?.status==='OK'?'green':'yellow';
+ const unsafe=m.authorities.real_order!==false||m.rules.futures_enabled!==false;
+ const waitingV3=health==='DEGRADED'&&r.pipeline?.v3_last_success_utc===null&&r.pipeline?.v3_status==='STALE'&&r.error_count===0&&r.stages?.mtm?.status==='OK';
+ E('connectionAlert').textContent=unsafe?label('GÜVENLİK BAYRAĞI UYUŞMAZLIĞI','SAFETY FLAG MISMATCH'):waitingV3?label('Master çalışıyor. Sıfırlama sonrası V3 henüz ilk tam saatlik mumunu üretmedi. Vadeli hesapların güncelliği aşağıda ayrı gösterilir.','Master is active. V3 has not produced its first full hourly candle since reset. Futures freshness is shown separately below.'):health!=='RUNNING'?label('Master durum uyarısı: '+health+'. Sistem sekmesindeki ayrıntıları kontrol edin. Bu uyarı ayrı vadeli hesapların veri durumunu belirtmez.','Master status warning: '+health+'. Check System for details. This does not describe the separate futures accounts.'):'';
+ E('clock').textContent=new Date().toLocaleTimeString('tr-TR',{timeZone:'Europe/Istanbul'});
+ E('masterStats').innerHTML=[['Equity',fmt(a.equity_try)+' TRY'],[tr('cash'),fmt(a.cash_try)+' TRY'],[tr('posValue'),fmt(a.position_market_value_try)+' TRY'],[tr('unreal'),fmt(a.unrealized_pnl_try)+' TRY'],[label('Günlük realized','Daily realized'),fmt(p.daily_realized_pnl_try)+' TRY'],[label('Günlük getiri','Daily return'),pct(p.daily_return_pct)],[label('Lifetime realized','Lifetime realized'),fmt(m.lifetime.total_realized_pnl_try)+' TRY'],[label('Günlük slot','Daily slot'),fmt(p.spot_slot_budget_try)+' TRY'],[label('Dönem','Period'),p.period_id],[label('Başlangıç equity','Start equity'),fmt(p.start_equity_try)+' TRY'],[label('Son BID değerleme','Last BID valuation'),timeText(m.runtime_mtm?.last_success_utc)],[label('Kapalı işlem / günlük','Closed trades / daily'),p.closed_trade_count]].map(x=>stat(...x)).join('');
+ E('masterPositions').innerHTML=Object.entries(a.positions).map(([symbol,x])=>`<div class="card"><div class="position-title"><span>${esc(symbol)}</span><span class="${pc(x.unrealized_pnl_try)}">${fmt(x.unrealized_pnl_try)} TRY (${pct(Number(x.unrealized_pnl_try)/Number(x.total_cost_try)*100)})</span></div><div class="summaryline">${label('Destekçiler','Supporters')}: ${esc(x.strategy_support.join(' · '))}</div><div class="metrics">${[[tr('cost'),fmt(x.total_cost_try)+' TRY'],[tr('entry'),x.entry_fill_price],[label('Referans giriş','Entry reference'),x.entry_reference_price],[tr('qty'),x.quantity],[tr('bid'),x.live_bid],[tr('ask'),x.live_ask],[tr('posValue'),fmt(x.market_value_try)+' TRY'],[label('Son mark','Last mark'),x.last_mark_price],[label('Açılış','Opened'),timeText(x.opened_utc)],[label('Fiyat zamanı','Quote received'),timeText(x.quote_received_utc)]].map(x=>metric(...x)).join('')}</div></div>`).join('')||`<div class="card muted">${tr('noPos')}</div>`;
+ const legacy=(r.legacy_events||[]).map(x=>({utc:x.executed_at_utc,side:x.side,symbol:x.symbol,strategy:x.strategy,result:x.result,event_id:x.source_trade_id}));
+ table('masterEvents',[tr('time'),tr('trade'),tr('pair'),tr('strategy'),label('Sonuç','Result'),'Event ID'],[...legacy,...(m.runtime_execution_receipts||[])].slice(-40).reverse().map(x=>[timeText(x.utc),x.side,x.symbol,x.strategy,x.result,x.event_id?.slice(0,16)]));
+ table('dailyArchive',[label('Dönem','Period'),label('Başlangıç','Start'),label('Kapanış','Close'),label('Getiri %','Return %'),'Realized',label('Son MTM','Last MTM')],(m.runtime_daily_records||[]).slice(-15).reverse().map(x=>[x.period_id,fmt(x.start_equity_try),fmt(x.closing_equity_try),x.equity_return_pct,fmt(x.realized_pnl_try),timeText(x.last_mtm_utc)]));
+ E('pipelineStats').innerHTML=[['V3',pipe.v3_status],['V3 trade',pipe.v3_trade_count],['Detector',pipe.detector_processed],['Event log',pipe.event_count],['Bridge',pipe.bridge_processed],['Master',pipe.master_processed],['Pending',pipe.pending_events],['Duplicate',pipe.duplicate_status],['Accounting',pipe.accounting_identity],['Heartbeat',timeText(r.heartbeat_utc)],[label('Son başarılı döngü','Last successful cycle'),timeText(r.last_successful_cycle_utc)],['PID / '+label('Döngü','Cycle'),r.pid+' / '+r.cycle_count]].map(x=>stat(...x)).join('');
+ table('runtimeSteps',[label('Adım','Stage'),label('Durum','Status'),tr('time')],Object.entries(r.stages||{}).map(([k,x])=>[k,x.status,timeText(x.utc)]));
+ table('runtimeErrors',[tr('time'),label('Adım','Stage'),label('Hata','Error')],(r.recent_errors||[]).slice(-20).reverse().map(x=>[timeText(x.utc),x.stage,x.message]));
+}
+async function refreshMaster(){if(masterBusy)return;masterBusy=true;try{masterData=await apiJson('/api/snapshot');renderMaster()}catch(e){E('connectionAlert').textContent=label('Master bağlantısı yok: ','Master connection failed: ')+e.message;E('systemState').textContent='OFFLINE';E('systemState').className='value red';E('runtimeHealth').textContent='OFFLINE'}finally{masterBusy=false}}
+function renderMarkets(){if(!latestV3)return;const symbols={};Object.entries(latestV3.strategies||{}).forEach(([strategy,s])=>(s.positions||[]).forEach(p=>{symbols[p.symbol]??={...p,strategies:[]};symbols[p.symbol].strategies.push(strategy)}));const q=E('marketFilter').value.toUpperCase();table('marketTable',[tr('pair'),tr('bid'),tr('ask'),'Spread %',tr('strategy'),label('Veri durumu','Data status')],Object.values(symbols).filter(x=>x.symbol.includes(q)).sort((a,b)=>a.symbol.localeCompare(b.symbol)).map(x=>[x.symbol,x.bid,x.ask,Number(x.bid)>0?((Number(x.ask)-Number(x.bid))/Number(x.bid)*100).toFixed(3):'—',x.strategies.join(', '),latestV3.book_error?'STALE / ERROR':'LIVE SNAPSHOT']))}
+function moduleCard(x){return `<div class="module"><div class="modulehead"><h3>${esc(x.title)}</h3><span class="badge ${x.available?'blue':'yellow'}">${esc(x.available?label('KAYIT VAR','SAVED DATA'):label('VERİ YOK','NO DATA'))}</span></div><p>${esc(lang==='tr'?x.description:x.description_en)}</p><p>${esc(timeText(x.modified_utc))}${x.record_count!==null?' · '+x.record_count+' '+label('kayıt','records'):''}</p><button class="btn module-open" data-module="${esc(x.id)}">${label('İncele →','Inspect →')}</button></div>`}
+function bindModules(){document.querySelectorAll('.module-open').forEach(b=>b.onclick=()=>openModule(b.dataset.module))}
+async function loadModules(){try{const d=await apiJson('/api/modules');modulesData=d.modules;E('moduleCards').innerHTML=modulesData.filter(x=>x.group==='intelligence').map(moduleCard).join('');E('memoryCards').innerHTML=modulesData.filter(x=>x.group==='memory').map(moduleCard).join('');E('experimentCards').innerHTML=modulesData.filter(x=>x.group==='experiments').map(moduleCard).join('');bindModules()}catch(e){E('moduleCards').textContent=e.message}}
+function readable(v){if(v===null||v===undefined)return '—';if(typeof v==='object')return JSON.stringify(v,null,2);return String(v)}
+async function openModule(id){activeModuleId=id;detailBack=activeView==='moduleDetail'?detailBack:activeView;showView('moduleDetail');E('moduleTitle').textContent=label('Yükleniyor…','Loading…');E('moduleContent').textContent='';try{const d=await apiJson('/api/module?id='+encodeURIComponent(id));E('moduleTitle').textContent=d.title;E('moduleInfo').textContent=(lang==='tr'?d.description:d.description_en)+' · '+timeText(d.modified_utc)+' · '+label('Kaydedilmiş veri; canlı servis sağlığı değildir.','Saved data; does not imply live service health.');const data=d.data;if(id==='cost_study'){renderCostStudy(data);return;}let rows=Array.isArray(data)?data:(data?.results||data?.stages||data?.observations||[]);if(!Array.isArray(rows))rows=[];E('moduleContent').innerHTML=rows.slice(-30).reverse().map((x,i)=>`<article class="detail-row"><h4>${esc(x.name||x.test||x.title||x.domain||x.project||x.symbol||('#'+(i+1)))}</h4>${Object.entries(x).filter(([k])=>!['hash','previous_hash','record_hash','prev_hash'].includes(k)).slice(0,14).map(([k,v])=>`<p><span class="muted">${esc(k)}:</span> ${esc(readable(v))}</p>`).join('')}</article>`).join('')+`<details ${rows.length?'':'open'}><summary>${label('Tüm kayıt ayrıntıları','All record details')}</summary><pre class="filedetail">${esc(readable(data))}</pre></details>`}catch(e){E('moduleTitle').textContent=label('Veri kullanılamıyor','Data unavailable');E('moduleInfo').textContent=e.message}}
+async function loadServices(){E('serviceCards').textContent=label('Servisler kontrol ediliyor…','Checking services…');try{const d=await apiJson('/api/services');E('serviceCards').innerHTML=d.services.map(x=>`<div class="module"><div class="modulehead"><h3>${esc(x.name)}</h3><span class="badge ${x.status==='ONLINE'?'green':'yellow'}">${esc(x.status)}</span></div><p>${esc(x.detail)}</p><p>${esc(timeText(x.checked_utc))}</p></div>`).join('')}catch(e){E('serviceCards').textContent=e.message}}
+E('masterBtn').onclick=()=>showView('master');E('marketsBtn').onclick=()=>showView('markets');E('experimentsBtn').onclick=()=>showView('experiments');E('systemBtn').onclick=()=>showView('system');E('marketFilter').oninput=renderMarkets;E('backModule').onclick=()=>showView(detailBack);
+E('langBtn').onclick=()=>{lang=lang==='tr'?'en':'tr';localStorage.setItem('zitar_lang',lang);applyLang();renderMaster();renderMarkets();loadModules()};
+applyLang();refreshMaster();loadModules();showView('dashboard');setInterval(refresh,5000);setInterval(refreshMaster,5000);setInterval(()=>{if(activeView==='system')loadServices()},30000);
+function renderCostStudy(data){
+ const fmt=(v,d=2)=>Number(v).toLocaleString(lang==='tr'?'tr-TR':'en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+ const m=data.model;
+ E('moduleContent').innerHTML=`<div class="stats">${stat('Fee / işlem',fmt(Number(m.fee_rate)*100,3)+'%')}${stat('Slippage / işlem',fmt(Number(m.slippage_rate)*100,3)+'%')}${stat('Sabit referansta gidiş-dönüş kaybı',fmt(m.flat_reference_roundtrip_loss_pct,4)+'%','red')}${stat('Başa baş referans artışı',fmt(m.reference_breakeven_rise_pct,4)+'%')}</div>
+ <p class="muted">Master paper modelinin hesabıdır; borsanın ücret tarifesi değildir. Miktar ve kuruş yuvarlaması hariçtir.</p>
+ <h2>Strateji bazında kayıtlı işlem maliyetleri</h2><div class="strategies">${Object.entries(data.v3_trade_costs?.strategies||{}).map(([name,x])=>`<article class="module"><h3>${esc(name)}</h3><div class="metrics">${stat('İşlem / satış',x.trades+' / '+x.sells)}${stat('Komisyon',fmt(x.fee_try)+' TRY')}${stat('Modellenen slippage',fmt(x.modeled_slippage_try)+' TRY')}${stat('Orta fiyata göre spread etkisi',fmt(x.spread_vs_mid_try)+' TRY')}</div></article>`).join('')}</div>
+ <p class="muted">Kaydedilmiş miktarlar üzerinden maliyet ayrıştırmasıdır. Açık pozisyonların girişleri dahildir; strateji kârlılık sıralaması veya yeniden oynatılmış backtest değildir.</p>
+ <h2>Master pozisyonlarında fiyat aralığı</h2><div class="strategies">${(data.open_position_observations||[]).map(x=>`<article class="module"><h3>${esc(x.symbol)}</h3>${stat('Spread',fmt(x.spread_bps,3)+' baz puan')}${stat('Ask al → aynı book Bid sat kaybı',fmt(x.same_book_ask_to_bid_loss_pct,4)+'%')}<p class="muted">Fiyat zamanı: ${esc(timeText(x.quote_received_utc))}</p></article>`).join('')}</div>
+ <p class="muted">Spread, modellenen slippage ile aynı şey değildir. Tarihli derinlik örnekleri güncel işlem kapasitesini garanti etmez. Rapor zamanı: ${esc(timeText(data.generated_utc))}</p>
+ ${renderResearchAutomation(data)}<details><summary>Kanıtlar ve hesap ayrıntıları</summary><pre class="filedetail">${esc(readable(data))}</pre></details>`;
+}
+function renderResearchAutomation(data){
+ const num=(v,d=2)=>Number(v).toLocaleString('tr-TR',{minimumFractionDigits:d,maximumFractionDigits:d});
+ const replay=data.matched_replay, depth=data.depth_observation, web=data.automatic_web;
+ if(!replay)return '';
+ const header='<h2>Otomatik araştırma</h2><p class="muted">İşlem analizi: 60 sn · Emir defteri: 5 dk · Web: tamamlandığında 6 saat, kısmi/hatalı durumda 30 dk. Bu açık görünüm de 60 saniyede yenilenir.</p>';
+ const matched=`<h2>Eşleşmiş alış/satış karşılaştırması</h2><div class="strategies">${Object.entries(replay.strategies).map(([s,x])=>`<article class="module"><h3>${esc(s)}</h3>${stat('Kapanan işlem',x.closed_trades)}${stat('Kayıtlı net sonuç',x.closed_trades?num(x.modeled_net_try)+' TRY':'Henüz kapanış yok')}${stat('Fee/slippage olmadan, aynı miktar',x.closed_trades?num(x.reference_no_fee_slippage_try)+' TRY':'—')}${stat('Komisyon + slippage',num(Number(x.fee_try)+Number(x.slippage_try))+' TRY')}</article>`).join('')}</div><p class="muted">Aynı kayıtlı miktar ve zaman kullanılır; sermayenin yeniden dağıtıldığı alternatif backtest değildir. Dört kapanış strateji sıralaması için yeterli değildir.</p>`;
+ const books=depth?`<h2>Güncel emir defteri · ${esc(timeText(depth.checked_utc))}</h2><div class="strategies">${Object.entries(depth.symbols).map(([s,x])=>`<article class="module"><h3>${esc(s)}</h3><p>${esc(x.status)}</p>${x.status==='OK'?Object.entries(x.analysis.scenarios).map(([budget,v])=>`<p>${num(budget)} TRY: ${v.net_return_pct!==undefined?num(v.net_return_pct,4)+'% aynı defter gidiş-dönüş':esc(v.buy.status==='FILLED_IN_SNAPSHOT'?(v.sell_same_book?.status||'—'):v.buy.status)}</p>`).join(''):`<p>${esc(x.error||'')}</p>`}</article>`).join('')}</div><p class="muted">Görünür derinlik ve fee kullanılır; sabit slippage ayrıca eklenmez. Geçmiş işlemleri bu anlık defterle yeniden fiyatlamıyoruz.</p>`:'';
+ const pages=web?`<h2>Otomatik web taraması · ${esc(web.status)}</h2><p class="muted">Son tarama: ${esc(timeText(web.checked_utc))} · Sonraki: ${esc(timeText(new Date(new Date(web.checked_utc).getTime()+(web.refresh_seconds||1800)*1000).toISOString()))}</p><div class="strategies">${(web.sources||[]).map(x=>`<article class="module"><h3>${esc(new URL(x.url).hostname)}</h3><p>${esc(x.status)}</p><p>${esc(x.error||(x.content_warnings||[]).join(', ')||x.change_status||'')}</p><a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">Kaynağı aç ↗</a></article>`).join('')}</div><p class="muted">Kaynak bulmak doğrulanmış iddia üretmek değildir. Dinamik ücret verisi eksikse ücret oranı çıkarılmaz ve paper kuralları değiştirilmez.</p>`:'';
+ return header+matched+books+pages;
+}
+let activeModuleId=null;
+setInterval(()=>{if(activeView==='moduleDetail'&&activeModuleId==='cost_study')openModule(activeModuleId)},60000);
+// One account on the home page; independent V3 books live in Experiments.
+function setupMasterHome(){
+ const experiments=E('experimentsView'), dashboard=E('dashboardView');
+ const experimentIntro=document.createElement('div');experimentIntro.className='section';
+ experimentIntro.innerHTML='<h2>V3 · Bağımsız strateji deneyleri</h2><p class="summaryline">Üç ayrı 10.000 TRY deneme hesabı. Bu tutarlar ana Master portföyüne dahil değildir.</p>';
+ experiments.prepend(experimentIntro);
+ for(const [id,selector] of [['totalEquity','.section'],['strategies','.section'],['activeSignals','.section'],['trades','.section'],['status','.grid']]){
+   const node=E(id)?.closest(selector);if(node)experimentIntro.append(node);
+ }
+ const hero=dashboard.querySelector('.hero');
+ hero.firstElementChild.innerHTML=`<div class="label">ANA PAPER HESABI · TOPLAM PORTFÖY</div><div class="total" id="masterEquity">—</div><p class="summaryline">Kullanılabilir nakit + açık pozisyonların güncel BID değeri</p><div class="subgrid">${[['Kullanılabilir nakit','homeCash'],['Açık pozisyon değeri','homePositionValue'],['Açık pozisyon / kapasite','masterPositionCount'],['İlk test sermayesi','homeInitial'],['Başlangıçtan beri net K/Z','masterPnl'],['Başlangıçtan beri getiri','masterReturn']].map(([name,id])=>`<div class="mini"><div class="label">${name}</div><div class="value" id="${id}">—</div></div>`).join('')}</div>`;
+ const home=document.createElement('div');home.id='masterHomeBody';
+ home.innerHTML='<div class="section"><h2>Bugün · 00:00–00:00 İstanbul</h2><div class="grid" id="homeDayStats"></div><p class="summaryline" id="rolloverRule"></p><div class="grid" id="homeProfitSplit"></div></div><div class="section panel"><div class="sectionhead"><h2>Günlük yüzde kâr / zarar</h2><label>Gösterim <select class="market-filter" id="dailyChartRange"><option value="30">Son 30 gün</option><option value="7">Son 7 gün</option><option value="all">Tüm günler</option></select></label></div><p class="summaryline">Her gün kendi başlangıç portföy değerine göre ölçülür. Dolu sütun: kapanmış gün · Çizgili sütun: devam eden bugün.</p><div id="dailyReturnChart"></div><p class="summaryline" id="dailyChartNote"></p></div>';
+ hero.after(home);
+ home.append(E('masterPositions').closest('.section'));
+ const events=E('masterEvents').closest('.section');home.append(events);
+ events.querySelector('h2').removeAttribute('data-i18n');events.querySelector('h2').textContent='V3 işlemi → Master sonucu';
+ const archive=E('dailyArchive').closest('.section');home.append(archive);
+ const masterLink=document.createElement('p');masterLink.className='summaryline';masterLink.textContent='Açık pozisyonlar, günlük grafik ve işlem sonuçları Panel sekmesindedir. Bu bölüm muhasebe ayrıntılarını gösterir.';
+ E('masterStats').before(masterLink);
+ E('dailyChartRange').onchange=()=>renderDailyChart(masterData.master);
+ const style=document.createElement('style');style.textContent='#dailyReturnChart{overflow-x:auto}#dailyReturnChart svg{display:block;width:100%;min-width:480px;height:290px}.daily-chart-label{fill:var(--muted);font:12px Segoe UI,sans-serif}#masterHomeBody .masterpositions{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}#dailyChartRange{width:auto;margin:0;padding:6px}.home-event-note{color:var(--muted);font-size:12px}';document.head.append(style);
+}
+function dailySeries(master){
+ const rows=(master.runtime_daily_records||[]).map(x=>({date:x.period_id,percent:Number(x.equity_return_pct),closed:true,start:Number(x.start_equity_try),end:Number(x.closing_equity_try)}));
+ const p=master.current_period;
+ rows.push({date:p.period_id,percent:Number(p.daily_return_pct),closed:false,start:Number(p.start_equity_try),end:Number(p.current_equity_try)});
+ return rows.filter(x=>Number.isFinite(x.percent)).sort((a,b)=>a.date.localeCompare(b.date));
+}
+function renderDailyChart(master){
+ const selected=E('dailyChartRange').value, all=dailySeries(master), data=selected==='all'?all:all.slice(-Number(selected));
+ const width=Math.max(640,data.length*80),height=290,left=55,right=20,top=35,bottom=65,plot=height-top-bottom;
+ const extent=Math.max(.1,...data.map(x=>Math.abs(x.percent)))*1.25, y=v=>top+(extent-v)/(extent*2)*plot, zero=y(0),step=(width-left-right)/Math.max(data.length,1);
+ const lines=[-extent,0,extent].map(v=>`<line x1="${left}" y1="${y(v)}" x2="${width-right}" y2="${y(v)}" stroke="#334155"/><text x="${left-7}" y="${y(v)+4}" text-anchor="end" class="daily-chart-label">${v.toFixed(2)}%</text>`).join('');
+ const bars=data.map((d,i)=>{const x=left+i*step+step*.2,w=step*.6,yy=Math.min(zero,y(d.percent)),h=Math.max(1,Math.abs(y(d.percent)-zero)),color=d.percent>=0?'#22c55e':'#ef4444';return `<g><title>${esc(d.date)} · ${d.closed?'Kapanmış gün':'Bugün, devam ediyor'} · ${d.percent.toFixed(4)}% · ${fmt(d.start)} → ${fmt(d.end)} TRY</title><rect x="${x}" y="${yy}" width="${w}" height="${h}" fill="${color}" fill-opacity="${d.closed?'.85':'.25'}" stroke="${color}" ${d.closed?'':'stroke-dasharray="4 3"'}/><text x="${x+w/2}" y="${d.percent>=0?yy-10:yy+h+17}" text-anchor="middle" fill="${color}" font-size="13">${d.percent>0?'+':''}${d.percent.toFixed(2)}%</text><text x="${x+w/2}" y="${height-35}" text-anchor="middle" class="daily-chart-label">${esc(d.date)}</text><text x="${x+w/2}" y="${height-15}" text-anchor="middle" class="daily-chart-label">${d.closed?'Kapandı':'Bugün • geçici'}</text></g>`}).join('');
+ E('dailyReturnChart').innerHTML=`<svg viewBox="0 0 ${width} ${height}" style="min-width:${width}px" role="img" aria-label="Günlük Master getiri yüzdeleri">${lines}${bars}</svg>`;
+ E('dailyChartNote').textContent='Günlük getiri = (gün sonu toplam portföy / gün başı toplam portföy − 1) × 100. İlk gün, testin başladığı saatten itibaren kısmi gündür. Arşivde olmayan günler için veri üretilmez.';
+}
+function masterResultText(value){
+ const texts={BOUGHT:'Pozisyon açıldı',SUPPORT_ADDED:'Mevcut pozisyona strateji desteği eklendi; ikinci alım yok',SUPPORT_REMOVED_POSITION_HELD:'Strateji desteği kalktı; diğer destek nedeniyle açık',NO_POSITION:'Açık pozisyon yok; satış yapılmadı',REJECTED_MAX_POSITIONS:'10 pozisyon sınırı; alım yapılmadı',REJECTED_INSUFFICIENT_CASH:'Nakit yetersiz; alım yapılmadı',DUPLICATE_EVENT:'Tekrarlanan olay; tekrar işlem yok',DUPLICATE_EVENT_RECOVERED:'Önceden işlendi; yeniden işlem yok',PRE_RUNTIME_PROCESSED:'Önceki bridge ile işlendi; portföye dahil'};
+ return texts[value]||(String(value).startsWith('SOLD')?'Pozisyon kapandı · '+value:value);
+}
+setupMasterHome();
+const renderMasterDetails=renderMaster;
+renderMaster=function(){
+ renderMasterDetails();if(!masterData)return;
+ const m=masterData.master,a=m.account,p=m.current_period,r=masterData.runtime;
+ E('homeCash').textContent=fmt(a.cash_try)+' TRY';E('homePositionValue').textContent=fmt(a.position_market_value_try)+' TRY';E('homeInitial').textContent=fmt(m.lifetime.initial_capital_try)+' TRY';
+ const change=Number(p.current_equity_try)-Number(p.start_equity_try);
+ E('homeDayStats').innerHTML=[stat('Gün başlangıcı · '+p.period_id,fmt(p.start_equity_try)+' TRY'),stat('Bugünkü net değişim',fmt(change)+' TRY',pc(change)),stat('Bugünkü getiri',pct(p.daily_return_pct),pc(change)),stat('Bugün sabit bütçe / pozisyon',fmt(p.spot_slot_budget_try)+' TRY')].join('');
+ E('homeProfitSplit').innerHTML=[stat('Kapanmış işlemler · toplam net K/Z',fmt(m.lifetime.total_realized_pnl_try)+' TRY',pc(m.lifetime.total_realized_pnl_try)),stat('Açık işlemler · gerçekleşmemiş K/Z',fmt(a.unrealized_pnl_try)+' TRY',pc(a.unrealized_pnl_try)),stat('Bugün kapanmış işlem K/Z',fmt(p.daily_realized_pnl_try)+' TRY',pc(p.daily_realized_pnl_try)),stat('Son fiyat değerleme',timeText(m.runtime_mtm?.last_success_utc))].join('');
+ const next=new Date(new Date(p.period_id+'T00:00:00+03:00').getTime()+86400000);
+ E('rolloverRule').textContent='Her gün 00:00 İstanbul’da, ilk runtime döngüsünde: nakit + pozisyonların son kayıtlı BID değeri yeni günün başlangıcı olur. Yeni günlük bütçe = toplam portföy ÷ 10. Bugün: '+fmt(p.start_equity_try)+' ÷ 10 = '+fmt(p.spot_slot_budget_try)+' TRY. Sonraki sınır: '+timeText(next.toISOString())+'. Bütçe gün içinde sabittir; açık pozisyonlar taşınır, zorla satılmaz veya otomatik 10 işlem açılmaz.';
+ renderDailyChart(m);
+ const legacy=(r.legacy_events||[]).map(x=>({utc:x.executed_at_utc,side:x.side,symbol:x.symbol,strategy:x.strategy,result:x.result,event_id:x.source_trade_id}));
+ table('masterEvents',['Zaman','Strateji','Parite','Kaynak işlemi','Master sonucu','Olay ID'],[...legacy,...(m.runtime_execution_receipts||[])].slice(-40).reverse().map(x=>[timeText(x.utc),x.strategy,x.symbol,x.side,masterResultText(x.result),x.event_id?.slice(0,16)]));
+ table('dailyArchive',['Gün','Başlangıç TRY','Kapanış TRY','Günlük K/Z %','Sonraki slot TRY','Gerçek devir zamanı','Kapanış fiyat zamanı'],(m.runtime_daily_records||[]).slice().reverse().map(x=>[x.period_id,fmt(x.start_equity_try),fmt(x.closing_equity_try),Number(x.equity_return_pct).toFixed(4)+'%',fmt(Number(x.closing_equity_try)/m.rules.max_spot_positions),timeText(x.actual_rollover_utc||x.archived_utc),timeText(x.last_mtm_utc)]));
+};
+if(masterData)renderMaster();
+
+
+
+// Independent, equal-start comparison. The historical live Master stays intact.
+const comparisonSection=document.createElement('section');
+comparisonSection.className='section';comparisonSection.id='comparisonSection';
+comparisonSection.innerHTML='<h2>Aynı başlangıç · Paper karşılaştırması</h2><div id="comparisonContent">Karşılaştırma yükleniyor…</div>';
+E('masterHomeBody').prepend(comparisonSection);
+const comparisonLabels={MASTER:'Yeni Master testi',SMA20_50:'SMA20_50',EMA12_26:'EMA12_26',RSI14:'RSI14'};
+const comparisonColors={MASTER:'#66b4ff',SMA20_50:'#22dc89',EMA12_26:'#f8ba49',RSI14:'#ca96ff'};
+const comparisonReasons={BOUGHT:'Pozisyon açıldı',SOLD:'Pozisyon kapandı',SUPPORT_ADDED:'Aynı parite açık; destek eklendi',SUPPORT_REMOVED_POSITION_HELD:'Diğer strateji destekliyor; pozisyon korundu',NO_POSITION:'Bu testte açık pozisyon yok',REJECTED_MAX_POSITIONS:'10 pozisyon kapasitesi dolu',REJECTED_INSUFFICIENT_CASH:'Kullanılabilir nakit yetersiz'};
+function comparisonChart(c){
+ const samples=c.samples||[];if(!samples.length)return '<p>İlk ölçüm bekleniyor.</p>';
+ const w=800,h=250,p=55,start=Date.parse(c.started_utc),end=Math.max(start+60000,Date.parse(samples.at(-1).utc));
+ const limit=Math.max(.1,...samples.flatMap(s=>Object.values(s.returns).map(v=>Math.abs(Number(v)))))*1.2;
+ const x=t=>p+(Date.parse(t)-start)/(end-start)*(w-p-20),y=v=>h/2-Number(v)/limit*(h/2-35);
+ return `<div style="overflow-x:auto"><svg viewBox="0 0 ${w} ${h}" style="width:100%;min-width:540px" role="img" aria-label="Aynı başlangıçtan itibaren dört hesabın yüzde getirisi"><line x1="${p}" x2="${w-20}" y1="${h/2}" y2="${h/2}" stroke="#506078"/><text x="3" y="${h/2-5}" fill="#aebcd1" font-size="12">0.00%</text><text x="3" y="35" fill="#aebcd1" font-size="12">+${limit.toFixed(2)}%</text><text x="3" y="${h-32}" fill="#aebcd1" font-size="12">-${limit.toFixed(2)}%</text>${Object.keys(comparisonLabels).map((k,i)=>`<polyline fill="none" stroke="${comparisonColors[k]}" stroke-width="2" ${i?'stroke-dasharray="'+(3+i*3)+' 4"':''} points="${[[c.started_utc,0],...samples.map(s=>[s.utc,s.returns[k]])].map(([t,v])=>x(t)+','+y(v)).join(' ')}"/>`).join('')}<text x="${p}" y="${h-3}" fill="#aebcd1" font-size="11">${esc(timeText(c.started_utc))}</text><text x="${w-20}" y="${h-3}" text-anchor="end" fill="#aebcd1" font-size="11">${esc(timeText(samples.at(-1).utc))}</text></svg></div>`;
+}
+function renderComparison(){
+ const c=masterData?.comparison,el=E('comparisonContent');if(!c){el.textContent='Karşılaştırma verisi henüz hazır değil.';return;}
+ if(!c.books){el.textContent='Karşılaştırma okunamıyor: '+(c.error||'veri eksik');return;}
+ const age=(Date.now()-Date.parse(c.heartbeat_utc))/1000,stale=!Number.isFinite(age)||age>60;
+ const liveReceipts=new Map((masterData.master.runtime_execution_receipts||[]).map(r=>[r.event_id,r.result]));
+ const rows=(c.events||[]).filter(r=>r.master_result);
+ el.innerHTML=`<p class="muted">Başlangıç: <b>${esc(timeText(c.started_utc))}</b> · Her hesap 10.000 TL nakit, 0 pozisyon · <b class="${stale||c.state!=='RUNNING'?'red':'green'}">${stale?'TAKİP GECİKMİŞ':esc(c.state)}</b></p>
+ <p class="controlnote">Bu dört hesap yeni ve ayrı bir testtir; üstteki mevcut ana hesabı sıfırlamaz. Yalnız başlangıçtan sonra V3’ün ürettiği işlemler aynı referans fiyat, %0,1 komisyon ve %0,1 kayma modeliyle uygulanır. Eski V3 kazançları dahil değildir. Ham strateji sinyallerinin sıfırdan yeniden çalıştırılması değildir.</p>
+ <div class="paper-summary">${(()=>{const books=Object.values(c.books),equity=books.reduce((n,b)=>n+Number(b.account.equity_try),0),initial=books.length*10000,pnl=equity-initial;return [['Test hesapları toplamı',fmt(equity)+' TRY',''],['Toplam K/Z',fmt(pnl)+' TRY',pnl>=0?'green':'red'],['Getiri',(pnl/initial*100).toFixed(2)+'%',pnl>=0?'green':'red'],['Açık pozisyon',books.reduce((n,b)=>n+b.account.open_position_count,0),'']].map(([label,value,color])=>`<div class="stat"><div class="label">${label}</div><div class="value ${color}">${value}</div></div>`).join('')})()}</div>
+ <div class="paper-accounts">${Object.entries(c.books).map(([name,b])=>{const a=b.account;return renderStrategy(comparisonLabels[name]||esc(name),{equity:a.equity_try,cash:a.cash_try,unrealized:a.unrealized_pnl_try,realized:a.realized_pnl_try,return_pct:(Number(a.equity_try)/10000-1)*100,positions:Object.values(a.positions).map(p=>({symbol:esc(p.symbol),unrealized_try:p.unrealized_pnl_try,unrealized_pct:Number(p.total_cost_try)>0?Number(p.unrealized_pnl_try)/Number(p.total_cost_try)*100:0,cost_try:p.total_cost_try,modeled_entry:esc(p.entry_fill_price),bid:esc(p.live_bid||p.last_mark_price||'—'),ask:esc(p.live_ask||'Kaydedilmemiş'),value_try:p.market_value_try,quantity:esc(p.quantity)}))})}).join('')}</div>
+ <p class="muted small">Üç stratejinin eşit ağırlıklı ortalama getirisi: <b>${(Object.entries(c.books).filter(([k])=>k!=='MASTER').reduce((v,[k,b])=>v+(Number(b.account.equity_try)/10000-1)*100,0)/3).toFixed(3)}%</b>. Toplam 30.000 TL deney sermayesi, 10.000 TL Master sermayesiyle TL üzerinden karşılaştırılmaz.</p>
+ ${comparisonChart(c)}<p class="small muted">${Object.keys(comparisonLabels).map(k=>`<span style="color:${comparisonColors[k]}">● ${comparisonLabels[k]}</span>`).join(' · ')} · Çizgiler eşitse üst üste görünür.</p>
+ <p class="small ${c.valuation_state==='OK'?'muted':'red'}">Ortak BID değerleme: ${esc(c.valuation_state)} · ${esc(timeText(c.last_mtm_utc))} · Son takip: ${esc(timeText(c.heartbeat_utc))}${c.last_error?' · Son hata: '+esc(c.last_error):''}</p>
+ <h3>İşlem bazında karşılaştırma</h3>${rows.length?`<div style="overflow-x:auto"><table><thead><tr><th>Kaynak zamanı</th><th>Strateji / Parite</th><th>İşlem</th><th>Strateji testi</th><th>Yeni Master testi</th><th>Mevcut ana hesap</th><th>İşleme gecikmesi</th></tr></thead><tbody>${rows.slice(-60).reverse().map(r=>`<tr><td>${esc(timeText(r.source_utc))}</td><td>${esc(r.strategy)}<br>${esc(r.symbol)}</td><td>${esc(r.side)}</td><td>${esc(comparisonReasons[r.strategy_result]||r.strategy_result)}</td><td>${esc(comparisonReasons[r.master_result]||r.master_result)}</td><td>${esc(comparisonReasons[liveReceipts.get(r.event_id)]||liveReceipts.get(r.event_id)||'Henüz eşleşen kayıt yok')}</td><td>${Number(r.delay_seconds).toFixed(1)} sn</td></tr>`).join('')}</tbody></table></div>`:'<p>Başlangıçtan sonra yeni kaynak işlemi gelmedi. Test %0 ile bekliyor; eski pozisyonlar taşınmadı.</p>'}
+ <details><summary>Yeni test hesaplarının açık işlemleri ve günlük arşivi</summary>${Object.entries(c.books).map(([name,b])=>`<h3>${comparisonLabels[name]}</h3><p>${Object.values(b.account.positions).map(p=>`${esc(p.symbol)} · maliyet ${fmt(p.total_cost_try)} · değer ${fmt(p.market_value_try)} · K/Z ${fmt(p.unrealized_pnl_try)} TRY`).join('<br>')||'Açık işlem yok.'}</p><p>${(b.runtime_daily_records||[]).map(d=>`${esc(d.period_id)}: ${esc(d.equity_return_pct)}%`).join('<br>')||'Henüz kapanmış gün yok.'}</p>`).join('')}</details>`;
+}
+const masterWithDaily=renderMaster;
+renderMaster=function(){masterWithDaily();renderComparison()};
+
+
+
+const comparisonTargetRender=renderComparison;
+renderComparison=function(){
+ comparisonTargetRender();const c=masterData?.comparison;if(!c?.books)return;
+ const book=c.books.MASTER,p=book.current_period;
+ const startedDay=new Date(c.started_utc).toLocaleDateString('en-CA',{timeZone:'Europe/Istanbul'});
+ const metric=c.performance?.books?.MASTER;
+ const full=(metric?.days||[]).filter(r=>r.eligible);
+ const achieved=metric?.days_at_least_3||0;
+ const upper=metric?.days_at_least_4||0;
+ const loss=metric?.loss_days||0;
+ const v=Number(p.daily_return_pct),gap=Math.max(0,3-v);
+ const box=document.createElement('div');box.className='controlnote';
+ box.innerHTML=`<h3>Günlük net hedef: %3–4</h3><p>Yeni Master testinin bugünkü getirisi: <b class="${v>=0?'green':'red'}">%${v.toFixed(3)}</b> · %3 eşiğine kalan: <b>${gap.toFixed(3)} yüzde puan</b></p><p>%3 hedef toplamı: ${fmt(Number(p.start_equity_try)*1.03)} TRY · %4 hedef toplamı: ${fmt(Number(p.start_equity_try)*1.04)} TRY</p><p>Kapanmış tam gün: ${full.length} · En az %3: ${achieved} · En az %4: ${upper} · Zarar günü: ${loss}</p><p class="small">İlk gün kısmi ölçümdür. Net değer; gerçekleşen işlemlerin komisyon/kaymasını ve açık pozisyonların BID değerini içerir, henüz yapılmamış satışın maliyeti düşülmez. Hedef garanti değildir ve otomatik risk artışı yapmaz. ${c.has_delayed_replay?'GECİKMİŞ İŞLEM VAR: bu seri kesintisiz canlı karşılaştırma olarak kabul edilmemelidir.':'Tam sürüm için performans kararı henüz verilmedi.'}</p>`;
+ E('comparisonContent').prepend(box);
+ const qualityNames={PARTIAL_FIRST_DAY:'İlk gün kısmi',MONITORING_GAP_OVER_120S:'Takipte 120 saniyeden uzun boşluk',STALE_QUOTES:'Fiyat verisi eksik/gecikmiş',DELAYED_REPLAY_IN_SERIES:'Seride gecikmeli işlem var',MULTIDAY_GAP:'Birden fazla günü kapsayan devir',STALE_OR_UNKNOWN_CLOSING_QUOTE:'Kapanış fiyatı eski/belirsiz',UNRELIABLE_START_VALUE:'Gün başlangıç değeri güvenilir değil'};
+ const number=v=>v==null?'Henüz veri yok':Number(v).toFixed(3)+'%';
+ const detail=document.createElement('div');detail.className='section';
+ detail.innerHTML=`<h3>Günlük performans değerlendirmesi</h3>${!metric?'<p>Değerlendirme hazırlanıyor.</p>':`<p>Hedef değerlendirmesine uygun gün: <b>${metric.eligible_days}</b> · Hariç tutulan gün: ${metric.excluded_days}. ${metric.eligible_days?'Sonuçlar inceleme için hazır; otomatik sürüm onayı verilmez.':'Henüz tamamlanmış uygun gün yok.'}</p><div style="overflow-x:auto"><table><thead><tr><th>Hesap</th><th>Ortalama günlük</th><th>En iyi gün</th><th>En kötü gün</th><th>Gözlenen en büyük düşüş</th></tr></thead><tbody>${Object.entries(c.performance.books).map(([k,m])=>`<tr><td>${comparisonLabels[k]}</td><td>${number(m.average_daily_pct)}</td><td>${number(m.best_daily_pct)}</td><td>${number(m.worst_daily_pct)}</td><td>${number(m.observed_max_drawdown_pct)}</td></tr>`).join('')}</tbody></table></div><p class="small muted">Düşüş, gözlenen portföy zirvesinden gerilemedir; fiyatlar arasındaki görülmeyen hareketleri kapsamaz. Günlük ortalama yalnız veri kalitesi kontrolünü geçen tam günleri kullanır.</p>${metric.today_reasons.length?`<p class="red">Bugünün veri kalitesi: ${metric.today_reasons.map(r=>esc(qualityNames[r]||r)).join(' · ')}</p>`:''}<details><summary>Günlük sonuçlar ve değerlendirme dışında kalan günler</summary>${metric.days.length?`<div style="overflow-x:auto"><table><thead><tr><th>Gün</th><th>K/Z</th><th>Durum</th></tr></thead><tbody>${metric.days.map(d=>`<tr><td>${esc(d.date)}</td><td>${number(d.return_pct)}</td><td>${d.eligible?'Değerlendirmeye uygun':d.reasons.map(r=>esc(qualityNames[r]||r)).join(' · ')}</td></tr>`).join('')}</tbody></table></div>`:'<p>İlk gün henüz kapanmadı.</p>'}</details>`}`;
+ box.after(detail);
+};
+
+
+const readinessPanel=document.createElement('section');readinessPanel.className='section';
+readinessPanel.innerHTML='<h2>Birleşik çalışma durumu</h2><p class="muted">Canlı verilerden hesaplanır. Dosyanın bulunması, servisin sağlıklı veya araştırmanın doğrulanmış olduğu anlamına gelmez.</p><div id="readinessCards" class="modules"></div><p id="readinessStamp" class="small muted"></p>';
+E('systemView').prepend(readinessPanel);
+let readinessResearch=null,readinessResearchError=null,readinessFetched=0,readinessBusy=false;
+const readinessAge=t=>{const n=(Date.now()-Date.parse(t))/1000;return Number.isFinite(n)&&n>=-30?n:Infinity};
+function renderReadiness(){
+ if(!masterData)return;
+ const r=masterData.runtime,m=masterData.master,c=masterData.comparison,a=m.account,p=m.current_period;
+ const checks=[];const add=(title,status,detail)=>checks.push({title,status,detail});
+ add('Ana paper döngüsü',readinessAge(r.heartbeat_utc)<=30&&readinessAge(r.last_successful_cycle_utc)<=90&&r.state==='RUNNING'?'OK':'SORUN',`Durum: ${r.state} · Son başarılı döngü: ${timeText(r.last_successful_cycle_utc)}`);
+ const pipe=r.pipeline||{};
+ add('V3 → Master işlem hattı',pipe.pending_events===0&&pipe.event_count===pipe.bridge_processed&&pipe.event_count===pipe.master_processed&&pipe.duplicate_status==='PASS'?'OK':'KONTROL GEREKLİ',`Event / bridge / Master: ${pipe.event_count??'?'} / ${pipe.bridge_processed??'?'} / ${pipe.master_processed??'?'} · Bekleyen: ${pipe.pending_events??'?'}`);
+ add('V3 üreticisi',readinessAge(pipe.v3_last_success_utc)<=4500?'OK':'GECİKMİŞ',`Son başarılı çalışma: ${timeText(pipe.v3_last_success_utc)} · Mum: ${pipe.last_processed_candle||'Bilinmiyor'}`);
+ const values=[a.cash_try,a.position_market_value_try,a.equity_try].map(Number);
+ const identity=values.every(Number.isFinite)&&Math.abs(values[0]+values[1]-values[2])<.011;
+ add('Portföy muhasebesi',identity?'OK':'SORUN',`${fmt(a.cash_try)} nakit + ${fmt(a.position_market_value_try)} pozisyon = ${fmt(a.equity_try)} TRY`);
+ add('Canlı fiyat değerleme',readinessAge(m.runtime_mtm?.last_success_utc)<=90&&r.stages?.mtm?.status==='OK'?'OK':'GECİKMİŞ',`Son BID: ${timeText(m.runtime_mtm?.last_success_utc)}`);
+ const slot=Number(p.spot_slot_budget_try),expected=Math.round(Number(p.start_equity_try)*10)/100;
+ add('Günlük bütçe',Number.isFinite(slot)&&Math.abs(slot-expected)<.001?'OK':'SORUN',`${p.period_id}: ${fmt(p.start_equity_try)} ÷ 10 = ${fmt(slot)} TRY`);
+ add('Otomatik karşılaştırma',c&&readinessAge(c.heartbeat_utc)<=60&&c.state==='RUNNING'?'OK':'GECİKMİŞ',c?`Son takip: ${timeText(c.heartbeat_utc)} · Fiyat: ${c.valuation_state} · Hata: ${c.error_count}`:'Karşılaştırma kaydı yok');
+ const researchFresh=readinessFetched&&Date.now()-readinessFetched<90000;
+ add('Araştırma döngüsü',!researchFresh||readinessResearchError?'DOĞRULANAMADI':readinessAge(readinessResearch?.heartbeat_utc)<=180&&readinessResearch?.state!=='ERROR'?'OK':'SORUN',readinessResearchError||`Son takip: ${timeText(readinessResearch?.heartbeat_utc)} · Durum: ${readinessResearch?.state||'Kontrol ediliyor'}`);
+ const web=readinessResearch?.automatic_web;
+ add('Web araştırması / kanıt','learning_ready' in (web||{})&&web.learning_ready===true&&researchFresh&&!readinessResearchError?'KANIT HAZIR':'EKSİK KANIT',`Durum: ${web?.status||'Bilinmiyor'} · Son tarama: ${timeText(web?.checked_utc)} · Kaynak toplamak doğrulanmış öğrenme değildir.`);
+ const perf=c?.performance;
+ add('Günlük %3–4 hedefi',perf?.books?.MASTER?.eligible_days?'İNCELEME BEKLİYOR':'VERİ BEKLENİYOR',`Uygun kapanmış gün: ${perf?.books?.MASTER?.eligible_days??0} · %3 ve üzeri: ${perf?.books?.MASTER?.days_at_least_3??0} · Otomatik sürüm onayı verilmez.`);
+ E('readinessCards').innerHTML=checks.map(x=>`<article class="module"><div class="modulehead"><h3>${esc(x.title)}</h3><span class="badge ${x.status==='OK'?'green':x.status==='SORUN'?'red':'yellow'}">${esc(x.status)}</span></div><p>${esc(x.detail)}</p></article>`).join('');
+ E('readinessStamp').textContent='Panel değerlendirmesi: '+timeText(new Date().toISOString())+' · Araştırma durumu açık Sistem ekranında 30 saniyede yenilenir. Gece testinde görülen gecikmeler bu anlık kontrollerle silinmez.';
+}
+async function refreshReadiness(){
+ if(readinessBusy)return;readinessBusy=true;
+ try{const result=await apiJson('/api/module?id=research_runtime');readinessResearch=result.data;readinessResearchError=null;readinessFetched=Date.now()}
+ catch(e){readinessResearchError=e.message}
+ finally{readinessBusy=false;renderReadiness()}
+}
+const servicesBeforeReadiness=loadServices;
+loadServices=async function(){await Promise.allSettled([servicesBeforeReadiness(),refreshReadiness()])};
+const masterBeforeReadiness=renderMaster;
+renderMaster=function(){masterBeforeReadiness();renderReadiness()};
+refreshReadiness();
+
+
+
+// Restore the compact reference layout: one account on Panel, comparisons separate.
+const comparisonView=document.createElement('div');comparisonView.id='comparisonView';comparisonView.style.display='none';
+comparisonView.append(E('comparisonSection'));E('systemView').before(comparisonView);views.push('comparison');
+const comparisonNav=document.createElement('button');comparisonNav.className='btn';comparisonNav.id='comparisonBtn';comparisonNav.textContent='Karşılaştırma';
+E('experimentsBtn').after(comparisonNav);comparisonNav.onclick=()=>showView('comparison');
+const showBeforeRecovery=showView;
+showView=function(v){showBeforeRecovery(v);comparisonNav.classList.toggle('active',v==='comparison');comparisonNav.setAttribute('aria-current',v==='comparison'?'page':'false')};
+E('masterHomeBody').prepend(E('masterPositions').closest('.section'));
+const recoveryStyle=document.createElement('style');recoveryStyle.textContent=`
+.wrap{max-width:1320px;margin:0 auto;padding:22px 24px}
+.nav{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0}
+.masterpositions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.tablebox{overflow-x:auto}.section{min-width:0}.hero>*,.module,.panel{min-width:0}
+.summaryline{line-height:1.6}.controlnote{line-height:1.6}
+@media(max-width:900px){.masterpositions{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.wrap{padding:16px 12px}.masterpositions{grid-template-columns:1fr}.nav .btn{font-size:12px;padding:9px 11px}.total{font-size:30px}}
+`;document.head.append(recoveryStyle);
+const renderBeforeRecovery=renderMaster;
+renderMaster=function(){renderBeforeRecovery();if(!masterData)return;
+ const mtmFresh=readinessAge(masterData.master.runtime_mtm?.last_success_utc)<=90;
+ if(!mtmFresh){E('mtmHealth').textContent='FİYAT ESKİ / DEVİR KAYITLI';E('mtmHealth').className='red'}
+};
+
+
+// Keep account and position cards ahead of performance commentary.
+const comparisonCardsFirst=renderComparison;
+renderComparison=function(){comparisonCardsFirst();const body=E('comparisonContent'),summary=body.querySelector('.paper-summary'),accounts=body.querySelector('.paper-accounts');if(summary&&accounts)body.prepend(summary,accounts);};
+
+</script><script>
+const zitarSession = localStorage.getItem('zitar_session_v1') || crypto.randomUUID();
+localStorage.setItem('zitar_session_v1', zitarSession);
+async function restoreZitarHistory(){
+  try {
+    const response = await fetch('/api/chat-proxy/history?session_id='+encodeURIComponent(zitarSession));
+    if(!response.ok) return;
+    const data = await response.json();
+    for(const turn of data.turns || []){addChat('user',turn.question);addChat('zitar',turn.answer);if(turn.council_job_id && ['QUEUED','RUNNING','RETRY_WAIT'].includes(turn.council_state))watchCouncil(turn.council_job_id);}
+  } catch(e) { console.warn('Chat history unavailable', e); }
+}
+restoreZitarHistory();
+</script><script>
+const councilWatching = new Set();
+async function watchCouncil(id){
+  if(councilWatching.has(id)) return;
+  councilWatching.add(id);
+  const node=document.createElement('div');node.className='chat-msg chat-zitar';
+  document.getElementById('chatMessages').appendChild(node);
+  let count=0;
+  async function poll(){
+    try {
+      const r=await fetch('/api/research-job?id='+encodeURIComponent(id)+'&session_id='+encodeURIComponent(zitarSession));
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const job=await r.json();
+      if(job.result && !['QUEUED','RUNNING','RETRY_WAIT'].includes(job.state)){node.textContent=(job.result.answer||'')+(job.state==='WAITING_24H'?'\nÜç deneme bitti; 24 saat sonra tekrar denenecek.':'');return;}
+      const done=job.stages.filter(x=>x.state==='DONE').length;
+      const active=job.stages.filter(x=>x.state==='RUNNING').map(x=>x.role).join(', ');
+      node.textContent='Araştırma ekibi: '+done+'/10 aşama tamamlandı. '+(active||job.state);
+      if(++count<120)setTimeout(poll,10000);
+      else node.textContent+=' Sonuç için sayfayı yenileyebilirsin.';
+    }catch(e){node.textContent='Araştırma durumu alınamadı: '+e.message;}
+  }
+  poll();
+}
+</script><script>const teamPanel=document.createElement('section');teamPanel.className='panel';teamPanel.style.marginBottom='16px';
+teamPanel.innerHTML='<h2>Araştırma ekibi</h2><p>10 görev · Kaynak, itiraz ve öneri takibi</p><div id="teamStatus">Bağlantı kontrol ediliyor…</div><div id="teamRoles" class="inline-metrics"></div><div id="teamJobs"></div>';
+document.getElementById('researchView').prepend(teamPanel);
+const teamState={RETRY_WAIT:'Yeni deneme bekleniyor',WAITING_24H:'24 saat beklemede',QUEUED:'Kuyrukta',RUNNING:'Çalışıyor',DONE:'Aşama bitti · kanıt onayı değil',ERROR:'Hata',COMPLETED_WITH_LIMITATIONS:'Sınırlılıklarla raporlandı',INSUFFICIENT_EVIDENCE:'Kanıt yetersiz'};
+function teamText(parent,tag,text){const el=document.createElement(tag);el.textContent=text;parent.appendChild(el);return el;}
+function teamEvidence(parent,e){
+ if(!e){teamText(parent,'p','Kanıt ayrıntıları henüz API tarafından sunulmuyor; servis yeni kodla başlatılmalı.');return;}
+ teamText(parent,'p',e.available?'Kaynaklı iddia: '+e.cited+' · Reddedilen: '+e.rejected+' · İtiraz edilen: '+e.challenged+' · İtiraz edilmeyen: '+e.unchallenged+' · Bağımsız doğrulama: yok':'Ayrıntılı kanıt kaydı yok.');
+ (e.reasons||[]).forEach(reason=>teamText(parent,'p',reason));
+ if(e.critic_summary)teamText(parent,'p','Karşı görüş (model değerlendirmesi): '+e.critic_summary);
+ if(!(e.sources||[]).length)teamText(parent,'p','Bu kayıtta okunmuş kaynak listesi bulunmuyor.');
+ (e.sources||[]).forEach(source=>{const row=teamText(parent,'p','');
+ let url;try{url=new URL(source.url);}catch{}
+ if(url && url.protocol==='https:'){const a=teamText(row,'a',source.url);a.href=url.href;a.target='_blank';a.rel='noopener noreferrer';}else teamText(row,'span',source.url||'Kaynak adresi kaydedilmemiş');
+ teamText(row,'span',' — '+(source.status==='ERROR'?'Okunamadı':source.status==='READ_NOT_VERIFIED'?'Okundu; doğrulanmadı':source.status==='CITED_NOT_VERIFIED'?'İddiaya kaynak gösterildi; doğrulanmadı':source.status)+(source.error?' · '+source.error:''));
+ });
+}
+async function refreshTeam(){
+ try{
+  const r=await fetch('/api/research-team?session_id='+encodeURIComponent(zitarSession));
+  if(!r.ok)throw new Error('Ekip API henüz yüklenmedi (HTTP '+r.status+')');
+  const d=await r.json();document.getElementById('teamStatus').textContent=d.model_policy;
+  const roles=document.getElementById('teamRoles');roles.replaceChildren();
+  d.roles.forEach(role=>{const card=document.createElement('div');card.className='mini';card.textContent=role.label;roles.appendChild(card);});
+  const jobs=document.getElementById('teamJobs');const opened=new Set(Array.from(jobs.querySelectorAll('details[open]')).map(e=>e.dataset.key));jobs.replaceChildren();
+  if(!d.jobs.length){jobs.textContent='Henüz araştırma işi yok. ZİTAR Chat üzerinden bir konu araştırmasını isteyebilirsin.';return;}
+  let lastGroup=null;
+  d.jobs.forEach(job=>{const group=job.state==='RUNNING'?'Şu an incelenen':job.state==='QUEUED'?'Sıradaki konular':['WAITING_24H','RETRY_WAIT'].includes(job.state)?'Bekleyen konular':'Sonuçlanan çalışmalar';if(group!==lastGroup){teamText(jobs,'h3',group);lastGroup=group;}const article=document.createElement('article');article.className='mini';article.style.marginTop='12px';
+   const title=document.createElement('h3');title.textContent=job.question;article.appendChild(title);
+   const status=document.createElement('p');status.textContent=(teamState[job.state]||job.state)+' · '+new Date(job.updated).toLocaleString('tr-TR');article.appendChild(status);if(job.retry){const retry=document.createElement('p');retry.textContent='Deneme: '+job.retry.attempt+'/3 · Döngü: '+job.retry.cycle+(job.retry.next_at?' · Sonraki çalışma: '+new Date(job.retry.next_at*1000).toLocaleString('tr-TR'):'');article.appendChild(retry);}
+   teamText(article,'p','Aşama durumu, araştırmanın yürütülmesini gösterir; kanıtın yeterli olduğu anlamına gelmez.');
+   const evidence=teamText(article,'details','');teamText(evidence,'summary','Son denemenin kanıtları ve sonuç gerekçesi');teamEvidence(evidence,job.evidence);
+   if(job.attempts?.length){const history=teamText(article,'details','');teamText(history,'summary','Deneme geçmişi · son '+job.attempts.length+' kayıt');
+    job.attempts.forEach(attempt=>{const entry=teamText(history,'details','');teamText(entry,'summary','Döngü '+attempt.cycle+' · Deneme '+attempt.attempt+' · '+new Date(attempt.finished).toLocaleString('tr-TR'));teamText(entry,'p','Arama sorgusu: '+attempt.query);teamEvidence(entry,attempt.evidence);});
+   }
+   job.stages.forEach(stage=>{const row=document.createElement('div');row.textContent=(d.roles.find(r=>r.id===stage.role)?.label||stage.role)+': '+(teamState[stage.state]||stage.state);article.appendChild(row);});
+   job.proposals.forEach(proposal=>{const p=document.createElement('p');p.textContent='Test edilmemiş öneri: '+proposal.content.hypothesis+' | Test: '+proposal.content.test+' | Ret ölçütü: '+proposal.content.failure_criterion;article.appendChild(p);});
+   article.querySelectorAll('details').forEach((el,i)=>{el.dataset.key=job.id+':'+i;el.open=opened.has(el.dataset.key);});
+   jobs.appendChild(article);
+  });
+ }catch(e){document.getElementById('teamStatus').textContent=e.message;}
+}
+refreshTeam();setInterval(()=>{if(document.getElementById('researchView').style.display!=='none')refreshTeam();},10000);
+</script><script>const tradeContextPanel=document.createElement('section');tradeContextPanel.className='panel';tradeContextPanel.innerHTML='<h2>İşlemler hangi piyasa koşulunda sonuçlandı?</h2><div id="tradeContextBody">İşlem–analiz bağlantısı yükleniyor…</div>';
+document.getElementById('researchView').appendChild(tradeContextPanel);
+async function refreshTradeContext(){const box=document.getElementById('tradeContextBody');try{
+ const response=await fetch('/api/trade-context');if(!response.ok)throw new Error('İşlem–analiz API’si henüz yüklenmedi. Servis yeni kodla başlatılmalı.');const d=await response.json();box.replaceChildren();
+ const add=(tag,text,parent=box)=>{const e=document.createElement(tag);e.textContent=text;parent.appendChild(e);return e;};
+ add('p',d.scope);add('p','Kapanmış işlem: '+d.closed_trades+' · Giriş analizi eşleşen işlem parçası: '+d.matched_segments);
+ d.limitations.forEach(x=>add('p',x));
+ d.groups.forEach(g=>add('p','Gözlenen grup: '+g.label+' · '+g.segments+' parça · Maliyet sonrası toplam: '+Number(g.net_try).toFixed(2)+' TRY. İstatistiksel başarı sonucu değildir.'));
+ d.rows.forEach(r=>{const entry=add('details','');add('summary',r.strategy+' · '+r.symbol+' · Net '+Number(r.net_try).toFixed(2)+' TRY · '+(r.context.status==='MATCHED'?'Önceki analizle eşleşti':'Analiz eşleşmedi'),entry);add('p','Giriş: '+new Date(r.entry_utc).toLocaleString('tr-TR')+' · Çıkış: '+new Date(r.exit_utc).toLocaleString('tr-TR'),entry);add('p',r.context.reason,entry);if(r.context.observation)add('p','Girişteki kayıt: kısa '+researchLabel(r.context.observation.short)+', orta '+researchLabel(r.context.observation.medium)+', uzun '+researchLabel(r.context.observation.long),entry);add('p','Komisyon: '+Number(r.fee_try).toFixed(2)+' TRY · Analiz kaydı: '+(r.context.record_id||'Yok'),entry);});
+ }catch(e){box.textContent=e.message;}}
+refreshTradeContext();setInterval(()=>{if(document.getElementById('researchView').style.display!=='none')refreshTradeContext();},60000);
+</script><script>const candidatePanel=document.createElement('section');candidatePanel.className='panel';candidatePanel.innerHTML='<h2>ZİTAR aday stratejisi · günlük / haftalık / aylık izleme</h2><div id="candidateMonitor">Yükleniyor…</div>';document.getElementById('experimentsView').prepend(candidatePanel);
+async function refreshCandidate(){const box=document.getElementById('candidateMonitor');try{const response=await fetch('/api/candidate-monitor');if(!response.ok)throw new Error('Aday strateji API’si için servis yeni kodla başlatılmalı.');const d=await response.json();const openKeys=new Set(Array.from(box.querySelectorAll('details[open]')).map(e=>e.dataset.key));box.replaceChildren();let host=box;const add=(tag,text,parent=host)=>{const el=document.createElement(tag);el.textContent=text;parent.appendChild(el);return el;};
+add('p','Durum: '+({INITIALIZED:'Başlangıç hazır; sürekli döngü henüz doğrulanmadı',RUNNING:'Çalışıyor',STALE_RUNTIME:'Çalışma sinyali eski; döngü doğrulanamıyor',DEGRADED:'Fiyat değerlemesi aksıyor',NOT_STARTED:'Henüz başlamadı'})[d.state]);if(!d.started_utc)return;const info=add('details','');info.dataset.key='candidate-info';add('summary','Test bilgileri ve strateji kuralları',info);host=info;add('p',d.scope);add('p','Başlangıç: '+new Date(d.started_utc).toLocaleString('tr-TR'));add('p','V1 giriş kuralı: spread en fazla 20 baz puan (%0,20), analiz en fazla 60 dakika eski, saatlik mum açılışı en fazla 2 saat eski, yön uyumu orta/yüksek, orta vade yukarı veya karışık. Bunlar test hipotezidir; öğrenilmiş başarı sonucu değildir.');add('p',d.release);
+host=box;const all=Object.values(d.books),eq=all.reduce((n,b)=>n+Number(b.equity_try),0),initial=10000*all.length,profit=eq-initial;const summary=add('div','');summary.className='paper-summary';for(const [label,value,col] of [['Test hesapları toplamı',eq.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' TRY',''],['Toplam K/Z',profit.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' TRY',profit>=0?'green':'red'],['Getiri',(initial?(profit/initial*100):0).toFixed(2)+'%',profit>=0?'green':'red'],['Açık pozisyon',String(all.reduce((n,b)=>n+b.positions,0)),'']]){const card=add('div','',summary);card.className='stat';add('div',label,card).className='label';add('div',value,card).className='value '+col;}add('p','İki ayrı test hesabının toplamıdır; ana Master portföyüne eklenmez.').className='summaryline';
+const accounts=add('div','');accounts.className='paper-accounts';
+const money=v=>v==null?'—':Number(v).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' TRY';
+const color=v=>v==null?'muted':Number(v)>0?'green':Number(v)<0?'red':'';
+for(const [name,b] of Object.entries(d.books)){host=add('article','',accounts);host.className='card';add('h3',name==='MASTER'?'Temel paper hesabı':'ZİTAR aday V1');const metrics=add('div','');metrics.className='metrics';
+for(const [label,value,tone] of [['Toplam portföy',money(b.equity_try),''],['Nakit',money(b.cash_try),''],['Gerçekleşmemiş K/Z',money(b.unrealized_pnl_try),color(b.unrealized_pnl_try)],['Getiri',Number(b.total_return_pct).toFixed(2)+'%',color(b.total_return_pct)],['Gerçekleşmiş K/Z',money(b.realized_pnl_try),color(b.realized_pnl_try)],['Açık pozisyon',b.positions+' / 10','']]){const m=add('div','',metrics);m.className='metric';add('div',label,m).className='label';add('div',value,m).className='v '+tone;}
+add('h4','Açık pozisyonlar');
+if(!b.open_positions)add('p','Pozisyon ayrıntıları API’ye henüz yüklenmedi.');
+else if(!b.open_positions.length)add('p','Bu hesapta açık pozisyon yok.');
+else b.open_positions.forEach(p=>{const card=add('article','');card.className='position';const title=add('div','',card);title.className='position-title';add('span',p.symbol,title);const pct=Number(p.total_cost_try)>0?Number(p.unrealized_pnl_try)/Number(p.total_cost_try)*100:null;add('span',money(p.unrealized_pnl_try)+(pct==null?'':' ('+pct.toFixed(2)+'%)'),title).className=color(p.unrealized_pnl_try);
+const grid=add('div','',card);grid.className='posgrid';for(const [label,value] of [['Maliyet',money(p.total_cost_try)],['Model giriş',p.entry_fill_price],['Son BID',p.live_bid||p.last_mark_price||'—'],['Son ASK',p.live_ask||'Kaydedilmemiş'],['Pozisyon değeri',money(p.market_value_try)],['Miktar',p.quantity]]){const cell=add('div',label,grid);cell.className='positem';add('strong',value,cell);}
+const detail=add('details','',card);detail.dataset.key=name+':'+p.symbol;add('summary','Giriş gerekçesi ve fiyat zamanı',detail);add('p','Giriş: '+new Date(p.opened_utc).toLocaleString('tr-TR')+' · '+(p.entry_reason||'Önceki kayıtta yok'),detail);add('p','Destekler: '+(p.strategy_support||[]).join(', '),detail);add('p','Fiyat zamanı: '+(p.quote_received_utc?new Date(p.quote_received_utc).toLocaleString('tr-TR'):'Kaydedilmemiş')+' · '+(b.valuation_state==='OK'&&d.state==='RUNNING'?'Son değerleme başarılı':'Güncellik doğrulanamıyor'),detail);});
+add('h4','Kapanan işlemler');
+if(!b.closed_positions)add('p','Kapanış ayrıntıları API’ye henüz yüklenmedi.');
+else {if(!b.closed_positions.length)add('p','Ayrıntılı kapanış takibinde henüz kayıt yok. Önceki kapanışlar bu listeye geriye dönük üretilmez.');b.closed_positions.slice().reverse().forEach(p=>{const card=add('article','');card.className='mini';add('h4',p.symbol+' · Gerçekleşen net K/Z: '+p.realized_pnl_try+' TRY',card);add('p','Giriş: '+new Date(p.entry_utc).toLocaleString('tr-TR')+' · Çıkış: '+new Date(p.exit_utc).toLocaleString('tr-TR')+' · Miktar: '+p.quantity,card);add('p','Model giriş: '+p.entry_fill_price+' · Çıkış referansı: '+p.exit_reference_price+' · Maliyet: '+p.total_cost_try+' TRY · Kesintiler sonrası satış tutarı: '+p.net_proceeds_try+' TRY',card);add('p',p.entry_reason+' · Çıkış: '+p.exit_reason,card);});}
+for(const [key,title] of [['days','Günlük'],['weeks','Haftalık'],['months','Aylık']]){const section=add('details','');add('summary',title+' sonuçlar',section);b[key].slice(-31).forEach(p=>add('p',(p.date||p.period)+' · '+p.return_pct.toFixed(3)+'% · '+((key==='days'?p.eligible:p.complete)?'Tamamlanmış, kalite koşulları uygun':'Devam eden / kısmi / kalite koşulları eksik'),section));}}
+host=box;const events=add('details','');add('summary','Son kararlar ve filtre gerekçeleri',events);d.events.slice().reverse().forEach(e=>add('p',(e.symbol||e.event_id)+' · '+(e.side||'')+' · Temel: '+(e.master_result||e.result)+' · Aday: '+(e.strategy_result||'İşlenmedi'),events));
+box.querySelectorAll('details').forEach((el,i)=>{el.dataset.key=el.dataset.key||'section:'+i;el.open=openKeys.has(el.dataset.key);});
+}catch(e){box.textContent=e.message;}}
+refreshCandidate();setInterval(()=>{if(document.getElementById('experimentsView').style.display!=='none')refreshCandidate();},15000);
+</script><script>const futuresPanel=document.createElement('section');futuresPanel.className='panel';futuresPanel.style.marginTop='20px';futuresPanel.innerHTML='<h2>Vadeli paper · USDT · izole teminat · takip eden stop</h2><div id="futuresPaperBody">Vadeli paper durumu yükleniyor…</div>';document.getElementById('experimentsView').prepend(futuresPanel);
+async function refreshFuturesPaper(){const box=document.getElementById('futuresPaperBody');try{const response=await fetch('/api/futures-paper');if(!response.ok)throw new Error('Vadeli paper API’si henüz yüklenmedi; servis yeni kodla başlatılmalı.');const d=await response.json();d.books=Object.fromEntries(Object.entries(d.books||{}).filter(([name])=>!name.startsWith('ZITAR_CONFLUENCE_')&&!name.startsWith('ZITAR_PIVOT_ATR_')));const selectedLeverage=box.querySelector('select')?.value;const opened=new Set(Array.from(box.querySelectorAll('details[open]')).map(e=>e.dataset.key));box.replaceChildren();let host=box;const add=(tag,text,parent=host)=>{const el=document.createElement(tag);el.textContent=text;parent.appendChild(el);return el;};const fmt=v=>v==null?'—':Number(v).toLocaleString('tr-TR',{maximumFractionDigits:4});const money=v=>fmt(v)+' USDT';const tone=v=>Number(v)>0?'green':Number(v)<0?'red':'muted';const date=v=>new Date(v).toLocaleString('tr-TR');
+add('p','Durum: '+({NOT_STARTED:'Henüz başlamadı',INITIALIZED:'Başlangıç hazır; sürekli döngü bekleniyor',RUNNING:'Paper döngüsü çalışıyor',DEGRADED:'Eksik/eski veri var; hata ayrıntılarını incele',STALE_RUNTIME:'Çalışma sinyali eski'})[d.state]);if(d.signal_status){const st=d.signal_status;add('p','Sinyal verisi: '+st.ready_intervals+'/'+st.expected_intervals+' zaman dilimi güncel · '+st.pending+' indirme bekliyor. Eksik mumla yeni sinyal üretilmez; güncel fiyat varsa stop kontrolü sürer.');}if(!d.policy)return;if(d.trigger_lab){const lab=d.trigger_lab;const section=add('details','');section.dataset.key='trigger-lab';add('summary','Yeni sinyal ve yön riski deneyi · V2',section);add('p','Aday: yalnız önceki ardışık mumdan farklı yeni yön; aynı yönde en fazla 3 pozisyon. Bütçe özkaynak / 10 olarak kalır; kullanılmayan tutar nakitte. Stop ve kaldıraç değişmez.',section);add('p','Başlangıç: '+date(lab.started_ms)+' · Aday eksi kontrol: '+fmt(lab.candidate_minus_control_pct)+' yüzde puan · '+({COLLECTING_EVIDENCE:'Veri toplanıyor',DATA_QUALITY_REVIEW:'Veri kalitesi incelemesi gerekli',READY_FOR_REVIEW_NOT_PROVEN:'İnceleme eşiği sağlandı; başarı kanıtı değil'})[lab.status],section);add('p','İki değişiklik birlikte sınanıyor; farkın hangi değişiklikten geldiği tek başına belirlenemez. Ana hesaba otomatik geçiş yok.',section);}if(d.strategy_lab){const lab=d.strategy_lab;if(lab.status==='DATA_QUALITY_REVIEW')add('p','Deney geçmişinde veri kesintisi veya eksik değerleme kaydı var. Güncel bağlantı düzelse bile bu geçmiş uyarısı korunur; anlık çalışma durumu yukarıdadır.');const info=add('details','');info.dataset.key='strategy-lab';add('summary','Sürekli strateji deneyi · '+({COLLECTING_EVIDENCE:'Veri toplanıyor',DATA_QUALITY_REVIEW:'Veri kalitesi incelenmeli',READY_FOR_REVIEW_NOT_PROVEN:'İncelemeye hazır; başarı kanıtı değil'})[lab.status],info);add('p','Aynı başlangıçlı kontrol ve aday. Aday: saatlik yön teyidi + aynı paritede çıkış sonrası 15 dk bekleme. Ana strateji otomatik değiştirilmez.',info);add('p','Aday − kontrol: '+fmt(lab.candidate_minus_control_pct)+' yüzde puan. İlk inceleme eşiği: en az 7 gün ve hesap başına 50 kapanış; bu eşik başarı garantisi değildir.',info);for(const [name,b] of Object.entries(lab.books))add('p',(name==='ZITAR_CONTROL_V2'?'V2 · Eşzamanlı kontrol':name==='ZITAR_TRIGGER_V2'?'V2 · Yeni sinyal + yön sınırı':name==='ZITAR_CONTROL_V1'?'Kontrol':'Seçici aday')+' · '+money(b.equity)+' · '+b.closed+' kapanış · Ücret '+money(b.fees)+' · Düşüş %'+fmt(b.drawdown_pct),info);}const settings=add('details','');settings.dataset.key='futures-settings';add('summary','Kaldıraç seçimi, test bilgileri ve model kuralları',settings);host=settings;
+const controls=add('div','');controls.className='actions';const label=add('label','Yeni testin kaldıracı ',controls);const selector=add('select','',label);selector.className='btn';(d.leverage_choices||[1,2,3,5]).forEach(n=>{const option=add('option',n+'×',selector);option.value=String(n);});selector.value=selectedLeverage||String(d.policy.leverage);const change=add('button','Mevcut testi arşivle ve yeni test başlat',controls);change.className='btn';const pending=d.leverage_request?.status==='PENDING';selector.disabled=!d.can_change_leverage||pending;change.disabled=selector.disabled;const message=add('p',d.can_change_leverage?'Değişiklik tüm vadeli paper hesaplarını eşit 10.000 USDT ile yeniden başlatır; eski sonuçlar arşivde korunur. Açık pozisyon varken uygulanmaz.':'Kaldıraç değişimi için bütün vadeli paper pozisyonlarının kapanması gerekir.');message.className='summaryline';if(d.leverage_request)add('p','Son ayar isteği: '+({PENDING:'Sırada',APPLIED:'Uygulandı',REJECTED:'Uygulanmadı'})[d.leverage_request.status]+(d.leverage_request.reason?' · '+d.leverage_request.reason:''));change.addEventListener('click',async()=>{change.disabled=true;try{const response=await fetch('/api/futures-paper/leverage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({leverage:Number(selector.value)})});const value=await response.json();if(!response.ok)throw new Error(value.error||'Ayar kaydedilemedi');message.textContent='Değişiklik sıraya alındı; paper döngüsü uygulayacak.';}catch(e){message.textContent=e.message;change.disabled=false;}});
+add('p','Başlangıç: '+new Date(d.started_utc).toLocaleString('tr-TR')+' · '+d.universe.length+' sözleşme · Hesap başına 10.000 USDT · '+d.policy.leverage+'× izole teminat. Spot TRY hesaplardan ayrıdır.');add('p','Takip eden stop: fiyatın %2’si. Long için en yüksek, short için en düşük gözlenen mark fiyatını izler. %2 fiyat hareketi '+d.policy.leverage+'× teminatta yaklaşık %'+(2*d.policy.leverage)+' etki oluşturabilir; maliyetler ayrıca düşer. Sabit kâr alma yok.');add('p','Model varsayımları: işlem başına %0,05 komisyon, %0,02 kayma, %0,5 maintenance, %0,5 tasfiye ücreti. Borsa hesabına özel oranlar doğrulanmış değildir. Funding gerçekleşmiş tarihsel oran ve funding mark fiyatıyla hesaplanır.');
+const info=add('details','');info.dataset.key='limits';add('summary','Sinyal kuralları ve testin sınırları',info);add('p','SMA20/50 ve EMA12/26: üstte long, altta short. RSI14 (basit): 30 altı long, 70 üstü short; ara bölge nötr. Temel hesap: en az iki aynı yön. ZİTAR: SMA/EMA aynı yön ve long RSI 45–70, short RSI 30–55; spread en fazla 20 baz puan ve mutlak funding oranı en fazla %0,1. Karşılaştırma hesapları 1 saatlik mum kullanır. ZİTAR ortak hesap 5 dk, 15 dk ve 1 saat çoğunluk sinyallerini tek bütçeyle işler; karşı yöndeki saatlik görünüm girişi engeller. Eşzamanlı sinyal önceliği 1 saat, 15 dk, 5 dk; pariteler alfabetiktir.',info);d.limitations.forEach(x=>add('p',x,info));add('p','Bu kurallar test hipotezidir. Kâr garantisi veya otomatik canlıya geçiş yok.',info);
+if(d.errors.length)add('p','Veri sorunları: '+d.errors.join(' | ')).className='yellow';
+host=box;const all=Object.values(d.books),eq=all.reduce((n,b)=>n+Number(b.equity),0),initial=10000*all.length,profit=eq-initial;const summary=add('div','');summary.className='paper-summary';for(const [label,value,col] of [['Vadeli test toplamı',money(eq),''],['Toplam K/Z',money(profit),tone(profit)],['Getiri',(initial?(profit/initial*100):0).toFixed(2)+'%',tone(profit)],['Açık pozisyon',String(all.reduce((n,b)=>n+b.positions.length,0)),'']]){const card=add('div','',summary);card.className='stat';add('div',label,card).className='label';add('div',value,card).className='value '+col;}add('p',all.length+' ayrı USDT deneme hesabı · '+d.policy.leverage+'× izole · %2 takip eden stop · Spot TRY hesaplarına dahil değildir.').className='summaryline';
+const accounts=add('div','');accounts.className='paper-accounts';
+for(const [name,b] of Object.entries(d.books)){host=add('article','',accounts);host.className='card';if(b.retired_ms)add('p','ARŞİVLENİYOR: fiyat/funding uzlaşması bekleniyor.');add('h3',name==='ZITAR_CONTROL_V2'?'V2 · Eşzamanlı kontrol':name==='ZITAR_TRIGGER_V2'?'V2 · Yeni sinyal + yön sınırı':name==='ZITAR_CONTROL_V1'?'Ortak strateji · eşzamanlı kontrol':name==='ZITAR_SELECTIVE_V1'?'Seçici aday · saatlik teyit + bekleme':name==='ZITAR_SHARED_MTF'?'ZİTAR ortak hesap · 5 dk / 15 dk / 1 saat':name==='BASELINE'?'Birleşik temel vadeli':name==='ZITAR_V1'?'ZİTAR vadeli aday V1':name+' · vadeli');const metrics=add('div','');metrics.className='metrics';for(const [label,value,color] of [['Toplam özkaynak',money(b.equity),''],['Serbest bakiye',money(b.cash),''],['Açık K/Z',money(b.unrealized),tone(b.unrealized)],['Getiri',fmt(b.return_pct)+'%',tone(b.return_pct)],['Gerçekleşen net K/Z',money(b.realized),tone(b.realized)],['Açık pozisyon',b.positions.length+'/10',''],['Günlük pozisyon bütçesi',money(b.slot),''],['Ayrılan teminat',money(b.margin),''],['Funding net',money(b.funding_total),tone(b.funding_total)]]){const el=add('div','',metrics);el.className='metric';add('div',label,el).className='label';add('div',value,el).className='v '+color;}
+if(name==='ZITAR_SHARED_MTF')add('p','Tek hesap · toplam 10 pozisyon · Başlangıç: '+date(b.started_ms)+' · Günlük 00:00 özkaynak / 10. Mevcut pozisyonlar korunur; yeni bütçe yeni girişlere uygulanır.').className='summaryline';
+const valuationAge=b.valuation_ms?(Date.now()-b.valuation_ms)/1000:Infinity;add('p','Değerleme: '+(b.valuation_ms?date(b.valuation_ms):'Doğrulanmadı')+' · '+(valuationAge>120?'ESKİ VERİ — güncel bakiye değildir':b.accounting_pending?'GEÇİCİ BAKİYE — funding eksik; yeni girişler bekliyor':'Güncel fiyat değerlemesi')).className=valuationAge>120||b.accounting_pending?'yellow':'summaryline';
+add('p','Toplam ücret: '+money(b.fees_total)+' · Gözlenen düşüş: '+fmt(b.max_drawdown_pct)+'%').className='summaryline';if(!b.positions.length)add('p',name==='ZITAR_CONTROL_V2'?'V2 · Eşzamanlı kontrol':name==='ZITAR_TRIGGER_V2'?'V2 · Yeni sinyal + yön sınırı':name==='ZITAR_CONTROL_V1'?'Ortak strateji · eşzamanlı kontrol':name==='ZITAR_SELECTIVE_V1'?'Seçici aday · saatlik teyit + bekleme':name==='ZITAR_SHARED_MTF'?'Açık pozisyon yok; 5 dk / 15 dk / 1 saat kapanışlarında koşullar değerlendirilir.':'Açık pozisyon yok; yeni saatlik kapanış ve uygun koşul bekleniyor.').className='muted';
+b.positions.forEach(p=>{const card=add('article','');card.className='position';const title=add('div','',card);title.className='position-title';add('span',p.symbol+' · '+(p.direction===1?'LONG':'SHORT'),title);add('span',money(p.unrealized),title).className=tone(p.unrealized);const grid=add('div','',card);grid.className='posgrid';for(const [label,value] of [['Zaman dilimi',p.timeframe||'1h'],['Giriş',fmt(p.entry)],['Mark fiyat',fmt(p.mark)],['Takip eden stop',fmt(p.trailing_stop)],['Teminat',money(p.margin)],['Miktar',fmt(p.quantity)],['Funding',money(p.funding)]]){const el=add('div',label,grid);el.className='positem';add('strong',value,el);}add('p','Giriş: '+date(p.opened_ms)+' · Fiyat: '+date(p.quote_ms)).className='summaryline';});
+const closed=add('details','');closed.dataset.key=name+':closed';add('summary','Kapanan işlemler ('+b.closed.length+')',closed);b.closed.slice().reverse().forEach(p=>add('p',p.symbol+' '+(p.direction===1?'LONG':'SHORT')+' · '+money(p.net_pnl)+' · '+({'TRAILING_STOP_2PCT':'Takip eden stop','SIGNAL_CHANGED':'Yön değişti','MODEL_LIQUIDATION':'Model tasfiyesi'})[p.exit_reason]+' · '+date(p.closed_ms),closed));
+for(const [key,title] of [['days','Günlük'],['weeks','Haftalık'],['months','Aylık']]){const section=add('details','');section.dataset.key=name+':'+key;add('summary',title+' izleme',section);b[key].slice(-31).forEach(p=>add('p',p.date+' · '+fmt(p.return_pct)+'% · '+(p.quality.includes('OPEN_DAY')||p.quality.includes('PARTIAL_PERIOD')||p.quality.includes('PARTIAL_FIRST_DAY')?'Kısmi / devam eden dönem':'Kapanmış dönem; model varsayımları geçerli'),section));}}
+host=box;const decisions=add('details','');decisions.dataset.key='decisions';add('summary','Son kararlar',decisions);d.decisions.slice().reverse().forEach(e=>add('p',date(e.ms)+' · '+(e.book||'Tümü')+' · '+e.symbol+' · '+(e.direction===1?'LONG':e.direction===-1?'SHORT':'Nötr')+' · '+e.reason+' · '+e.result,decisions));box.querySelectorAll('details').forEach(e=>e.open=opened.has(e.dataset.key));
+}catch(e){box.textContent=e.message;}}
+refreshFuturesPaper();setInterval(()=>{if(document.getElementById('experimentsView').style.display!=='none'||(window.paperFuturesHome&&document.getElementById('dashboardView').style.display!=='none'))refreshFuturesPaper();},15000);
+</script><script>// Reuse the same account/position renderer: no duplicate balances or controls.
+(()=>{
+ const dashboard=document.getElementById('dashboardView');
+ const spot=document.createElement('div');spot.id='paperSpotHome';
+ while(dashboard.firstChild)spot.append(dashboard.firstChild);
+ const tabs=document.createElement('div');tabs.className='actions';tabs.style.marginBottom='16px';tabs.setAttribute('aria-label','Paper hesap türü');
+ const future=document.createElement('div');future.id='paperFuturesHome';future.hidden=true;
+ dashboard.append(tabs,spot,future);
+ let selected='futures';
+ const buttons={};
+ for(const [key,label] of [['futures','Vadeli paper · USDT']]){
+  const b=document.createElement('button');b.className='btn';b.textContent=label;buttons[key]=b;tabs.append(b);
+  b.onclick=()=>{selected=key;place();};
+ }
+ function place(){
+  const home=activeView==='dashboard'&&selected==='futures';
+  window.paperFuturesHome=home;
+  spot.hidden=selected!=='spot';future.hidden=selected!=='futures';
+  for(const [key,b] of Object.entries(buttons)){b.setAttribute('aria-pressed',String(selected===key));b.style.borderColor=selected===key?'var(--blue)':'';}
+  const target=home?future:document.getElementById('experimentsView');
+  target.prepend(futuresPanel);
+  futuresPanel.querySelector('h2').textContent=home?'ZİTAR ortak vadeli paper hesabı · USDT':'Vadeli paper karşılaştırma hesapları · USDT';
+  refreshFuturesPaper();
+ }
+ const previous=showView;
+ showView=function(v){previous(v);place();};
+ place();
+})();
+</script><script>(()=>{
+ const panel=document.createElement('section');panel.className='panel section';panel.innerHTML='<h2>Dinamik piyasalar · likidite / ani hareket / 10 gösterge</h2><div id="discoveryBody">Yükleniyor…</div>';document.getElementById('marketsView').prepend(panel);
+ async function refresh(){const host=document.getElementById('discoveryBody');try{
+  const res=await fetch('/api/market-discovery');if(!res.ok)throw Error('Yeni piyasa modülü henüz servise yüklenmedi.');const d=await res.json();host.replaceChildren();
+  const add=(tag,text,parent=host)=>{const e=document.createElement(tag);e.textContent=text;parent.append(e);return e;};const num=x=>Number(x).toLocaleString('tr-TR',{maximumFractionDigits:2});const date=x=>new Date(x).toLocaleString('tr-TR');
+  add('p','Açık formüllerin yerel hesaplamasıdır; TradingView bağlantısı veya birebir TradingView sonucu değildir. 5 dakikalık kapanmış mumlar. Eski hesaplar sabit listeleriyle korunur.');
+  if(!d.discovery){add('p','Henüz tarama kaydı yok. Yeni worker başladıktan sonra görünür.');return;}
+  add('p','Son tarama: '+date(d.discovery.completed_ms)+' · '+(d.discovery.stale?'ESKİ VERİ':'Tarama kaydı güncel')).className=d.discovery.stale?'yellow':'green';
+  for(const [market,m] of Object.entries(d.discovery.markets)){
+   const box=add('section','');box.className='section';add('h3',market==='spot'?'Spot · TRY':'Vadeli · USDT',box);
+   if(m.error){add('p',m.error,box).className='red';continue;}
+   add('p',m.universe_count+' uygun parite · Bu tur '+m.scanned+' tarandı · '+m.main.length+' ana aday · '+m.radar.length+' ani hareket adayı',box);
+   add('p','En yüksek 24 saatlik hacimde 30 aday + sırayla taranan 10 ek parite. Tüm piyasa aynı anda taranmıyor. Spread ≤20 baz puan; iki yönde hesaplanan kayma ≤10 baz puan. Bunlar deney eşikleridir.',box);
+   const grid=add('div','',box);grid.className='paper-accounts';
+   for(const r of m.rows){const card=add('article','',grid);card.className='card';add('h3',r.symbol,card);add('p',m.main.includes(r.symbol)?'ANA LİSTE':m.radar.includes(r.symbol)?'ANİ HAREKET ADAYI':'İZLEME / ELEME',card).className=m.main.includes(r.symbol)?'green':'yellow';
+    const metrics=add('div','',card);metrics.className='metrics';for(const [label,value] of [['24s hacim',num(r.volume_24h)+' '+m.quote],['Spread',r.spread_bps==null?'—':num(r.spread_bps)+' bp'],['Alış kayması',r.buy_impact_bps==null?'—':num(r.buy_impact_bps)+' bp'],['Satış kayması',r.sell_impact_bps==null?'—':num(r.sell_impact_bps)+' bp']]){const e=add('div','',metrics);e.className='metric';add('div',label,e).className='label';add('div',value,e).className='v';}
+    if(r.error||r.reasons?.length)add('p',r.error||(r.reasons||[]).join(', '),card).className='yellow';
+    if(r.analysis){const a=r.analysis;add('p','5dk değişim %'+num(a.move_5m_pct)+' · Hacim '+num(a.volume_ratio)+'× · '+(a.radar?'Anomali var; tahmin değildir':'Anomali eşiği aşılmadı'),card);const detail=add('details','',card);add('summary','10 gösterge ve karar',detail);for(const i of a.indicators)add('p',i.name+' · '+i.group+' · '+(i.vote>0?'Yukarı':i.vote<0?'Aşağı':'Nötr'),detail);add('p','Tek gösterge: '+a.single+' · Çoğunluk: '+a.majority+' · Gruplu: '+a.grouped+' (1 yukarı, −1 aşağı, 0 bekle)',detail);}
+   }
+  }
+  if(d.spot){add('h3','Dinamik spot paper deneyleri');if(d.spot.signal_status){const st=d.spot.signal_status;add('p','Sinyal verisi: '+st.ready_intervals+'/'+st.expected_intervals+' güncel · '+st.pending+' indirme bekliyor. Mum eksikliği fiyatla stop kontrolünü durdurmaz.');}add('p','Durum: '+(d.spot.stale?'ESKİ KAYIT':d.spot.state)+' · Ayrı 10.000 TRY hesaplar · Ana Master dahil değildir.');const grid=add('div','');grid.className='paper-accounts';for(const [name,b] of Object.entries(d.spot.books).filter(([,b])=>!b.retired_ms||Object.keys(b.positions).length)){const card=add('article','',grid);card.className='card';add('h3',name,card);add('p','Özkaynak '+num(b.equity)+' TRY · Nakit '+num(b.cash)+' TRY · Bütçe '+num(b.slot)+' TRY',card);add('p','Açık '+Object.keys(b.positions).length+'/10 · Kapanan '+b.closed.length+' · Ücret '+num(b.fees)+' TRY',card);for(const [symbol,p] of Object.entries(b.positions)){const pos=add('div','',card);pos.className='position';add('strong',symbol+' · '+num(Number(p.value)-Number(p.cost))+' TRY',pos);add('p','Giriş '+num(p.entry)+' · Stop '+num(p.stop)+' · Değer '+num(p.value)+' TRY',pos);}}}
+ }catch(e){host.textContent=e.message;}}
+ refresh();setInterval(()=>{if(document.getElementById('marketsView').style.display!=='none')refresh();},30000);
+})();
+</script><script>(()=>{
+ const home=document.getElementById('paperSpotHome');
+ const legacy=document.createElement('details');legacy.className='panel section';
+ const summary=document.createElement('summary');summary.textContent='Eski V3 Master · Saatlik referans hesabı (ayrı bakiye)';legacy.append(summary);
+ while(home.firstChild)legacy.append(home.firstChild);
+ const panel=document.createElement('section');panel.className='panel section';
+ const title=document.createElement('h2');title.textContent='Çalışan spot paper hesapları · TRY';
+ const status=document.createElement('p');status.textContent='Hesaplar yükleniyor…';
+ const body=document.createElement('div');panel.append(title,status,body);home.append(panel,legacy);
+ const names={RSI14:'RSI14 · Saatlik spot',SINGLE:'Tek gösterge · SMA',MAJORITY:'10 gösterge · Çoğunluk',GROUPED:'Gösterge grupları · Uyum',RADAR:'Ani hareket · Radar'};
+ const num=v=>Number(v).toLocaleString('tr-TR',{maximumFractionDigits:2});
+ const money=v=>num(v)+' TRY';const tone=v=>Number(v)>0?'green':Number(v)<0?'red':'muted';
+ const add=(parent,tag,text,cls='')=>{const el=document.createElement(tag);el.textContent=text;el.className=cls;parent.append(el);return el;};
+ const metric=(parent,label,value,cls='')=>{const box=add(parent,'div','','metric');add(box,'div',label,'label');add(box,'div',value,'v '+cls);};
+ let busy=false;
+ async function refresh(){
+  if(busy)return;busy=true;const ctl=new AbortController();const timer=setTimeout(()=>ctl.abort(),8000);
+  try{
+   const response=await fetch('/api/market-discovery',{signal:ctl.signal});if(!response.ok)throw Error('API '+response.status);
+   const data=await response.json();const s=data.spot;if(!s?.books)throw Error('Spot hesap kaydı henüz yok');
+   const age=(Date.now()-s.heartbeat_ms)/1000;const stale=age>60||age< -5;
+   status.textContent=(stale?'VERİ ESKİ':s.state==='RUNNING'?'ÇALIŞIYOR':'VERİ UYARISI')+' · Son çevrim '+new Date(s.heartbeat_ms).toLocaleString('tr-TR')+' · '+Math.round(age)+' sn önce';status.className=stale||s.state!=='RUNNING'?'yellow':'green';
+   body.replaceChildren();add(body,'p','Aktif bağımsız paper hesaplar: hesap başına 10.000 TRY başlangıç. RSI saatlik, Radar 5 dakikalık kapanmış mumları izler. Arşivlenen hesaplar toplama dahil değildir.');
+   const books=Object.entries(s.books).filter(([,b])=>!b.retired_ms||Object.keys(b.positions).length);const total=books.reduce((a,[,b])=>a+Number(b.equity),0);const cash=books.reduce((a,[,b])=>a+Number(b.cash),0);
+   const totals=add(body,'div','','paper-summary');metric(totals,'DENEMELER TOPLAM ÖZKAYNAK',money(total));metric(totals,'TOPLAM NAKİT',money(cash));metric(totals,'BAŞLANGIÇTAN NET K/Z',money(total-books.length*10000),tone(total-books.length*10000));metric(totals,'AÇIK POZİSYON',books.reduce((a,[,b])=>a+Object.keys(b.positions).length,0));
+   if(s.signal_status)add(body,'p','Güncel sinyal verisi: '+s.signal_status.ready_intervals+'/'+s.signal_status.expected_intervals+' · Bekleyen indirme: '+s.signal_status.pending);
+   if(s.errors?.length)add(body,'p',s.errors.join(' · '),'yellow');
+   const grid=add(body,'div','','paper-accounts');
+   for(const [name,b] of books){
+    const card=add(grid,'article','','card');add(card,'h3',names[name]||name);
+    const metrics=add(card,'div','','metrics');const pnl=Number(b.equity)-10000;
+    metric(metrics,'ÖZKAYNAK',money(b.equity));metric(metrics,'KULLANILABİLİR NAKİT',money(b.cash));metric(metrics,'NET K/Z',money(pnl),tone(pnl));metric(metrics,'GETİRİ',num(pnl/100)+'%',tone(pnl));metric(metrics,'AÇIK / KAPASİTE',Object.keys(b.positions).length+' / 10');metric(metrics,'KAPANAN İŞLEM',b.closed.length);metric(metrics,'TOPLAM KOMİSYON',money(b.fees));metric(metrics,'YENİ POZİSYON BÜTÇESİ',money(b.slot));
+    add(card,'p','Son değerleme: '+(b.valuation_ms?new Date(b.valuation_ms).toLocaleString('tr-TR'):'Henüz yok'),'muted');
+    if(!Object.keys(b.positions).length)add(card,'p','Açık pozisyon yok; yeni uygun sinyal bekleniyor.');
+    for(const [symbol,p] of Object.entries(b.positions)){
+     const box=add(card,'div','','position');const gain=Number(p.value)-Number(p.cost);add(box,'h4',symbol+' · '+money(gain)+' ('+num(gain/Number(p.cost)*100)+'%)',tone(gain));
+     const fields=add(box,'div','','posgrid');for(const [key,value] of [['Maliyet',money(p.cost)],['Giriş',num(p.entry)],['Pozisyon değeri',money(p.value)],['Miktar',p.qty],['Takip eden stop',num(p.stop)],['Fiyat zamanı',p.quote_ms?new Date(p.quote_ms).toLocaleTimeString('tr-TR'):'—']]){const field=add(fields,'div','','positem');add(field,'div',key,'label');add(field,'strong',value);}
+    }
+   }
+  }catch(error){status.textContent='GÜNCEL VERİ ALINAMADI · '+error.message+' · Varsa aşağıdaki değerler son alınan kayıttır.';status.className='yellow';}
+  finally{clearTimeout(timer);busy=false;}
+ }
+ refresh();setInterval(()=>{if(!home.hidden&&document.getElementById('dashboardView').style.display!=='none')refresh();},10000);
+})();
+</script><script>(()=>{
+const panel=document.createElement('section');panel.className='panel section';
+document.getElementById('dashboardView').prepend(panel);
+let busy=false;
+async function refresh(){if(busy)return;busy=true;
+try{const r=await fetch('/api/futures-paper',{signal:AbortSignal.timeout(8000)});if(!r.ok)throw Error('API yanıtı '+r.status);const d=await r.json();panel.replaceChildren();
+const add=(tag,text,parent=panel)=>{const el=document.createElement(tag);el.textContent=text;parent.append(el);return el;};
+const fmt=v=>Number(v||0).toLocaleString('tr-TR',{maximumFractionDigits:2});const money=v=>fmt(v)+' USDT';const date=v=>new Date(v).toLocaleString('tr-TR');
+add('h2','ZİTAR · Dört onaylı yeni paper deneyi');
+add('p','5 dk ve 15 dk ayrı hesap · Hesap başına 10.000 USDT · 3× izole · En fazla 10 pozisyon · Gerçek emir yok.');
+add('p','EMA200 + günlük UTC VWAP, yükselen/düşen RSI, 1,8× hacim ve BB/Keltner sıkışma çıkışı birlikte aranır. 24 saat hacim en az 10 milyon USDT; spread ve emir defteri derinliği de kontrol edilir.');
+add('p','Stop: ATR × 1,5 veya %1 mesafeden dar olanı. %1,2 hareket: maliyet dahil başabaş. %2: yarısı kapanır, kalan %1 takip eden stop ve %2,5 hedef ile izlenir. Komisyon %0,075 + kayma %0,1, her yönde.');
+add('p','Günlük özkaynak +%3: yeni girişler durur; −%2: pozisyonlar kapatılır ve o gün giriş yapılmaz. Gün değişimi İstanbul 00:00; yeni bütçe özkaynak / 10. Stoplar periyodik fiyat gözlemine bağlıdır; fiyat boşluklarında kayıp sınırı aşılabilir.');
+const books=Object.entries(d.books||{}).filter(([name])=>name.startsWith('ZITAR_CONFLUENCE_'));
+if(!books.length){add('p','KOD HAZIR, CANLI BAŞLANGIÇ DOĞRULANMADI — paper servisi yeni kodla başlatılmalı.').className='yellow';return;}
+add('p','Servis: '+d.state+' · Son heartbeat '+fmt(d.heartbeat_age_seconds)+' saniye önce.').className=d.state==='RUNNING'?'green':'yellow';
+const cards=add('div','');cards.className='paper-accounts';
+for(const [name,b]of books){const card=add('article','',cards);card.className='card';add('h3',name.endsWith('5M')&&!name.endsWith('15M')?'5 dakika · Dört onay':'15 dakika · Dört onay',card);
+add('p','Başlangıç: '+date(b.started_ms)+' · 24 saat değerlendirme: '+date(b.started_ms+86400000),card);
+const grid=add('div','',card);grid.className='metrics';
+for(const [label,val]of [['Özkaynak',money(b.equity)],['Serbest nakit',money(b.cash)],['Net K/Z',money(Number(b.equity)-10000)],['Günlük K/Z',fmt(b.daily_pnl_pct)+'%'],['Açık pozisyon',b.positions.length+'/10'],['Gerçekleşen K/Z',money(b.realized)],['Ücretler',money(b.fees_total)],['Funding',money(b.funding_total)],['Pozisyon bütçesi',money(b.slot)],['Günlük sınır',({OPEN:'Giriş açık',LOSS_STOP:'Zarar sınırı',PROFIT_LOCK:'Kâr koruma'})[b.daily_limit]||'Bekleniyor']]){const m=add('div','',grid);m.className='metric';add('div',label,m).className='label';add('div',val,m).className='v';}
+add('p','Değerleme: '+date(b.valuation_ms)+(Date.now()-b.valuation_ms>120000?' · ESKİ VERİ':''),card);
+if(!b.positions.length)add('p','Açık pozisyon yok. Şartlar sağlanmadan işlem açılmaz; bekleme nedenleri aşağıdadır.',card);
+for(const p of b.positions){const pos=add('article','',card);pos.className='position';add('h4',p.symbol+' · '+(p.direction===1?'LONG':'SHORT')+' · '+money(p.unrealized),pos);add('p','Giriş '+fmt(p.entry)+' · Mark '+fmt(p.mark)+' · Stop '+fmt(p.trailing_stop)+' · TP '+fmt(Number(p.entry)*(1+.025*p.direction)),pos);add('p','Miktar '+p.quantity+' · Teminat '+money(p.margin)+' · '+(p.partial_done?'Yarım kâr alındı':p.break_even_active?'Başabaş etkin':'İlk stop etkin'),pos);}
+const detail=add('details','',card);add('summary','Son değerlendirmeler ve kapanışlar',detail);
+Object.entries(b.evaluations||{}).forEach(([symbol,e])=>add('p',symbol+' · '+e.result+' · '+e.reason+(e.evidence?' · RSI '+fmt(e.evidence.rsi)+' · Hacim '+fmt(e.evidence.volume_ratio)+'× · Sıkışma çıkışı '+(e.evidence.squeeze_release?'var':'yok'):''),detail));
+b.closed.slice(-20).reverse().forEach(p=>add('p',p.symbol+' · '+p.exit_reason+' · '+money(p.net_pnl)+' · '+date(p.closed_ms),detail));
+}
+add('p','Eski hesaplar farklı maliyet ve başlangıç kullanır; doğrudan performans üstünlüğü kanıtı değildir. Bu iki hesap yeni kuralları ileriye dönük sınar.');
+}catch(e){panel.textContent='Yeni paper deneyi verisi alınamadı: '+e.message;}finally{busy=false;}}
+refresh();setInterval(refresh,15000);
+})();
+</script><script>(()=>{
+const panel=document.createElement('section');panel.className='panel section';
+document.getElementById('dashboardView').prepend(panel);
+let busy=false;
+async function refresh(){if(busy)return;busy=true;
+try{const r=await fetch('/api/futures-paper',{signal:AbortSignal.timeout(8000)});if(!r.ok)throw Error('API yanıtı '+r.status);const d=await r.json();if(d.active_strategy_names&&!d.active_strategy_names.some(n=>n.startsWith('ZITAR_PIVOT_ATR_'))){panel.hidden=true;return;}panel.hidden=false;panel.replaceChildren();
+const add=(tag,text,parent=panel)=>{const el=document.createElement(tag);el.textContent=text;parent.append(el);return el;};
+const fmt=v=>Number(v||0).toLocaleString('tr-TR',{maximumFractionDigits:2});const money=v=>fmt(v)+' USDT';const date=v=>new Date(v).toLocaleString('tr-TR');
+add('h2','ZİTAR · Pivot + ATR · bağımsız paper deneyi');
+add('p','5 dk ve 15 dk ayrı hesap · Hesap başına 10.000 USDT · 3× izole · En fazla 10 pozisyon · Gerçek emir yok.');
+add('p','İki sağ mumla doğrulanmış pivot merkezi + ATR10 × 3 trend dönüşü ve EMA200 yön onayı aranır. EMA10/50/100 ek gözlemdir. Kapalı kaynak göstergenin kopyası değildir. 24 saat hacim en az 10 milyon USDT; spread ve emir defteri derinliği de kontrol edilir.');
+add('p','Stop: ATR × 1,5 veya %1 mesafeden dar olanı. %1,2 hareket: maliyet dahil başabaş. %2: yarısı kapanır, kalan %1 takip eden stop ve %2,5 hedef ile izlenir. Komisyon %0,075 + kayma %0,1, her yönde.');
+add('p','Günlük özkaynak +%3: yeni girişler durur; −%2: pozisyonlar kapatılır ve o gün giriş yapılmaz. Gün değişimi İstanbul 00:00; yeni bütçe özkaynak / 10. Stoplar periyodik fiyat gözlemine bağlıdır; fiyat boşluklarında kayıp sınırı aşılabilir.');
+const books=Object.entries(d.books||{}).filter(([name])=>name.startsWith('ZITAR_PIVOT_ATR_'));
+if(!books.length){add('p','KOD HAZIR, CANLI BAŞLANGIÇ DOĞRULANMADI — paper servisi yeni kodla başlatılmalı.').className='yellow';return;}
+add('p','Servis: '+d.state+' · Son heartbeat '+fmt(d.heartbeat_age_seconds)+' saniye önce.').className=d.state==='RUNNING'?'green':'yellow';
+const cards=add('div','');cards.className='paper-accounts';
+for(const [name,b]of books){const card=add('article','',cards);card.className='card';add('h3',name.endsWith('5M')&&!name.endsWith('15M')?'5 dakika · Pivot + ATR':'15 dakika · Pivot + ATR',card);
+add('p','Başlangıç: '+date(b.started_ms)+' · 24 saat değerlendirme: '+date(b.started_ms+86400000),card);
+const grid=add('div','',card);grid.className='metrics';
+for(const [label,val]of [['Özkaynak',money(b.equity)],['Serbest nakit',money(b.cash)],['Net K/Z',money(Number(b.equity)-10000)],['Günlük K/Z',fmt(b.daily_pnl_pct)+'%'],['Açık pozisyon',b.positions.length+'/10'],['Gerçekleşen K/Z',money(b.realized)],['Ücretler',money(b.fees_total)],['Funding',money(b.funding_total)],['Pozisyon bütçesi',money(b.slot)],['Günlük sınır',({OPEN:'Giriş açık',LOSS_STOP:'Zarar sınırı',PROFIT_LOCK:'Kâr koruma'})[b.daily_limit]||'Bekleniyor']]){const m=add('div','',grid);m.className='metric';add('div',label,m).className='label';add('div',val,m).className='v';}
+add('p','Değerleme: '+date(b.valuation_ms)+(Date.now()-b.valuation_ms>120000?' · ESKİ VERİ':''),card);
+if(!b.positions.length)add('p','Açık pozisyon yok. Şartlar sağlanmadan işlem açılmaz; bekleme nedenleri aşağıdadır.',card);
+for(const p of b.positions){const pos=add('article','',card);pos.className='position';add('h4',p.symbol+' · '+(p.direction===1?'LONG':'SHORT')+' · '+money(p.unrealized),pos);add('p','Giriş '+fmt(p.entry)+' · Mark '+fmt(p.mark)+' · Stop '+fmt(p.trailing_stop)+' · TP '+fmt(Number(p.entry)*(1+.025*p.direction)),pos);add('p','Miktar '+p.quantity+' · Teminat '+money(p.margin)+' · '+(p.partial_done?'Yarım kâr alındı':p.break_even_active?'Başabaş etkin':'İlk stop etkin'),pos);}
+const detail=add('details','',card);add('summary','Son değerlendirmeler ve kapanışlar',detail);
+Object.entries(b.evaluations||{}).forEach(([symbol,e])=>add('p',symbol+' · '+e.result+' · '+e.reason+(e.evidence?' · Trend '+e.evidence.trend+' · EMA200 '+fmt(e.evidence.emas?.['200'])+' · Pivot onayı '+(e.evidence.pivot_confirmation_ms?date(e.evidence.pivot_confirmation_ms):'yok'):''),detail));
+b.closed.slice(-20).reverse().forEach(p=>add('p',p.symbol+' · '+p.exit_reason+' · '+money(p.net_pnl)+' · '+date(p.closed_ms),detail));
+}
+add('p','Eski hesaplar farklı maliyet ve başlangıç kullanır; doğrudan performans üstünlüğü kanıtı değildir. Bu iki hesap yeni kuralları ileriye dönük sınar.');
+}catch(e){panel.textContent='Pivot paper deneyi verisi alınamadı: '+e.message;}finally{busy=false;}}
+refresh();setInterval(refresh,15000);
+})();
+</script><script>(()=>{
+ const style=document.createElement('style');style.textContent='#dashboardView>:not(#rsiPages){display:none!important}#rsiPages .green{color:#28db8a}#rsiPages .red{color:#ff666e}#rsiPages .muted{color:#99adc6}#rsiPages .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}#rsiPages .metric{padding:14px;background:#0b1321;border-radius:10px}#rsiPages .v{font-size:21px;font-weight:bold}#rsiPages .position{padding:16px;margin-top:12px;border:1px solid #30415b;border-left:3px solid;border-radius:12px}#rsiPages .top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}#rsiPages details{margin:16px 0}';document.head.append(style);
+ const root=document.createElement('section');root.id='rsiPages';document.getElementById('dashboardView').append(root);
+ const add=(p,t,text,cls='')=>{const e=document.createElement(t);e.textContent=text;e.className=cls;p.append(e);return e;};
+ const num=v=>Number(v||0).toLocaleString('tr-TR',{maximumFractionDigits:2}),tone=v=>v>0?'green':v<0?'red':'muted',stamp=t=>t?new Date(t).toLocaleString('tr-TR'):'Henüz yok';
+ const names={dashboard:'Spot · RSI',futuresOnly:'Vadeli · RSI',pumpOnly:'Pump · Kapalı',dailyOnly:'Günlük grafikler'};let page='futuresOnly',busy=false;
+ const dash=document.getElementById('dashBtn'),nav=dash.parentElement;dash.textContent='Panel';dash.hidden=true;dash.style.display='none';const buttons={dashboard:dash};
+ for(const [id,label]of [['futuresOnly','Vadeli'],['pumpOnly','Pump'],['dailyOnly','Günlük grafikler']]){const v=document.createElement('section');v.id=id+'View';v.style.display='none';document.getElementById('dashboardView').after(v);views.push(id);const b=add(nav,'button',label,'btn');buttons[id]=b;b.onclick=()=>showView(id);}
+ const original=showView;showView=function(v){original(v);Object.entries(buttons).forEach(([id,b])=>b.classList.toggle('active',id===v));if(names[v]){page=v;document.getElementById(v+'View').append(root);refresh();}};
+ const positions=b=>Array.isArray(b.positions)?b.positions:Object.entries(b.positions||{}).map(([symbol,p])=>({symbol,...p}));
+ function controls(market,s){const row=add(root,'div','','actions');const msg=add(root,'p',market==='pump'?'Pump kaldırıldı; yeni işlem açmaz.':s?.entry_control?(s.entry_control.paused?'DURDURULDU · stop takibi sürüyor':'BAŞLATILDI'):'Motorun kontrol onayı bekleniyor.','muted');
+  for(const [action,label]of [['start','Başlat'],['stop','Durdur']]){const b=add(row,'button',label,'btn');b.disabled=market==='pump';b.onclick=async()=>{b.disabled=true;try{const r=await fetch('/api/paper-control',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({market,action})});if(!r.ok)throw Error(r.status===404?'Yeni kontrol kodu için Repair-Zitar.ps1 çalıştırılmalı.':'Kontrol isteği reddedildi.');await r.json();msg.textContent='İstek kaydedildi; motorun uygulaması bekleniyor.';}catch(e){msg.textContent=e.message;}finally{b.disabled=false;}};}
+  add(root,'p','Durdur: yeni girişler kapanır; açık pozisyonların fiyat, stop ve çıkış takibi devam eder.','muted');
+ }
+ function chart(title,b,unit){const card=add(root,'section','','card');add(card,'h3',title);if(!b || !Number(b.period_start)){add(card,'p','Günlük veri alanı bekleniyor. Yeni motoru yüklemek için Repair-Zitar.ps1 çalıştırılmalı.');return;}
+  const history=b.daily||[],rows=[...history,{date:(b.period||'Bugün')+' · devam ediyor',start:b.period_start,end:b.equity,open:true}];
+  const scale=Math.max(1,...rows.map(r=>Math.abs(Number(r.start)?(Number(r.end)/Number(r.start)-1)*100:0)));
+  for(const r of rows){const delta=Number(r.end)-Number(r.start),pct=Number(r.start)?delta/Number(r.start)*100:0;const line=add(card,'div','','metric');line.style.marginTop='8px';add(line,'strong',r.date+' · %'+num(pct)+' · '+num(delta)+' '+unit,tone(delta));const bar=add(line,'div','');bar.style.cssText='height:14px;margin-top:8px;width:'+Math.max(.4,Math.abs(pct)/scale*100)+'%;background:'+(delta<0?'#ff666e':'#28db8a');if(r.open)add(line,'small','Gün tamamlanmadı.','muted');else if((r.quality||[]).includes('PARTIAL_FIRST_DAY')||new Date(b.started_ms).toLocaleDateString('en-CA',{timeZone:'Europe/Istanbul'})===r.date)add(line,'small','İlk gün: kısmi ölçüm.','muted');}
+  if(!history.length)add(card,'p','İlk tamamlanmış gün 00:00 döngüsünden sonra görünür.','muted');
+ }
+ async function refresh(){if(busy)return;busy=true;const requested=page;try{
+  const [d,f]=await Promise.all(['/api/market-discovery','/api/futures-paper'].map(async u=>{const r=await fetch(u,{signal:AbortSignal.timeout(8000)});if(!r.ok)throw Error('Hesap verisi alınamadı');return r.json();}));if(page!==requested)return;root.replaceChildren();add(root,'h2',names[page]);add(root,'p','PAPER · Gerçek emirler kapalı','muted');const spot=d.spot;
+  if(page==='dailyOnly'){add(root,'p','İstanbul 00:00: gün sonucu arşivlenir. Kâr/zarar bakiyede kalır; yeni günün pozisyon bütçesi özkaynak / 10.','muted');chart('Vadeli RSI · USDT',f.books?.RSI14,'USDT');return;}
+  if(page==='pumpOnly'){controls('pump',spot);add(root,'p','Yalnız RSI seçildiği için Pump stratejisi kaldırıldı.');const b=spot?.books?.RADAR;if(b&&positions(b).length)add(root,'p',positions(b).length+' eski Pump pozisyonu güncel fiyatla kapanmayı bekliyor.','red');return;}
+  const futures=page==='futuresOnly',s=futures?f:spot,unit=futures?'USDT':'TRY',money=v=>num(v)+' '+unit;controls(futures?'futures':'spot',s);if(!s)throw Error('Hesap henüz yok');
+  const age=futures?s.heartbeat_age_seconds:(Date.now()-s.heartbeat_ms)/1000;add(root,'p',(age>60?'VERİ ESKİ':s.state==='RUNNING'?'GÜNCEL':'VERİ UYARISI')+' · '+Math.round(age)+' sn',age>60||s.state!=='RUNNING'?'red':'green');
+  const retiring=Object.entries(s.books||{}).filter(([n,b])=>n!=='RSI14'&&positions(b).length);if(retiring.length)add(root,'p','Kaldırılan hesaplarda kapanış bekleyen pozisyonlar: '+retiring.map(([n,b])=>n+' ('+positions(b).length+')').join(', '),'red');
+  const b=s.books?.RSI14;if(!b)throw Error('RSI hesabı yok');const ps=positions(b),closed=b.closed||[],pnl=Number(b.equity)-10000;const card=add(root,'article','','card');add(card,'h3','RSI14');add(card,'p','Başlangıç '+stamp(b.started_ms)+' · Değerleme '+stamp(b.valuation_ms),'muted');const grid=add(card,'div','','metrics');
+  for(const [label,value,n]of [['ÖZKAYNAK',money(b.equity),pnl],['NAKİT',money(b.cash),0],['TOPLAM K/Z',money(pnl),pnl],['GETİRİ','%'+num(pnl/100),pnl],['GÜNLÜK K/Z',b.period_start===undefined?'Güncelleme bekleniyor':money(Number(b.equity)-Number(b.period_start)),Number(b.equity)-Number(b.period_start)],['POZİSYON BÜTÇESİ',money(b.slot),0]]){const m=add(grid,'div','','metric');add(m,'small',label);add(m,'div',value,'v '+tone(n));}
+  const day=t=>new Date(t).toLocaleDateString('en-CA',{timeZone:'Europe/Istanbul'}),today=day(Date.now());add(card,'p','Açık '+ps.length+' / 10 · Bugün açılan '+[...ps,...closed].filter(p=>day(p.opened_ms)===today).length+' · Bugün kapanan '+closed.filter(p=>day(p.closed_ms)===today).length+' · Toplam kapanan '+closed.length);
+  if(!ps.length)add(card,'p','Açık pozisyon yok. Yeni sinyal bekleniyor.','muted');
+  for(const p of ps){const gain=futures?Number(p.unrealized):Number(p.value)-Number(p.cost);const box=add(card,'div','','position '+tone(gain));const row=add(box,'div','','top');add(row,'strong',p.symbol+' · '+(p.direction===-1?'SHORT':'LONG'));add(row,'strong',money(gain));add(box,'p','Giriş '+p.entry+' · Stop '+(p.trailing_stop||p.stop),'muted');add(box,'small',(p.timeframe||'1h')+' · Miktar '+(p.quantity||p.qty)+' · '+stamp(p.opened_ms),'muted');}
+  const details=add(card,'details','');add(details,'summary','Kapanan işlemler ve maliyetler');add(details,'p','Komisyon '+money(b.fees_total??b.fees)+' · Funding '+money(b.funding_total||0));for(const p of closed.slice(-30).reverse())add(details,'p',p.symbol+' · '+money(p.net_pnl)+' · '+stamp(p.closed_ms),tone(Number(p.net_pnl)));
+  if(s.errors?.length){const w=add(root,'details','');add(w,'summary','Veri uyarıları ('+s.errors.length+')');s.errors.forEach(e=>add(w,'p',e,'red'));}
+ }catch(e){let w=root.querySelector('.load-error');if(!w)w=add(root,'p','','load-error red');w.textContent=e.message+' · Varsa bilgiler son kayıttır.';}finally{busy=false;if(page!==requested)refresh();}}
+ showView('futuresOnly');refresh();setInterval(()=>{if(document.getElementById(page+'View').style.display!=='none')refresh();},10000);
+})();
+</script><script>/* User-started voice conversation; one turn at a time, stop invalidates pending callbacks. */
+(()=>{
+ const input=document.getElementById('chatInput');if(!input)return;
+ const bar=document.createElement('div');bar.className='actions';bar.setAttribute('aria-label','Sesli sohbet');input.parentElement.before(bar);
+ const button=t=>{const b=document.createElement('button');b.className='btn';b.type='button';b.textContent=t;bar.append(b);return b;};
+ const start=button('Sesli sohbeti başlat'),stop=button('Sohbeti durdur'),test=button('Sesi dene');
+ const status=document.createElement('p');status.setAttribute('role','status');bar.after(status);
+ const note=document.createElement('small');note.textContent='Başlatınca konuşman otomatik gönderilir, yanıt seslendirilir ve tekrar dinlenir. Tarayıcının ses tanıma hizmeti sesi dışarıda işleyebilir. Yanıt cihazdaki sesle okunur. Kulaklık önerilir.';status.after(note);
+ const synth=window.speechSynthesis,R=window.SpeechRecognition||window.webkitSpeechRecognition;
+ let active=false,epoch=0,recognition=null,timer=null,utterance=null;
+ const localVoice=()=>synth?.getVoices().find(v=>v.localService&&v.lang.toLowerCase().startsWith('tr'));
+ function end(message){active=false;epoch++;clearTimeout(timer);recognition?.abort();recognition=null;synth?.cancel();utterance=null;start.disabled=false;start.textContent='Sesli sohbeti başlat';status.textContent=message;}
+ function speak(text,token,next){
+  if(token!==epoch)return;
+  const v=localVoice();if(!v){end('Cihazda Türkçe ses bulunamadı. Windows Türkçe konuşma sesini yükleyip sayfayı yenile.');return;}
+  synth.cancel();utterance=new SpeechSynthesisUtterance(text.slice(0,4000));utterance.lang='tr-TR';utterance.voice=v;utterance.rate=1;
+  timer=setTimeout(()=>{if(token===epoch)end('Ses motoru başlamadı. Tarayıcı/site sesinin kapalı olmadığını kontrol et; Sesi dene ile tekrar dene.');},8000);
+  utterance.onstart=()=>{if(token!==epoch)return;clearTimeout(timer);status.textContent='ZİTAR konuşuyor…';timer=setTimeout(()=>end('Seslendirme zaman aşımı; sohbet durduruldu.'),180000);};
+  utterance.onend=()=>{if(token!==epoch)return;clearTimeout(timer);utterance=null;next();};
+  utterance.onerror=e=>{if(token===epoch)end('Seslendirme hatası: '+e.error+'. Site sesi ve ses çıkışını kontrol et.');};
+  synth.resume();synth.speak(utterance);
+ }
+ function listen(token){
+  if(!active||token!==epoch)return;
+  let transcript='',failed=false;recognition=new R();recognition.lang='tr-TR';recognition.continuous=false;recognition.interimResults=false;
+  recognition.onstart=()=>{if(token===epoch)status.textContent='Dinliyorum — konuşma bitince otomatik göndereceğim.';};
+  recognition.onresult=e=>{transcript=Array.from(e.results).filter(r=>r.isFinal).map(r=>r[0].transcript).join(' ').trim();};
+  recognition.onerror=e=>{failed=true;if(token===epoch)end('Mikrofon/ses tanıma hatası: '+e.error);};
+  recognition.onend=async()=>{
+   if(failed||!active||token!==epoch)return;recognition=null;
+   if(!transcript){end('Konuşma algılanmadı. Hazır olduğunda yeniden başlat.');return;}
+   if(document.getElementById('chatSend').disabled){end('Bir yanıt zaten bekleniyor; tamamlanınca yeniden başlat.');return;}
+   input.value=transcript;status.textContent='Yanıt bekleniyor…';
+   const before=document.querySelectorAll('#chatMessages .chat-zitar').length;
+   await sendChat();if(!active||token!==epoch)return;
+   const replies=[...document.querySelectorAll('#chatMessages .chat-zitar')].slice(before).map(n=>n.textContent.trim()).filter(Boolean);
+   if(!replies.length){end('Seslendirilecek yanıt gelmedi.');return;}
+   speak(replies[0],token,()=>listen(token));
+  };
+  try{recognition.start();}catch(e){end('Mikrofon başlatılamadı: '+e.message);}
+ }
+ start.addEventListener('click',()=>{
+  if(!R||!synth){status.textContent='Bu tarayıcı sesli sohbeti desteklemiyor.';return;}
+  if(input.value.trim()){status.textContent='Yazılı taslağını önce gönder veya temizle; üzerine yazmayacağım.';return;}
+  if(!confirm('Sesli sohbet sırasında konuşman otomatik gönderilecek. Tarayıcı ses tanıma hizmeti sesi dışarıda işleyebilir. Başlatılsın mı?'))return;
+  end('Başlatılıyor…');active=true;start.disabled=true;start.textContent='Sesli sohbet açık';const token=epoch;
+  speak('Hazırım, seni dinliyorum.',token,()=>listen(token));
+ });
+ stop.addEventListener('click',()=>end('Sesli sohbet durduruldu.'));
+ test.addEventListener('click',()=>{end('Ses deneniyor…');speak('Merhaba, ben Zitar. Bu sesi duyabiliyor musun?',epoch,()=>{status.textContent='Ses motoru okumayı tamamladı. Duymadıysan cihazın ses çıkışını kontrol et.';});});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)end('Sayfa arka plana geçti; sesli sohbet durduruldu.');});
+ window.addEventListener('pagehide',()=>end('Durduruldu.'));
+ status.textContent='Başlat düğmesine basınca sesli sohbet açılır.';
+})();
+</script><script>(()=>{for(const id of ['masterBtn','experimentsBtn','comparisonBtn'])document.getElementById(id)?.style.setProperty('display','none','important');})();
+</script><script>(()=>{
+ const nav=document.getElementById('dashBtn').parentElement;
+ const button=document.createElement('button');button.className='btn';button.textContent='API bağlantıları';button.id='apiConnectionsBtn';nav.append(button);
+ const panel=document.createElement('section');panel.id='apiConnectionsView';panel.className='card';panel.style.display='none';document.getElementById('dashboardView').after(panel);views.push('apiConnections');
+ const banner=document.createElement('div');banner.id='exchangeConnectionBadge';banner.setAttribute('role','status');banner.style.cssText='padding:12px 18px;margin:12px 0;border:1px solid #778899;border-radius:12px;background:#172438;color:#eaf2ff;font-weight:700';nav.after(banner);
+ let connectionRows=null,lastVerified=null;
+ function drawConnections(){
+  banner.replaceChildren();
+  const rows=connectionRows?.filter(x=>x.stored)||[];
+  if(!connectionRows){banner.textContent='API borsası: durum alınamadı · bağlantı doğrulanmadı';button.textContent='API bağlantıları';return;}
+  if(!rows.length){banner.textContent='API anahtarı kayıtlı değil · PAPER';button.textContent='API bağlantıları';return;}
+  button.textContent='API · '+rows.map(x=>x.exchange.toUpperCase()).join(' + ');
+  for(const row of rows){const badge=document.createElement('span');badge.style.cssText='display:inline-block;padding:8px 12px;margin:4px;border-radius:8px;color:#141414;background:'+(row.exchange==='binance'?'#f0b90b':'#ffb347');badge.textContent=row.exchange.toUpperCase()+' · '+(row.status==='READ_ONLY_VERIFIED'?'Son bağlantı testi başarılı':row.status==='FAILED'?'Bağlantı testi başarısız':row.checked_ms?'Son test sonucu belirsiz':'Anahtar kayıtlı · Henüz test edilmedi');if(row.status==='READ_ONLY_VERIFIED')badge.style.background='#28db8a';if(row.status==='FAILED')badge.style.background='#ff666e';banner.append(badge);if(row.checked_ms){const stamp=document.createElement('span');stamp.textContent=' Son test: '+new Date(row.checked_ms).toLocaleString('tr-TR');banner.append(stamp);}}
+  const note=document.createElement('span');note.textContent=' · PAPER · Gerçek emir kapalı';banner.append(note);
+ }
+ async function loadConnections(){try{const r=await fetch('/api/credentials/health',{signal:AbortSignal.timeout(8000)});if(!r.ok)throw Error();const h=await r.json();connectionRows=Array.isArray(h.connections)?h.connections:null;}catch(e){connectionRows=null;}drawConnections();}
+ loadConnections();setInterval(loadConnections,30000);
+ const original=showView;showView=function(v){original(v);button.classList.toggle('active',v==='apiConnections');button.setAttribute('aria-current',v==='apiConnections'?'page':'false');};
+ const add=(tag,text,parent=panel)=>{const e=document.createElement(tag);e.textContent=text;parent.append(e);return e;};
+ async function refresh(){
+  panel.replaceChildren();add('h2','API bağlantıları');add('p','PAPER · Gerçek emir ve para çekme kapalı');
+  const saved=add('div','');add('h3','Kayıtlı anahtarla bağlantı',saved);
+  add('p','Anahtarı yeniden girmeden borsaya imzalı, salt okunur test gönderir. Son başarılı test zamanıyla birlikte yeşil kalır; yalnız başarısız test kırmızı gösterilir. Sürekli bağlantı izleme değildir; gerçek işlem başlatmaz.',saved);
+  for(const name of ['binance','bybit']){const test=add('button',name.toUpperCase()+' · Bağlantıyı test et',saved);test.type='button';test.className='btn';const status=add('p','',saved);test.onclick=async()=>{test.disabled=true;status.textContent='Borsa yanıtı bekleniyor…';try{const r=await fetch('/api/credentials/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({exchange:name}),signal:AbortSignal.timeout(15000)});if(r.status===404)throw Error('Yeni bağlantı testi için Repair-Zitar.ps1 ile motoru yeniden başlatın.');const d=await r.json();if(!r.ok||d.status!=='READ_ONLY_VERIFIED')throw Error(d.error||'Bağlantı doğrulanamadı');status.textContent='Bağlantı testi başarılı · Salt okunur yetkiler doğrulandı · '+new Date(d.checked_ms).toLocaleString('tr-TR');status.style.color='#28db8a';}catch(e){status.textContent=e.message;status.style.color='#ff666e';}finally{test.disabled=false;await loadConnections();}};}
+  const form=add('form','');form.style.cssText='display:grid;gap:16px;max-width:720px;padding:20px;border:1px solid #53739a;border-radius:14px;background:#101c30';add('h3','API Key / API Secret',form);
+  const exchange=add('select','',form);exchange.setAttribute('aria-label','Borsa');exchange.style.cssText='padding:12px;background:#0b1322;color:white;border:1px solid #53739a;border-radius:8px';for(const n of ['binance','bybit']){const o=add('option',n,exchange);o.value=n;}
+  const field=(label)=>{const l=add('label',label,form);l.style.cssText='display:grid;gap:8px';const i=add('input','',l);i.style.cssText='width:100%;box-sizing:border-box;padding:14px;background:#0b1322;color:#fff;border:1px solid #53739a;border-radius:8px;font-size:16px';i.placeholder=label.trim();i.type='password';i.autocomplete='off';i.required=true;return i;};
+  const key=field('API Key '),secret=field('API Secret ');
+  const label=add('label','Borsada yalnız okuma yetkisi verdim; işlem ve para çekme kapalı. ',form);const consent=add('input','',label);consent.type='checkbox';consent.required=true;
+  const save=add('button','Doğrula ve şifreli kaydet',form);save.type='submit';save.className='btn';save.disabled=true;key.disabled=true;secret.disabled=true;const feedback=add('p','Güvenli saklama kontrol ediliyor…',form);
+  try{const r=await fetch('/api/credentials/health',{signal:AbortSignal.timeout(8000)});if(!r.ok)throw Error();const h=await r.json();if(h.ready){save.disabled=false;key.disabled=false;secret.disabled=false;feedback.textContent='Salt okunur ve IP kısıtlı HMAC anahtarı kullan. Yetkiler borsadan doğrulanmadan saklanmaz. Binance Global / Bybit Global desteklenir; Binance TR anahtarı farklıdır.';}else feedback.textContent=h.error;}catch(e){feedback.textContent='Yeni güvenli bağlantı servisi henüz yüklenmemiş; yeniden başlatma gerekli.';}
+  form.onsubmit=async event=>{event.preventDefault();save.disabled=true;try{const r=await fetch('/api/credentials',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({exchange:exchange.value,key:key.value,secret:secret.value,read_only_confirmed:consent.checked})});const d=await r.json();if(!r.ok)throw Error(d.error||'Kaydedilemedi');feedback.textContent='Salt okunur yetkiler borsadan doğrulandı ve şifreli saklandı. Paper çalışır; gerçek emirler kapalı.';lastVerified=new Date(d.verified_ms).toLocaleString('tr-TR');await loadConnections();}catch(e){feedback.textContent=e.message;}finally{key.value='';secret.value='';save.disabled=false;}};
+  const details=add('details','');details.style.marginTop='20px';add('summary','Teknik API detaylari',details);
+  const rows=[['Binance spot','https://api.binance.me/api/v3/','Mevcut spot motoru'],['Binance vadeli','https://fapi.binance.com/fapi/v1/','Mevcut vadeli motoru'],['Binance alternatif veri','https://data-api.binance.vision','Adaptör hazır; işlem motoruna bağlı değil'],['Bybit','https://api.bybit.com/v5/market/orderbook','Adaptör hazır; işlem motoruna bağlı değil']];
+  for(const [name,url,state] of rows){const card=add('article','',details);card.style.padding='8px';add('h3',name,card);add('p',url,card);add('p',state,card);}
+  const result=add('p','Çalışan motorların veri durumu okunuyor…');
+  try{const [d,f]=await Promise.all(['/api/market-discovery','/api/futures-paper'].map(async u=>{const r=await fetch(u,{signal:AbortSignal.timeout(8000)});if(!r.ok)throw Error('HTTP '+r.status);return r.json();}));
+   result.textContent='Spot motoru: '+(d.spot?.state||'Bilinmiyor')+' · Vadeli motoru: '+(f.state||'Bilinmiyor');
+   add('p','Bu durumlar borsa hesabı yetkisini doğrulamaz; çalışan paper motorunun son kaydını gösterir.');
+   for(const [label,s] of [['Spot',d.spot],['Vadeli',f]]){if(!s)continue;const age=label==='Spot'?(Date.now()-s.heartbeat_ms)/1000:s.heartbeat_age_seconds;add('p',label+' son heartbeat: '+Math.round(age)+' saniye önce'+(age>60?' · ESKİ':'') );for(const e of (s.errors||[]).slice(0,5))add('p',label+': '+e);}
+  }catch(e){result.textContent='Bağlantı durumu doğrulanamadı: '+e.message;}
+  const retry=add('button','Durumu yenile');retry.className='btn';retry.onclick=refresh;
+ }
+ button.onclick=()=>{showView('apiConnections');refresh();};
+})();
+</script><script>(()=>{
+ const nav=document.getElementById('dashBtn').parentElement;
+ const panel=document.createElement('section');panel.id='indicatorLabView';panel.style.display='none';document.getElementById('dashboardView').after(panel);views.push('indicatorLab');
+ const style=document.createElement('style');style.textContent='#indicatorLabView .lab-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}#indicatorLabView .lab-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px}#indicatorLabView .lab-metric{padding:12px;background:#0b1321;border-radius:10px}#indicatorLabView .green{color:#28db8a}#indicatorLabView .red{color:#ff666e}#indicatorLabView .muted{color:#99adc6}#indicatorLabView article{margin:12px 0}';document.head.append(style);
+ const add=(p,t,text,cls='')=>{const e=document.createElement(t);e.textContent=text;e.className=cls;p.append(e);return e;};
+ const fmt=x=>Number(x||0).toLocaleString('tr-TR',{maximumFractionDigits:2});const tone=x=>x>0?'green':x<0?'red':'muted';
+ let scalp=true,busy=false;
+ const buttons=[['Scalping · 20×',true],['RSI karşılaştırma',false]].map(([label,mode])=>{const b=add(nav,'button',label,'btn');b.onclick=()=>{scalp=mode;showView('indicatorLab');refresh();};return b;});
+ const original=showView;showView=function(v){original(v);buttons.forEach((b,i)=>b.classList.toggle('active',v==='indicatorLab'&&(i===0?scalp:!scalp)));};
+ async function refresh(){if(busy)return;busy=true;try{
+  const r=await fetch('/api/indicator-lab',{signal:AbortSignal.timeout(5000)});if(!r.ok)throw Error(r.status===404?'Yeni test bağlantısı çalışan uygulamaya henüz yüklenmedi. Repair-Zitar.ps1 komutunu bir kez çalıştırın; hesaplar korunur.':'HTTP '+r.status);const d=await r.json();panel.replaceChildren();
+  add(panel,'h2',scalp?'RSI Scalping · 1 dakika · İzole 20×':'RSI karşılaştırma · 1 saat · Eş zamanlı paper deneyi');
+  const age=(Date.now()-d.heartbeat_ms)/1000;add(panel,'p',(age>30?'VERİ ESKİ':d.state)+' · '+Math.round(age)+' sn · Hazır mum serisi '+(d.ready_intervals||0)+' / '+(d.expected_intervals||0),age>30||d.state==='DEGRADED'?'red':'green');
+  add(panel,'p','Başlangıç: '+new Date(d.started_ms).toLocaleString('tr-TR')+' · Her hesap 10.000 · Gerçek emir yok. Ana hesaplarla bakiye paylaşılmaz.','muted');
+  add(panel,'p',scalp?'RSI Wilder(14): 30 üzerine dönüş LONG, 70 altına dönüş SHORT. RSI 50 geçişi veya %0,5 fiyat izleyen stop ile çıkış. Günlük −%2 özkaynak sınırı. En fazla 10 pozisyon; pozisyon bütçesi özkaynak / 10.':'Aynı evren, maliyet ve başlangıç: kontrol RSI<30 LONG / >70 SHORT; aday 30 üzerine veya 70 altına geri dönüşte girer, stop sonrası 3 mum bekler ve yeni kesişim ister. İkisinde de RSI 50 veya %2 takip eden stop çıkışı. Vadeli 3×. Ana RSI hesapları değişmez.','muted');
+  if(scalp)add(panel,'p','Stop ve tasfiye periyodik fiyat örnekleriyle simüle edilir; aradaki fiyat hareketleri bilinmez. 20× yalnız bu hesapta geçerli.','muted');
+  if(scalp){const controls=add(panel,'div','','actions');for(const [action,label]of [['start','Başlat'],['stop','Durdur']]){const button=add(controls,'button',label,'btn');button.onclick=async()=>{button.disabled=true;try{const response=await fetch('/api/paper-control',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({market:'scalping',action})});if(!response.ok)throw Error('Kontrol servisi güncellemesi gerekli.');add(controls,'span','İstek kaydedildi; motor onayı bekleniyor.');}catch(e){add(controls,'span',e.message,'red');}finally{button.disabled=false;}};}add(panel,'p',d.entry_control?(d.entry_control.paused?'Yeni girişler kapalı; stop takibi sürüyor.':'Yeni girişler açık.'):'Kontrol güncellemesi bekleniyor.','muted');}const grid=add(panel,'div','','lab-grid');
+  for(const [id,b]of Object.entries(d.books||{})){
+   if(b.market==='spot')continue;
+   if(scalp?id!=='SCALP20':!id.startsWith('RSI_BASE_')&&!id.startsWith('RSI_CONFIRM_'))continue;
+   const unit=b.market==='spot'?'TRY':'USDT',money=x=>fmt(x)+' '+unit;const pnl=Number(b.equity)-10000;const c=add(grid,'article','','card');
+   add(c,'h3',b.label);add(c,'p',(b.market==='spot'?'SPOT':'VADELİ')+' · '+b.execution_policy.leverage+'× · '+(b.health||'Hazırlanıyor'),'muted');
+   const metrics=add(c,'div','','lab-metrics');
+   for(const [label,value,n]of [['Özkaynak',money(b.equity),pnl],['Serbest bakiye',money(b.cash),0],['Net K/Z',money(pnl),pnl],['Getiri','%'+fmt(pnl/100),pnl],['Bugün K/Z',money(Number(b.equity)-Number(b.period_start)),Number(b.equity)-Number(b.period_start)],['Komisyon',money(b.fees_total),-Number(b.fees_total)]]){const m=add(metrics,'div','','lab-metric');add(m,'small',label);add(m,'div',value,tone(n));}
+   add(c,'p','Açık: '+Object.keys(b.positions).length+' · Kapanan: '+b.closed.length+' · Funding: '+money(b.funding_total));
+   for(const [symbol,p]of Object.entries(b.positions)){const box=add(c,'div','','card');add(box,'strong',symbol+' · '+(p.direction===1?'LONG':'SHORT'));add(box,'p',money(p.unrealized),tone(Number(p.unrealized)));add(box,'small','Giriş '+p.entry+' · Stop '+p.trailing_stop+' · Miktar '+p.quantity);}
+   if(!Object.keys(b.positions).length)add(c,'p',b.daily_limit==='LOSS_STOP'?'Günlük zarar limiti: yeni giriş kapalı.':(id==='SCALP20'&&d.entry_control?.paused)?'Kullanıcı kararı: yeni girişler durduruldu.':'Açık pozisyon yok; geçerli yeni sinyal bekleniyor.','muted');
+   const details=add(c,'details','');add(details,'summary','Sinyaller, günlük sonuçlar ve kapanışlar');
+   for(const row of b.daily||[])add(details,'p',row.date+' · %'+fmt(row.return_pct),tone(Number(row.return_pct)));
+   for(const row of b.decisions.slice(-5).reverse())add(details,'p',new Date(row.ms).toLocaleTimeString('tr-TR')+' · '+row.symbol+' · '+row.result);
+   for(const row of b.closed.slice(-10).reverse())add(details,'p',row.symbol+' · '+money(row.net_pnl)+' · '+row.exit_reason,tone(Number(row.net_pnl)));
+  }
+  if(!scalp)add(panel,'p','Bu sonuçlar bağımsız deneydir; daha iyi getiri garanti etmez. Gün içi farklı başlangıçlı ana hesaplarla doğrudan kıyaslamayın.','muted');
+  if(d.errors?.length){const details=add(panel,'details','');add(details,'summary','Veri uyarıları ('+d.errors.length+')');d.errors.forEach(e=>add(details,'p',e,'red'));}
+ }catch(e){let warning=panel.querySelector('.lab-error');if(!warning)warning=add(panel,'p','','lab-error red');warning.textContent='Test servisi doğrulanamadı: '+e.message+' Ekranda hesaplar varsa bunlar son alınan kayıttır; canlı değildir.';}finally{busy=false;}}
+ setInterval(()=>{if(panel.style.display!=='none')refresh();},5000);
+})();
+</script><script>(()=>{
+ const host=document.getElementById('systemView');if(!host)return;
+ const panel=document.createElement('section');panel.className='card';host.prepend(panel);
+ const title=document.createElement('h2');title.textContent='Paper hesaplarını sıfırla';panel.append(title);
+ const info=document.createElement('p');info.textContent='Aktif Spot RSI: 10.000 TRY · Vadeli RSI: 10.000 USDT · RSI Scalping: 10.000 USDT. Açık paper işlemleri güncel fiyatla kapatılır, geçmiş arşivlenir. Pump kapalı kalır. Gerçek borsa hesabına dokunulmaz.';panel.append(info);
+ const label=document.createElement('label'),check=document.createElement('input');check.type='checkbox';label.append(check,document.createTextNode(' Aktif paper hesaplarının arşivlenip sıfırlanmasını onaylıyorum.'));panel.append(label);
+ const button=document.createElement('button');button.className='btn';button.textContent='Tüm aktif paper hesaplarını sıfırla';button.disabled=true;panel.append(button);
+ const output=document.createElement('p');panel.append(output);let pending=false,ready=false;
+ check.onchange=()=>button.disabled=!ready||pending||!check.checked;
+ let polling=false;async function poll(){if(polling)return;polling=true;try{const r=await fetch('/api/paper-reset',{signal:AbortSignal.timeout(6000)});if(!r.ok)throw Error('Sıfırlama servisi yüklenmedi; Repair-Zitar.ps1 çalıştırılmalı.');const d=await r.json();ready=true;pending=d.status==='PENDING';output.textContent=d.status==='NONE'?'Henüz sıfırlama isteği yok.':(pending?'Bekleniyor: motorlar açık olmalı; güncel fiyat ve hesaplaşma beklenebilir. ':'Son sıfırlama tamamlandı. ')+Object.entries(d.markets||{}).map(([k,v])=>k+': '+(v.status==='RESET_COMMITTED'?'Tamamlandı':({MOTOR_STALE:'Motor güncel değil; yeniden bağlantı bekleniyor',DATA_OR_ACCOUNTING_WAIT:'Güncel fiyat / hesaplaşma bekleniyor',WAITING_NEXT_CYCLE:'Sonraki çevrim bekleniyor',MOTOR_STATUS_UNAVAILABLE:'Motor durumu okunamadı'}[v.reason]||'Bekliyor'))).join(' · ');}catch(e){ready=false;output.textContent='Uygulamaya ulaşılamadı. Bu, isteğin iptal edildiği anlamına gelmez; durum otomatik yeniden kontrol edilecek. '+e.message;}button.disabled=!ready||pending||!check.checked;polling=false;}
+ button.onclick=async()=>{if(!check.checked||!confirm('Spot, Vadeli ve Scalping paper hesapları 10.000 başlangıç bakiyesine dönecek. Devam edilsin mi?'))return;button.disabled=true;try{const r=await fetch('/api/paper-reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirm:'RESET_PAPER_10000'}),signal:AbortSignal.timeout(8000)});if(!r.ok)throw Error('İstek kaydedilemedi.');check.checked=false;await poll();}catch(e){output.textContent='Yanıt alınamadı; sıfırlama kaydedilmiş olabilir. Durum yeniden kontrol ediliyor.';await poll();}};
+ window.addEventListener('online',poll);poll();setInterval(poll,10000);
+})();</script><script>
+(()=>{
+ const nav=document.getElementById('dashBtn').parentElement,panel=document.createElement('section');panel.id='researchExperimentView';panel.style.display='none';document.getElementById('dashboardView').after(panel);views.push('researchExperiment');
+ const add=(p,t,text,cls='')=>{let e=document.createElement(t);e.textContent=text;e.className=cls;p.append(e);return e;};
+ const button=add(nav,'button','Strateji deneyleri','btn');button.onclick=()=>{showView('researchExperiment');refresh();};
+ const fmt=x=>x==null?'—':Number(x).toLocaleString('tr-TR',{maximumFractionDigits:2});let busy=false;
+ const names={SIMPLE:'1 · Basit RSI',WILDER:'2 · Wilder RSI',CONFIRM:'3 · Dönüş teyidi',COOLDOWN:'4 · Stop sonrası 3 mum bekleme',TWO_STOP:'5 · İki stop sonrası sembol molası',RISK:'6 · İşlem ve toplam risk bütçesi',REGIME:'7 · EMA 200 yön filtresi',STRESS:'8 · İki kat kayma maliyeti'};
+ async function refresh(){if(busy)return;busy=true;try{
+ const response=await fetch('/api/research-experiment',{signal:AbortSignal.timeout(5000)});if(!response.ok)throw Error('Deney servisi henüz yüklenmedi. Motorun yeniden başlatılması gerekiyor.');const d=await response.json();panel.replaceChildren();
+ add(panel,'h2','Strateji deneyleri · Bağımsız paper hesapları');add(panel,'p',(d.state||'')+' · '+(d.heartbeat_age_seconds==null?'Henüz başlamadı':fmt(d.heartbeat_age_seconds)+' sn önce güncellendi'));
+ add(panel,'p','Ana RSI hesapları korunur. Her basamak bir öncekinden tek değişkenle ayrılır. Saatlik kapanmış mumlar; spot 1×, vadeli 3×. Başlangıç hesap başına 10.000.');
+ if(d.message)add(panel,'p',d.message);
+ const controls=add(panel,'div','');for(const [action,label]of [['start','Deney girişlerini başlat'],['stop','Yeni girişleri durdur']]){const b=add(controls,'button',label,'btn');b.onclick=async()=>{b.disabled=true;try{const r=await fetch('/api/paper-control',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({market:'research',action})});if(!r.ok)throw Error('Kontrol isteği reddedildi');add(controls,'p','İstek kaydedildi. Açık pozisyonların çıkış takibi devam eder.');}catch(e){add(controls,'p',e.message);}finally{b.disabled=false;}};}
+ if(d.started_ms)add(panel,'p','Başlangıç: '+new Date(d.started_ms).toLocaleString('tr-TR')+' · '+(d.entry_control?.paused?'Yeni girişler durduruldu':'Yeni girişler açık')+' · 30 saniyeyi aşan çevrim boşluğu: '+d.gap_cycles);
+ for(const market of ['spot','futures']){add(panel,'h3',market==='spot'?'Spot · TRY':'Vadeli · USDT');let wrap=add(panel,'div','');wrap.style.overflowX='auto';let table=add(wrap,'table','');table.style.width='100%';let head=add(table,'tr','');for(const t of ['Deney','Net K/Z','Getiri','Açık / kapalı','Komisyon','Funding','Azami düşüş','Kanıt'])add(head,'th',t);
+ for(const [id,b]of Object.entries(d.books||{})){if(b.market!==market)continue;const m=d.evaluation[id],tr=add(table,'tr','');const cell=add(tr,'td',names[b.variant]);cell.style.padding='12px 4px';let td=add(tr,'td',fmt(m.net));td.style.color=m.net>=0?'#28db8a':'#ff666e';add(tr,'td','%'+fmt(m.return_pct));add(tr,'td',m.open+' / '+m.closed);add(tr,'td',fmt(b.fees_total));add(tr,'td',fmt(b.funding_total));add(tr,'td','%'+fmt(m.max_drawdown_pct));add(tr,'td',fmt(m.days)+'/30 gün · '+m.closed+'/100 işlem');
+ const detail=add(panel,'details','');add(detail,'summary',(market==='spot'?'Spot':'Vadeli')+' · '+names[b.variant]+' · '+m.verdict);add(detail,'p','Kapanmış işlem başına net beklenti: '+fmt(m.expectancy)+' · Kazanma oranı: %'+fmt(m.win_rate));for(const issue of m.issues)add(detail,'p',issue);for(const p of Object.values(b.positions))add(detail,'p',p.symbol+' '+(p.direction===1?'LONG':'SHORT')+' · K/Z '+fmt(p.unrealized)+' · Stop '+p.trailing_stop);for(const row of b.decisions.slice(-6).reverse())add(detail,'p',row.symbol+' · '+row.result);}
+ }
+ add(panel,'p','Değerlendirme otomatik strateji değiştirmez. 30 gün ve 100 kapanış yalnız asgari koşuldur. Kârın tek sembole/güne bağımlılığı ve %5 düşüş bütçesi de denetlenir.');
+ add(panel,'p','Henüz doğrulanmayanlar: kısmi dolum, fiyat örnekleri arasındaki stop hareketleri, TradingView dışa aktarım eşleşmesi ve görülmemiş tarihsel dönem testi. İki kat kayma hesabı bu sınırlamaları gidermez.');
+ }catch(e){panel.replaceChildren();add(panel,'h2','Strateji deneyleri');add(panel,'p',e.message);}finally{busy=false;}}
+ setInterval(()=>{if(panel.style.display!=='none')refresh();},5000);
+})();
+
+</script>
+<script>
+(()=>{
+ const panel=document.createElement('section');panel.id='learningProgressView';panel.style.display='none';document.getElementById('dashboardView').after(panel);views.push('learningProgress');
+ const add=(p,t,txt)=>{const e=document.createElement(t);e.textContent=txt;p.append(e);return e;};
+ const button=add(document.getElementById('dashBtn').parentElement,'button','AI gelişimi');button.className='btn';button.onclick=()=>{showView('learningProgress');refresh();};let busy=false;
+ async function refresh(){if(busy)return;busy=true;try{const r=await fetch('/api/learning-progress',{signal:AbortSignal.timeout(6000)});if(!r.ok)throw Error('Gelişim servisi yüklenmedi; motorun yeniden başlatılması gerekiyor.');const d=await r.json();panel.replaceChildren();add(panel,'h2','AI gelişimi · Kanıta bağlı seviyeler');add(panel,'p','Model: '+(d.readiness.stale?'Son kontrol güncel değil':d.readiness.ready?'Erişilebilir':d.readiness.reason)+' · Ölçülmüş iyileşme: '+d.measured_improvements+' · Öneriye bağlı deney: '+d.agent_linked_experiments);add(panel,'p',d.limitation);
+ const grid=add(panel,'div','');grid.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px';for(const l of d.levels){const c=add(grid,'article','');c.className='card';add(c,'h3','L'+l.level+' · '+l.name);add(c,'p',l.requirement);add(c,'strong',(d.counts[l.level]||0)+' konu');}
+ for(const j of d.jobs){const c=add(panel,'details','');c.className='card';add(c,'summary','L'+j.level+' · '+j.question);add(c,'p','Durum: '+j.state+' · Kaynaklı gözlem: '+j.observations+' · Öneri: '+j.proposals);add(c,'p','Sıradaki koşul: '+j.next_required);for(const [role,error]of Object.entries(j.errors))add(c,'p',role+': '+error);for(const p of j.proposal_details){add(c,'h4','Öneri: '+p.id);for(const k of ['hypothesis','test','failure_criterion'])add(c,'p',k+': '+(p.content[k]||'—'));}}
+ }catch(e){panel.replaceChildren();add(panel,'p',e.message);}finally{busy=false;}}
+ setInterval(()=>{if(panel.style.display!=='none')refresh();},15000);
+})();
+
+</script><script>
+(()=>{
+ const nav=document.getElementById('dashBtn').parentElement,panel=document.createElement('section');panel.id='momentumExperimentView';panel.style.display='none';document.getElementById('dashboardView').after(panel);views.push('momentumExperiment');
+ const add=(p,t,text,cls='')=>{let e=document.createElement(t);e.textContent=text;e.className=cls;p.append(e);return e;};
+ const button=add(nav,'button','Yeni RSI deneyi','btn');button.onclick=()=>{showView('momentumExperiment');refresh();};
+ const fmt=x=>x==null?'—':Number(x).toLocaleString('tr-TR',{maximumFractionDigits:2});let busy=false;
+ const names={MOMENTUM:'A · RSI50 / 15dk kontrol',TREND:'B · + 1sa EMA200 yönü',VOLUME:'C · + Hacim 1,2×',GUARD:'D · + Tekrar kayıp koruması',STRESS:'E · D + iki kat kayma'};
+ async function refresh(){if(busy)return;busy=true;try{
+ const response=await fetch('/api/momentum-experiment',{signal:AbortSignal.timeout(5000)});if(!response.ok)throw Error('Deney servisi henüz yüklenmedi. Motorun yeniden başlatılması gerekiyor.');const d=await response.json();panel.replaceChildren();
+ add(panel,'h2','Yeni RSI deneyi · Bağımsız paper hesapları');add(panel,'p',(d.state||'')+' · '+(d.heartbeat_age_seconds==null?'Henüz başlamadı':fmt(d.heartbeat_age_seconds)+' sn önce güncellendi'));
+ add(panel,'p','Ana RSI mevcut kurallarıyla ayrı referans olarak korunur; eski sürümle birebir kod eşleşmesi doğrulanmış değildir. Her basamak bir öncekinden tek değişkenle ayrılır. 15dk RSI50 kesişimi, 1sa trend. İşlem başına %0,25 / toplam %1,5 tahmini risk; %2 izleyen stop. Vadeli 3×. Başlangıç hesap başına 10.000.');
+ if(d.message)add(panel,'p',d.message);
+ const controls=add(panel,'div','');for(const [action,label]of [['start','Deney girişlerini başlat'],['stop','Yeni girişleri durdur']]){const b=add(controls,'button',label,'btn');b.onclick=async()=>{b.disabled=true;try{const r=await fetch('/api/paper-control',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({market:'momentum',action})});if(!r.ok)throw Error('Kontrol isteği reddedildi');add(controls,'p','İstek kaydedildi. Açık pozisyonların çıkış takibi devam eder.');}catch(e){add(controls,'p',e.message);}finally{b.disabled=false;}};}
+ if(d.started_ms)add(panel,'p','Başlangıç: '+new Date(d.started_ms).toLocaleString('tr-TR')+' · '+(d.entry_control?.paused?'Yeni girişler durduruldu':'Yeni girişler açık')+' · 30 saniyeyi aşan çevrim boşluğu: '+d.gap_cycles);
+ for(const market of ['spot','futures']){add(panel,'h3',market==='spot'?'Spot · TRY':'Vadeli · USDT');let wrap=add(panel,'div','');wrap.style.overflowX='auto';let table=add(wrap,'table','');table.style.width='100%';let head=add(table,'tr','');for(const t of ['Deney','Net K/Z','Getiri','Açık / kapalı','Komisyon','Funding','Azami düşüş','Kanıt'])add(head,'th',t);
+ for(const [id,b]of Object.entries(d.books||{})){if(b.market!==market)continue;const m=d.evaluation[id],tr=add(table,'tr','');const cell=add(tr,'td',names[b.variant]);cell.style.padding='12px 4px';let td=add(tr,'td',fmt(m.net));td.style.color=m.net>=0?'#28db8a':'#ff666e';add(tr,'td','%'+fmt(m.return_pct));add(tr,'td',m.open+' / '+m.closed);add(tr,'td',fmt(b.fees_total));add(tr,'td',fmt(b.funding_total));add(tr,'td','%'+fmt(m.max_drawdown_pct));add(tr,'td',fmt(m.days)+'/30 gün · '+m.closed+'/100 işlem');
+ const detail=add(panel,'details','');add(detail,'summary',(market==='spot'?'Spot':'Vadeli')+' · '+names[b.variant]+' · '+m.verdict);add(detail,'p','Kapanmış işlem başına net beklenti: '+fmt(m.expectancy)+' · Kazanma oranı: %'+fmt(m.win_rate));if(m.costs){add(detail,'p','Kapanmış fiyat K/Z: '+fmt(m.costs.closed_price_pnl)+' · Komisyon: '+fmt(m.costs.closed_fees)+' · Funding: '+fmt(m.costs.closed_funding)+' · Fiyata dahil tahmini kayma: '+fmt(m.costs.embedded_slippage_estimate));add(detail,'p',m.costs.note);}for(const issue of m.issues)add(detail,'p',issue);for(const p of Object.values(b.positions))add(detail,'p',p.symbol+' '+(p.direction===1?'LONG':'SHORT')+' · K/Z '+fmt(p.unrealized)+' · Stop '+p.trailing_stop);for(const row of b.decisions.slice(-6).reverse())add(detail,'p',row.symbol+' · '+row.result);}
+ }
+ add(panel,'p','Değerlendirme otomatik strateji değiştirmez. 30 gün ve 100 kapanış yalnız asgari koşuldur. Kârın tek sembole/güne bağımlılığı ve %5 düşüş bütçesi de denetlenir.');
+ add(panel,'p','Henüz doğrulanmayanlar: kısmi dolum, fiyat örnekleri arasındaki stop hareketleri, TradingView dışa aktarım eşleşmesi ve görülmemiş tarihsel dönem testi. İki kat kayma hesabı bu sınırlamaları gidermez.');
+ }catch(e){panel.replaceChildren();add(panel,'h2','Yeni RSI deneyi');add(panel,'p',e.message);}finally{busy=false;}}
+ setInterval(()=>{if(panel.style.display!=='none')refresh();},5000);
+})();
+
+</script><script>
+(()=>{const panel=document.createElement('section');panel.id='rsiTimeframesView';panel.style.display='none';document.getElementById('dashboardView').after(panel);views.push('rsiTimeframes');const add=(p,t,v)=>{const e=document.createElement(t);e.textContent=v;p.append(e);return e;};const b=add(document.getElementById('dashBtn').parentElement,'button','RSI · 5 / 10 / 60 dk');b.className='btn';b.onclick=()=>{showView('rsiTimeframes');refresh();};const fmt=x=>Number(x||0).toLocaleString('tr-TR',{maximumFractionDigits:2});let busy=false;async function refresh(){if(busy)return;busy=true;try{const r=await fetch('/api/rsi-timeframes',{signal:AbortSignal.timeout(5000)});if(!r.ok)throw Error('Yeni motor henüz yüklenmedi; Repair-Zitar ile yeniden başlatın.');const d=await r.json();panel.replaceChildren();add(panel,'h2','Aynı RSI · Zaman dilimi karşılaştırması');add(panel,'p',d.state+' · '+(d.started_ms?new Date(d.started_ms).toLocaleString('tr-TR'):'Henüz başlamadı'));add(panel,'p','Her hesap 10.000 USDT · İzole 3× · 10 pozisyon · %2 fiyat takip stopu · RSI14 basit ortalama: <30 LONG, >70 SHORT, nötr/ters sinyalde çıkış. Ana vadeli Başlat/Durdur kontrolüne bağlı.');add(panel,'p','10dk: UTC sınırlarına hizalı iki kapanmış 5dk mum. Eski ana RSI hesabı ayrı tutulur.');for(const [tf,s]of Object.entries(d.accounts||{})){const a=s.books.RSI14,c=add(panel,'div','');c.className='card';c.style.margin='16px 0';add(c,'h3',tf+' · '+s.state);const n=Number(a.equity)-10000;const line=add(c,'h3','Net '+fmt(n)+' USDT · %'+fmt(n/100));line.style.color=n>=0?'#20d98b':'#ff515d';add(c,'p','Özkaynak '+fmt(a.equity)+' · Nakit '+fmt(a.cash)+' · Açık '+Object.keys(a.positions).length+' / 10 · Kapanan '+a.closed.length);add(c,'p','Komisyon '+fmt(a.fees_total)+' · Funding '+fmt(a.funding_total)+' · Azami düşüş %'+fmt(a.max_drawdown_pct));for(const p of Object.values(a.positions)){let x=add(c,'p',p.symbol+' '+(p.direction===1?'LONG':'SHORT')+' · '+fmt(p.unrealized)+' USDT · Giriş '+p.entry+' · Stop '+p.trailing_stop);x.style.color=Number(p.unrealized)>=0?'#20d98b':'#ff515d';}const dt=add(c,'details','');add(dt,'summary','Kapanan işlemler ve veri durumu');for(const p of a.closed.slice(-30).reverse())add(dt,'p',p.symbol+' · '+fmt(p.net_pnl)+' USDT · '+p.exit_reason);for(const e of s.errors.slice(0,15))add(dt,'p',e);}}catch(e){panel.replaceChildren();add(panel,'p',e.message);}finally{busy=false;}}setInterval(()=>{if(panel.style.display!=='none')refresh();},5000);})();
+
+</script>
+<script>(()=>{const p=document.createElement('section');p.id='rsiRepairView';p.style.display='none';document.getElementById('dashboardView').after(p);views.push('rsiRepair');const add=(x,t,v)=>{const e=document.createElement(t);e.textContent=v;x.append(e);return e;};const b=add(document.getElementById('dashBtn').parentElement,'button','RSI iyileştirme');b.className='btn';b.onclick=()=>{showView('rsiRepair');refresh();};let busy=false;const fmt=x=>Number(x||0).toLocaleString('tr-TR',{maximumFractionDigits:2});async function refresh(){if(busy)return;busy=true;try{const r=await fetch('/api/rsi-repair',{signal:AbortSignal.timeout(5000)});if(!r.ok)throw Error('Yeni kod için motoru yeniden başlatın.');const d=await r.json();p.replaceChildren();add(p,'h2','RSI iyileştirme · Ayrı paper deneyi');add(p,'p',d.state+' · '+(d.started_ms?new Date(d.started_ms).toLocaleString('tr-TR'):'Başlamadı'));add(p,'p','15dk · Her hesap 10.000 · Vadeli USDT/3× · Tahmini risk işlem başına %0,25 / toplam %1 · %2 takip stopu · Günlük %2 düşüşte yeni giriş kilidi.');add(p,'p','CONTROL: RSI30/70, nötrde çıkış. EXIT50: çıkışı RSI50’ye taşı. RECOVERY: aşırı bölgeden dönüşü bekle. COOLDOWN: ayrıca zararlı kapanıştan sonra aynı paritede 1 saat bekle. Hiçbirinin kârlılığı henüz doğrulanmadı.');for(const [action,label]of [['start','Yeni girişleri başlat'],['stop','Yeni girişleri durdur']]){const z=add(p,'button',label);z.className='btn';z.onclick=async()=>{const r=await fetch('/api/paper-control',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({market:'repair',action})});add(p,'p',r.ok?'İstek kaydedildi; açık pozisyon takibi sürer.':'Kontrol reddedildi');};}for(const [id,a]of Object.entries(d.books||{})){const c=add(p,'div','');c.className='card';add(c,'h3',id);const n=Number(a.equity)-10000;const q=add(c,'h3',fmt(n)+' · %'+fmt(n/100));q.style.color=n>=0?'#20d98b':'#ff515d';add(c,'p','Açık '+Object.keys(a.positions).length+' · Kapanan '+a.closed.length+' · Komisyon '+fmt(a.fees_total)+' · '+(a.entries_paused?'Giriş kapalı':'Giriş açık'));for(const x of Object.values(a.positions))add(c,'p',x.symbol+' · '+fmt(x.unrealized)+' · Stop '+x.trailing_stop);}}catch(e){p.replaceChildren();add(p,'p',e.message);}finally{busy=false;}}setInterval(()=>{if(p.style.display!=='none')refresh();},5000);})();
+</script><script>(()=>{const p=document.createElement('section');p.id='bollingerPairView';p.style.display='none';document.getElementById('dashboardView').after(p);views.push('bollingerPair');const add=(x,t,v)=>{const e=document.createElement(t);e.textContent=v;x.append(e);return e;};const b=add(document.getElementById('dashBtn').parentElement,'button','Bollinger karşılaştırması');b.className='btn';b.onclick=()=>{showView('bollingerPair');refresh();};let busy=false;const fmt=x=>Number(x||0).toLocaleString('tr-TR',{maximumFractionDigits:2});async function refresh(){if(busy)return;busy=true;try{const r=await fetch('/api/bollinger-pair',{signal:AbortSignal.timeout(5000)});if(!r.ok)throw Error('Yeni kod için motoru yeniden başlatın.');const d=await r.json();p.replaceChildren();add(p,'h2','Bollinger karşılaştırması · Ayrı paper deneyi');add(p,'p',d.state+' · '+(d.started_ms?new Date(d.started_ms).toLocaleString('tr-TR'):'Başlamadı'));add(p,'p','15dk · Her hesap 10.000 · Vadeli USDT/3× · Tahmini risk işlem başına %0,25 / toplam %1,5 · %2 takip stopu.');add(p,'p','CONTROL: EMA200 yön/eğim (1sa) + RSI50 kesişimi (15dk) + hacim1,2×. BOLLINGER: aynı kurallar + önceki mumda BB20/2 kanalının KC20/1,5 içinde olması, mevcut mumda sıkışmadan çıkış ve yönle uyumlu bant dışı kapanış. Tüm teyitler aynı mumda gerekir; sinyal sayısı azalabilir. Sıfır işlem başarı değildir.');for(const [action,label]of [['start','Yeni girişleri başlat'],['stop','Yeni girişleri durdur']]){const z=add(p,'button',label);z.className='btn';z.onclick=async()=>{const r=await fetch('/api/paper-control',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({market:'bollinger',action})});add(p,'p',r.ok?'İstek kaydedildi; açık pozisyon takibi sürer.':'Kontrol reddedildi');};}for(const [id,a]of Object.entries(d.books||{})){const c=add(p,'div','');c.className='card';add(c,'h3',id);const n=Number(a.equity)-10000;const q=add(c,'h3',fmt(n)+' · %'+fmt(n/100));q.style.color=n>=0?'#20d98b':'#ff515d';add(c,'p','Açık '+Object.keys(a.positions).length+' · Kapanan '+a.closed.length+' · Komisyon '+fmt(a.fees_total)+' · '+(a.entries_paused?'Giriş kapalı':'Giriş açık'));for(const x of Object.values(a.positions))add(c,'p',x.symbol+' · '+fmt(x.unrealized)+' · Stop '+x.trailing_stop);}}catch(e){p.replaceChildren();add(p,'p',e.message);}finally{busy=false;}}setInterval(()=>{if(p.style.display!=='none')refresh();},5000);})();
+</script><script>(()=>{
+ const nav=document.getElementById('dashBtn').parentElement,panel=document.createElement('section');panel.id='paV1View';panel.style.display='none';document.getElementById('dashboardView').after(panel);views.push('paV1');
+ const add=(p,t,text,cls='')=>{const e=document.createElement(t);e.textContent=text;e.className=cls;p.append(e);return e;};const fmt=n=>Number(n).toLocaleString('tr-TR',{maximumFractionDigits:2});let busy=false;
+ const removedPaButton=add(nav,'button','PA-V1 · Deney','btn');removedPaButton.hidden=true;removedPaButton.style.display='none';removedPaButton.onclick=()=>{showView('paV1');refresh();};
+ async function refresh(){if(busy)return;busy=true;try{
+ const r=await fetch('/api/pa-v1',{signal:AbortSignal.timeout(5000)});if(!r.ok)throw Error('PA-V1 çalışan sunucuya henüz yüklenmedi.');const d=await r.json();panel.replaceChildren();
+ add(panel,'h2','PA-V1 · Price Action + Hacim · PAPER SPOT');add(panel,'p',d.state+' · 1h rejim / 15m yapı / 5m giriş · Gerçek emir yok');add(panel,'p','İşlem riski %0,25 · Günlük −%1 veya 3 ardışık kayıpta yeni giriş kapanır. %3 kâr hedefi yalnız ölçülür. A/B hesapları bağımsızdır.');
+ for(const [name,x] of Object.entries(d.books||{})){const card=add(panel,'article','','card');add(card,'h3',name==='A_BE'?'A · TP1 sonrası başabaş':'B · Yapısal takip');const pnl=Number(x.equity)-10000;const line=add(card,'h3','Özkaynak '+fmt(x.equity)+' TRY · Net K/Z '+fmt(pnl)+' TRY (%'+fmt(pnl/100)+')');line.style.color=pnl<0?'#ff626b':'#20d994';add(card,'p','Nakit '+fmt(x.cash)+' · Komisyon '+fmt(x.fees_total)+' · Açık '+Object.keys(x.positions).length+' · Kapanış parçaları '+x.closed.length+' · '+(x.halted?'Günlük giriş durduruldu':'Giriş değerlendirmesi açık'));
+ for(const [s,p] of Object.entries(x.positions))add(card,'p',s+' · Giriş '+fmt(p.entry)+' · Stop '+fmt(p.pa_stop)+' · Miktar '+fmt(p.quantity));
+ const detail=add(card,'details','');add(detail,'summary','Son kararlar ve ret nedenleri');for(const a of x.decisions||[])add(detail,'p',a.symbol+' · '+a.result+' · '+(a.reasons||[]).join(', '));}
+ for(const e of d.errors||[])add(panel,'p',e);
+ }catch(e){panel.replaceChildren();add(panel,'p',e.message);}finally{busy=false;}}
+ setInterval(()=>{if(panel.style.display!=='none')refresh();},15000);
+})();
+</script><script>showView('futuresOnly');</script></body></html>

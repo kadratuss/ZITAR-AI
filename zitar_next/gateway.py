@@ -6,6 +6,7 @@ from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
 from urllib.error import HTTPError
 from urllib.request import Request,build_opener,HTTPRedirectHandler
 from urllib.parse import urlsplit,parse_qs
+from zitar_next.futures_scope import public
 from zitar_next.position_charts import candles,positions
 
 class NoRedirect(HTTPRedirectHandler):
@@ -27,15 +28,18 @@ def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv
             if self.command=='POST' and self.headers.get('Origin')!='http://'+host:
                 return self.reply(403,b'{"error":"ORIGIN_REJECTED"}')
             path=self.path
+            if urlsplit(path).path in ('/api/spot-control','/api/pa-v1'):
+                return self.reply(410,b'{"error":"SPOT_DISABLED_BY_USER"}')
             if urlsplit(path).path in ('/api/position-chart','/api/chart-positions'):
                 if self.command!='GET':return self.reply(405,b'{"error":"READ_ONLY"}')
                 try:
-                    if path=='/api/chart-positions':data=positions(production_port)
+                    if path=='/api/chart-positions':data=public(positions(production_port))
                     else:
                         query=parse_qs(urlsplit(path).query,strict_parsing=True)
                         if set(query)!= {'market','symbol','interval'} or any(len(v)!=1 for v in query.values()):raise ValueError('invalid query')
+                        if query['market'][0]!='futures':raise ValueError('spot disabled')
                         data=candles(query['market'][0],query['symbol'][0],query['interval'][0])
-                    return self.reply(200,json.dumps(data,ensure_ascii=False).encode())
+                    return self.reply(200,json.dumps(public(data),ensure_ascii=False).encode())
                 except ValueError:return self.reply(400,b'{"error":"INVALID_CHART_DATA"}')
                 except OSError:return self.reply(503,b'{"error":"CHART_SOURCE_UNAVAILABLE"}')
             if path=='/api/operations-study':
@@ -45,7 +49,7 @@ def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv
                     source=Path(ops_status)
                     if source.is_symlink():raise ValueError('symlink')
                     data=json.loads(source.read_text(encoding='utf-8'))
-                    return self.reply(200,json.dumps(data,ensure_ascii=False).encode('utf-8'))
+                    return self.reply(200,json.dumps(public(data),ensure_ascii=False).encode('utf-8'))
                 except (OSError,ValueError):
                     return self.reply(503,b'{"error":"OPERATIONS_STATUS_UNAVAILABLE"}')
             if path=='/api/entry-filter':
@@ -61,7 +65,7 @@ def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv
                         summary=folder/'summary.json'
                         if summary.is_symlink():raise ValueError('symlink')
                         data=json.loads(summary.read_text(encoding='utf-8'))
-                    return self.reply(200,json.dumps(data,ensure_ascii=False).encode('utf-8'))
+                    return self.reply(200,json.dumps(public(data),ensure_ascii=False).encode('utf-8'))
                 except (OSError,ValueError):
                     return self.reply(503,b'{"error":"FILTER_STATUS_UNAVAILABLE"}')
             if path=='/api/forward-study':
@@ -71,7 +75,7 @@ def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv
                     source=Path(study_status)
                     if source.is_symlink():raise ValueError('symlink')
                     data=json.loads(source.read_text(encoding='utf-8'))
-                    return self.reply(200,json.dumps(data,ensure_ascii=False).encode('utf-8'))
+                    return self.reply(200,json.dumps(public(data),ensure_ascii=False).encode('utf-8'))
                 except (OSError,ValueError):
                     return self.reply(503,b'{"error":"STUDY_STATUS_UNAVAILABLE"}')
             if path=='/zitar-next':
@@ -87,6 +91,8 @@ def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv
                 length=int(self.headers.get('Content-Length','0'))
                 if not 0<=length<=65536:raise ValueError('size')
                 body=self.rfile.read(length) if self.command=='POST' else None
+                if self.command=='POST' and urlsplit(path).path=='/api/paper-control' and json.loads(body).get('market')=='spot':
+                    return self.reply(410,b'{"error":"SPOT_DISABLED_BY_USER"}')
                 headers={'Host':f'127.0.0.1:{upstream}'}
                 for key in ('Content-Type','X-Next-CSRF'):
                     if key in self.headers:headers[key]=self.headers[key]
@@ -97,6 +103,8 @@ def handler(port=8080,production_port=5020,research_port=8768,study_status='/srv
                 except HTTPError as exc:response=exc
                 with response:
                     raw=response.read(20000001);status=response.code;mime=response.headers.get('Content-Type','application/json')
+                if status==200 and 'application/json' in mime and path not in ('/api/snapshot','/health'):
+                    raw=json.dumps(public(json.loads(raw)),ensure_ascii=False).encode()
                 if len(raw)>20000000:raise ValueError('response size')
                 if status==200 and 'text/html' in mime and next_panel:
                     raw=raw.replace(b'data-next-base=""',b'data-next-base="/zitar-next"')

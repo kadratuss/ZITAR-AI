@@ -398,6 +398,9 @@ class Runtime:
                     master_paper_authority_metadata=state['authorities'].get('paper_order'))
 
     def cycle(self):
+        if (self.base/'zitar_futures_only.flag').exists():
+            self.status.update(state='RUNNING',cycle_started_utc=self.stamp(),last_successful_cycle_utc=self.stamp(),active_stage=None,spot_disabled=True,stages={},pipeline={},legacy_events=[])
+            self.publish();return True
         with self.mutex:
             self.status.update(state='RUNNING', cycle_started_utc=self.stamp())
         errors = []

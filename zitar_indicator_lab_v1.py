@@ -14,6 +14,7 @@ from zitar_futures_funding_recovery_v1 import update_pending,reconcile_closed
 from zitar_indicator_lab_signals_v1 import analyze,INTERVALS
 
 STATE='zitar_indicator_lab_v1.json'
+FUTURES_ONLY=(Path(__file__).parent/'zitar_futures_only.flag').exists()
 # Label, market, closed signal interval, rule, leverage, trailing price distance.
 SPECS={
  'RSI_BASE_SPOT':('RSI kontrol · 1sa','spot','1h','RSI_BASE',1,'.02'),
@@ -30,6 +31,9 @@ SPECS={
  'SQ5':('Squeeze / Pump · 5 dk','spot','5m','SQ',1,'.02'),
  'SCALP20':('RSI Scalping · 1 dk · 20×','futures','1m','SCALP',20,'.005'),
 }
+
+if FUTURES_ONLY:
+    SPECS={k:v for k,v in SPECS.items() if v[1]=='futures'}
 
 def initial(ms):
     books={}
@@ -49,6 +53,8 @@ def cooling_down(book,symbol,candle):
 
 def apply_book(b,market,analyses,ms,before_entry=None):
     """Shared execution assumptions, isolated cash. Never trades an old candle."""
+    if FUTURES_ONLY and b.get('market')=='spot':
+        b.update(entries_paused=True,health='DISABLED_BY_USER');return
     quotes={s:d['quote'] for s,d in market.items() if 0<=ms-d['quote']['time']<=30000}
     closed_now=set()
     reconcile_closed(b,market,ms)
@@ -112,6 +118,10 @@ class Lab:
     def __init__(self,base):
         self.base=Path(base);self.path=self.base/STATE
         self.state=json.loads(self.path.read_text(encoding='utf-8')) if self.path.exists() else initial(int(time.time()*1000))
+        if FUTURES_ONLY:
+            self.state['books']={k:b for k,b in self.state['books'].items() if b.get('market')!='spot'}
+            self.state['specs']={k:v for k,v in self.state.get('specs',{}).items() if v[1]!='spot'}
+            self.state.setdefault('universe',{})['spot']=[]
         existing=self.state.get('specs',{})
         if any(k not in SPECS or list(v)!=list(SPECS[k]) for k,v in existing.items()):raise ValueError('LAB_SPEC_CHANGED_ARCHIVE_REQUIRED')
         if set(existing)!=set(SPECS):
@@ -169,7 +179,7 @@ class Lab:
             s['universe']=selected
         if not self.meta or ms-self.meta_ms>3600000:
             futures=contracts(all_symbols=True);spot={}
-            for row in mg('spot','exchangeInfo')['symbols']:
+            for row in ([] if FUTURES_ONLY else mg('spot','exchangeInfo')['symbols']):
                 if row.get('status')!='TRADING':continue
                 f={f['filterType']:f for f in row['filters']};lot=f['LOT_SIZE'];nf=f.get('NOTIONAL',f.get('MIN_NOTIONAL',{}))
                 spot[row['symbol']]=dict(step=lot['stepSize'],min_qty=lot['minQty'],max_qty=lot['maxQty'],min_notional=nf.get('minNotional','0'))
@@ -177,6 +187,8 @@ class Lab:
         premium={r['symbol']:r for r in fg('premiumIndex')}
         snapshots={};signals={};ready=expected=0
         for market,symbols in s['universe'].items():
+            if FUTURES_ONLY and market=='spot':
+                snapshots[market]={};continue
             snapshots[market]={}
             active=[b for b in s['books'].values() if b['market']==market and not b.get('retired_ms')]
             intervals={b['interval'] for b in active};intervals.update(('1h','15m'))

@@ -141,7 +141,7 @@ def make_server(base, port=5020):
     from zitar_indicator_lab_v1 import start_worker as start_indicator_lab
     start_indicator_lab(base)
     from pa_v1.runtime import start_worker as start_pa_v1
-    start_pa_v1(base)
+    if not (base/'zitar_futures_only.flag').exists():start_pa_v1(base)
     cache = {'time':0, 'data':None}
     cache_lock = threading.Lock()
     class Handler(BaseHTTPRequestHandler):

@@ -136,7 +136,9 @@ class Spot:
         atomic_json(self.path,s);return s
 
 def loop(base):
-    base=Path(base);lock=FileLock(base/'zitar_discovery_spot_v1.lock')
+    base=Path(base)
+    if (base/'zitar_futures_only.flag').exists():return
+    lock=FileLock(base/'zitar_discovery_spot_v1.lock')
     if not lock.acquire():return
     worker=Spot(base)
     try:
