@@ -269,6 +269,12 @@ def overview(base):
     result['heartbeat_age_seconds']=age
     if not 0<=age<=60:
         result['recorded_state']=result.get('state');result['state']='STALE'
+    from zitar_next.scalping_diagnostics import report
+    for name in ('SCALP20','SCALP_RISK'):
+        if name in result['books']:result['books'][name]['diagnostics']=report(result['books'][name])
+    from zitar_next.scalping_diagnostics import report
+    for name in ('SCALP20','SCALP_RISK'):
+        if name in result['books']:result['books'][name]['diagnostics']=report(result['books'][name])
     return result
 
 def loop(base):
