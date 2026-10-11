@@ -489,35 +489,32 @@ renderComparison=function(){
 const readinessPanel=document.createElement('section');readinessPanel.className='section';
 readinessPanel.innerHTML='<h2>Birleşik çalışma durumu</h2><p class="muted">Canlı verilerden hesaplanır. Dosyanın bulunması, servisin sağlıklı veya araştırmanın doğrulanmış olduğu anlamına gelmez.</p><div id="readinessCards" class="modules"></div><p id="readinessStamp" class="small muted"></p>';
 E('systemView').prepend(readinessPanel);
+let readinessFutures=null,readinessLab=null,readinessFeedsError=null,readinessFeedsFetched=0;
 let readinessResearch=null,readinessResearchError=null,readinessFetched=0,readinessBusy=false;
 const readinessAge=t=>{const n=(Date.now()-Date.parse(t))/1000;return Number.isFinite(n)&&n>=-30?n:Infinity};
 function renderReadiness(){
- if(!masterData)return;
- const r=masterData.runtime,m=masterData.master,c=masterData.comparison,a=m.account,p=m.current_period;
  const checks=[];const add=(title,status,detail)=>checks.push({title,status,detail});
- add('Ana paper döngüsü',readinessAge(r.heartbeat_utc)<=30&&readinessAge(r.last_successful_cycle_utc)<=90&&r.state==='RUNNING'?'OK':'SORUN',`Durum: ${r.state} · Son başarılı döngü: ${timeText(r.last_successful_cycle_utc)}`);
- const pipe=r.pipeline||{};
- add('V3 → Master işlem hattı',pipe.pending_events===0&&pipe.event_count===pipe.bridge_processed&&pipe.event_count===pipe.master_processed&&pipe.duplicate_status==='PASS'?'OK':'KONTROL GEREKLİ',`Event / bridge / Master: ${pipe.event_count??'?'} / ${pipe.bridge_processed??'?'} / ${pipe.master_processed??'?'} · Bekleyen: ${pipe.pending_events??'?'}`);
- add('V3 üreticisi',readinessAge(pipe.v3_last_success_utc)<=4500?'OK':'GECİKMİŞ',`Son başarılı çalışma: ${timeText(pipe.v3_last_success_utc)} · Mum: ${pipe.last_processed_candle||'Bilinmiyor'}`);
- const values=[a.cash_try,a.position_market_value_try,a.equity_try].map(Number);
- const identity=values.every(Number.isFinite)&&Math.abs(values[0]+values[1]-values[2])<.011;
- add('Portföy muhasebesi',identity?'OK':'SORUN',`${fmt(a.cash_try)} nakit + ${fmt(a.position_market_value_try)} pozisyon = ${fmt(a.equity_try)} TRY`);
- add('Canlı fiyat değerleme',readinessAge(m.runtime_mtm?.last_success_utc)<=90&&r.stages?.mtm?.status==='OK'?'OK':'GECİKMİŞ',`Son BID: ${timeText(m.runtime_mtm?.last_success_utc)}`);
- const slot=Number(p.spot_slot_budget_try),expected=Math.round(Number(p.start_equity_try)*10)/100;
- add('Günlük bütçe',Number.isFinite(slot)&&Math.abs(slot-expected)<.001?'OK':'SORUN',`${p.period_id}: ${fmt(p.start_equity_try)} ÷ 10 = ${fmt(slot)} TRY`);
- add('Otomatik karşılaştırma',c&&readinessAge(c.heartbeat_utc)<=60&&c.state==='RUNNING'?'OK':'GECİKMİŞ',c?`Son takip: ${timeText(c.heartbeat_utc)} · Fiyat: ${c.valuation_state} · Hata: ${c.error_count}`:'Karşılaştırma kaydı yok');
+ const fresh=readinessFeedsFetched&&Date.now()-readinessFeedsFetched<90000;
+ const f=readinessFutures,l=readinessLab;
+ add('Ana vadeli paper motoru',!fresh||!f?'DOĞRULANAMADI':f.state==='RUNNING'&&f.heartbeat_age_seconds<=60?'OK':'KONTROL GEREKLİ',readinessFeedsError||`Durum: ${f?.state||'Kontrol ediliyor'} · Son çevrim: ${fmt(f?.heartbeat_age_seconds)} sn önce · Güncel hata kaydı: ${f?.errors?.length??'?'}`);
+ const b=f?.books?.RSI14;
+ if(b){const v=[b.cash,b.margin,b.unrealized,b.equity].map(Number);const identity=v.every(Number.isFinite)&&Math.abs(v[0]+v[1]+v[2]-v[3])<.011;
+ add('Vadeli portföy muhasebesi',!fresh?'DOĞRULANAMADI':b.accounting_pending?'BEKLİYOR':identity?'OK':'SORUN',`${fmt(b.cash)} nakit + ${fmt(b.margin)} teminat + ${fmt(b.unrealized)} açık K/Z = ${fmt(b.equity)} USDT`);
+ const age=(Date.now()-Number(b.valuation_ms))/1000;add('Vadeli fiyat değerleme',fresh&&age>=0&&age<=90?'OK':'GECİKMİŞ',`Son değerleme: ${timeText(new Date(Number(b.valuation_ms)).toISOString())} · Muhasebe bekliyor: ${b.accounting_pending?'Evet':'Hayır'}`);
+ const expected=Number(b.period_start)/10;add('Vadeli günlük bütçe',fresh&&Number.isFinite(expected)&&Math.abs(Number(b.slot)-expected)<.011?'OK':'KONTROL GEREKLİ',`${b.period}: ${fmt(b.period_start)} ÷ 10 = ${fmt(b.slot)} USDT`);}
+ add('Vadeli sinyal verisi',fresh&&f?.signal_status?.ready_intervals===f?.signal_status?.expected_intervals&&f?.signal_status?.expected_intervals>0?'OK':'VERİ BEKLENİYOR',`Hazır mum serisi: ${f?.signal_status?.ready_intervals??'?'} / ${f?.signal_status?.expected_intervals??'?'}`);
+ for(const [key,title] of [['SCALP_RISK','Scalping risk testi'],['RSI_BASE_FUTURES','RSI kontrol deneyi'],['RSI_CONFIRM_FUTURES','RSI dönüş deneyi']]){const x=l?.books?.[key];add(title,!fresh||!x?'DOĞRULANAMADI':l.heartbeat_age_seconds>60?'GECİKMİŞ':x.retired_ms?'KAPALI':x.health==='OK'?'OK':'KONTROL GEREKLİ',x?`Sağlık: ${x.health||'Bilinmiyor'} · Son çevrim: ${fmt(l.heartbeat_age_seconds)} sn önce · Özkaynak: ${fmt(x.equity)} USDT · Yeni giriş: ${x.entries_paused||x.retired_ms?'Kapalı':'Açık'} · Günlük sınır: ${x.daily_limit||'Bilinmiyor'}`:'Hesap verisi alınamadı');}
+ add('Kaldırılan spot modülleri','KAPALI','Spot, V3 → Master ve eski otomatik karşılaştırma kapsam dışı. TRY bakiyeleri ve eski karşılaştırmanın birikmiş hata sayısı vadeli sağlık göstergesi olarak kullanılmaz.');
  const researchFresh=readinessFetched&&Date.now()-readinessFetched<90000;
  add('Araştırma döngüsü',!researchFresh||readinessResearchError?'DOĞRULANAMADI':readinessAge(readinessResearch?.heartbeat_utc)<=180&&readinessResearch?.state!=='ERROR'?'OK':'SORUN',readinessResearchError||`Son takip: ${timeText(readinessResearch?.heartbeat_utc)} · Durum: ${readinessResearch?.state||'Kontrol ediliyor'}`);
  const web=readinessResearch?.automatic_web;
  add('Web araştırması / kanıt','learning_ready' in (web||{})&&web.learning_ready===true&&researchFresh&&!readinessResearchError?'KANIT HAZIR':'EKSİK KANIT',`Durum: ${web?.status||'Bilinmiyor'} · Son tarama: ${timeText(web?.checked_utc)} · Kaynak toplamak doğrulanmış öğrenme değildir.`);
- const perf=c?.performance;
- add('Günlük %3–4 hedefi',perf?.books?.MASTER?.eligible_days?'İNCELEME BEKLİYOR':'VERİ BEKLENİYOR',`Uygun kapanmış gün: ${perf?.books?.MASTER?.eligible_days??0} · %3 ve üzeri: ${perf?.books?.MASTER?.days_at_least_3??0} · Otomatik sürüm onayı verilmez.`);
  E('readinessCards').innerHTML=checks.map(x=>`<article class="module"><div class="modulehead"><h3>${esc(x.title)}</h3><span class="badge ${x.status==='OK'?'green':x.status==='SORUN'?'red':'yellow'}">${esc(x.status)}</span></div><p>${esc(x.detail)}</p></article>`).join('');
  E('readinessStamp').textContent='Panel değerlendirmesi: '+timeText(new Date().toISOString())+' · Araştırma durumu açık Sistem ekranında 30 saniyede yenilenir. Gece testinde görülen gecikmeler bu anlık kontrollerle silinmez.';
 }
 async function refreshReadiness(){
  if(readinessBusy)return;readinessBusy=true;
- try{const result=await apiJson('/api/module?id=research_runtime');readinessResearch=result.data;readinessResearchError=null;readinessFetched=Date.now()}
+ try{const results=await Promise.allSettled(['/api/futures-paper','/api/indicator-lab','/api/module?id=research_runtime'].map(u=>apiJson(u)));readinessFutures=results[0].status==='fulfilled'?results[0].value:null;readinessLab=results[1].status==='fulfilled'?results[1].value:null;readinessFeedsFetched=Date.now();readinessFeedsError=results.slice(0,2).some(x=>x.status==='rejected')?'Canlı hesap bağlantılarından biri doğrulanamadı.':null;if(results[2].status==='fulfilled'){readinessResearch=results[2].value.data;readinessResearchError=null;readinessFetched=Date.now()}else readinessResearchError='Araştırma bağlantısı doğrulanamadı.'}
  catch(e){readinessResearchError=e.message}
  finally{readinessBusy=false;renderReadiness()}
 }
@@ -1029,7 +1026,7 @@ refresh();setInterval(refresh,15000);
  const host=document.getElementById('systemView');if(!host)return;
  const panel=document.createElement('section');panel.className='card';host.prepend(panel);
  const title=document.createElement('h2');title.textContent='Paper hesaplarını sıfırla';panel.append(title);
- const info=document.createElement('p');info.textContent='Aktif Spot RSI: 10.000 TRY · Vadeli RSI: 10.000 USDT · RSI Scalping: 10.000 USDT. Açık paper işlemleri güncel fiyatla kapatılır, geçmiş arşivlenir. Pump kapalı kalır. Gerçek borsa hesabına dokunulmaz.';panel.append(info);
+ const info=document.createElement('p');info.textContent='Vadeli RSI: 10.000 USDT · Scalping: 10.000 USDT. Açık paper işlemleri güncel fiyatla kapatılır, geçmiş arşivlenir. Pump kapalı kalır. Gerçek borsa hesabına dokunulmaz.';panel.append(info);
  const label=document.createElement('label'),check=document.createElement('input');check.type='checkbox';label.append(check,document.createTextNode(' Aktif paper hesaplarının arşivlenip sıfırlanmasını onaylıyorum.'));panel.append(label);
  const button=document.createElement('button');button.className='btn';button.textContent='Tüm aktif paper hesaplarını sıfırla';button.disabled=true;panel.append(button);
  const output=document.createElement('p');panel.append(output);let pending=false,ready=false;
