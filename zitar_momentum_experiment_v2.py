@@ -145,8 +145,13 @@ def overview(base):
     path=Path(base)/STATE
     if not path.exists():return dict(state='NOT_STARTED',books={},message='Motor yeniden başlatılınca deney oluşturulacak.')
     s=json.loads(path.read_text(encoding='utf-8'));ms=int(time.time()*1000)
+    if (Path(base)/'zitar_futures_only.flag').exists():
+        s['books']={k:b for k,b in s['books'].items() if b.get('market')=='futures'}
     s['heartbeat_age_seconds']=(ms-s.get('heartbeat_ms',0))/1000
     if not 0<=s['heartbeat_age_seconds']<=30:s['state']='STALE'
+    if (Path(base)/'zitar_comparison_supervisor.pause').exists():
+        s.update(state='PAUSED',supervisor_paused=True,message='Deney motoru duraklatıldı. Gösterilen sonuçlar son kayıtlı vadeli sonuçlardır; yeni işlem ve açık pozisyon takibi yapılmıyor.')
+        s['entry_control']=dict(paused=True)
     s['evaluation']={k:metrics(b,ms) for k,b in s['books'].items()}
     for k,b in s['books'].items():
         slip=D(b['execution_policy']['slippage_rate']);price=D(0);fees=D(0);funding=D(0);slippage=D(0)
@@ -160,7 +165,8 @@ def overview(base):
             m['issues'].append('Çalışan çevrim veya kayıt sürekliliği doğrulanmadı');m['verdict']='KANIT_YETERSIZ'
         m['issues'].append('Dış doğrulama ve kısmi dolum modeli tamamlanmadı')
         m['automatic_promotion']=False
-    for market in ('spot','futures'):
-        baseline=s['evaluation'][market+'_GUARD'];stress=s['evaluation'][market+'_STRESS']
+    for market in {b['market'] for b in s['books'].values()}:
+        baseline=s['evaluation'].get(market+'_GUARD');stress=s['evaluation'].get(market+'_STRESS')
+        if baseline is None or stress is None:continue
         stress['net_difference_vs_normal_slip']=stress['net']-baseline['net']
     return s
