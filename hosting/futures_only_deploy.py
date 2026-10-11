@@ -50,6 +50,8 @@ try:
   (drop/'futures-only.conf').write_text('[Service]\nExecStart=\nExecStart=/srv/zitar/venv/bin/python -B -m zitar_next.'+module+' '+suffix+'\n')
  run('systemctl','daemon-reload')
  run('systemctl','disable','--now','zitar-v3.timer')
+ run('systemctl','disable','--now','zitar-aux-history.timer','zitar-aux-liquidity.timer','zitar-aux-forward.timer')
+ run('systemctl','stop','zitar-aux@history.service','zitar-aux@liquidity.service','zitar-aux@forward.service')
  print(json.dumps({'spot_proposals_removed':len(ids),'scope':'FUTURES_ONLY','real_orders':False}))
 finally:
  run('systemctl','start','zitar-production.service','zitar-learning.service','zitar-forward-study.timer')
