@@ -993,21 +993,22 @@ refresh();setInterval(refresh,15000);
  const add=(p,t,text,cls='')=>{const e=document.createElement(t);e.textContent=text;e.className=cls;p.append(e);return e;};
  const fmt=x=>Number(x||0).toLocaleString('tr-TR',{maximumFractionDigits:2});const tone=x=>x>0?'green':x<0?'red':'muted';
  let scalp=true,busy=false;
- const buttons=[['Scalping · 20×',true],['RSI karşılaştırma',false]].map(([label,mode])=>{const b=add(nav,'button',label,'btn');b.onclick=()=>{scalp=mode;showView('indicatorLab');refresh();};return b;});
+ const buttons=[['Scalping · Risk testi',true],['RSI karşılaştırma',false]].map(([label,mode])=>{const b=add(nav,'button',label,'btn');b.onclick=()=>{scalp=mode;showView('indicatorLab');refresh();};return b;});
  const original=showView;showView=function(v){original(v);buttons.forEach((b,i)=>b.classList.toggle('active',v==='indicatorLab'&&(i===0?scalp:!scalp)));};
  async function refresh(){if(busy)return;busy=true;try{
   const r=await fetch('/api/indicator-lab',{signal:AbortSignal.timeout(5000)});if(!r.ok)throw Error(r.status===404?'Yeni test bağlantısı çalışan uygulamaya henüz yüklenmedi. Repair-Zitar.ps1 komutunu bir kez çalıştırın; hesaplar korunur.':'HTTP '+r.status);const d=await r.json();panel.replaceChildren();
-  add(panel,'h2',scalp?'RSI Scalping · 1 dakika · İzole 20×':'RSI karşılaştırma · 1 saat · Eş zamanlı paper deneyi');
+  add(panel,'h2',scalp?'Scalping · Eski sürüm ve yeni risk testi · 1 dakika':'RSI karşılaştırma · 1 saat · Eş zamanlı paper deneyi');
   const age=(Date.now()-d.heartbeat_ms)/1000;add(panel,'p',(age>30?'VERİ ESKİ':d.state)+' · '+Math.round(age)+' sn · Hazır mum serisi '+(d.ready_intervals||0)+' / '+(d.expected_intervals||0),age>30||d.state==='DEGRADED'?'red':'green');
   add(panel,'p','Başlangıç: '+new Date(d.started_ms).toLocaleString('tr-TR')+' · Her hesap 10.000 · Gerçek emir yok. Ana hesaplarla bakiye paylaşılmaz.','muted');
   add(panel,'p',scalp?'RSI Wilder(14): 30 üzerine dönüş LONG, 70 altına dönüş SHORT. RSI 50 geçişi veya %0,5 fiyat izleyen stop ile çıkış. Günlük −%2 özkaynak sınırı. En fazla 10 pozisyon; pozisyon bütçesi özkaynak / 10.':'Aynı evren, maliyet ve başlangıç: kontrol RSI<30 LONG / >70 SHORT; aday 30 üzerine veya 70 altına geri dönüşte girer, stop sonrası 3 mum bekler ve yeni kesişim ister. İkisinde de RSI 50 veya %2 takip eden stop çıkışı. Vadeli 3×. Ana RSI hesapları değişmez.','muted');
+  if(scalp)add(panel,'p','Yeni risk testi: işlem başına tahmini %0,25; toplam %1; en fazla 3 pozisyon; günlük zarar %1; günlük komisyon bütçesi %0,25; kapanış sonrası 3 mum bekleme. Aynı RSI sinyali, 20× izole, %0,5 fiyat stopu. Risk sınırları fiyat boşluklarında aşılabilir. Yeni hesap bağımsızdır; kârlılığı kanıtlanmış değildir.');
   if(scalp)add(panel,'p','Stop ve tasfiye periyodik fiyat örnekleriyle simüle edilir; aradaki fiyat hareketleri bilinmez. 20× yalnız bu hesapta geçerli.','muted');
   if(scalp){const controls=add(panel,'div','','actions');for(const [action,label]of [['start','Başlat'],['stop','Durdur']]){const button=add(controls,'button',label,'btn');button.onclick=async()=>{button.disabled=true;try{const response=await fetch('/api/paper-control',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({market:'scalping',action})});if(!response.ok)throw Error('Kontrol servisi güncellemesi gerekli.');add(controls,'span','İstek kaydedildi; motor onayı bekleniyor.');}catch(e){add(controls,'span',e.message,'red');}finally{button.disabled=false;}};}add(panel,'p',d.entry_control?(d.entry_control.paused?'Yeni girişler kapalı; stop takibi sürüyor.':'Yeni girişler açık.'):'Kontrol güncellemesi bekleniyor.','muted');}const grid=add(panel,'div','','lab-grid');
   for(const [id,b]of Object.entries(d.books||{})){
    if(b.market==='spot')continue;
-   if(scalp?id!=='SCALP20':!id.startsWith('RSI_BASE_')&&!id.startsWith('RSI_CONFIRM_'))continue;
+   if(scalp?!['SCALP20','SCALP_RISK'].includes(id):!id.startsWith('RSI_BASE_')&&!id.startsWith('RSI_CONFIRM_'))continue;
    const unit=b.market==='spot'?'TRY':'USDT',money=x=>fmt(x)+' '+unit;const pnl=Number(b.equity)-10000;const c=add(grid,'article','','card');
-   add(c,'h3',b.label);add(c,'p',(b.market==='spot'?'SPOT':'VADELİ')+' · '+b.execution_policy.leverage+'× · '+(b.health||'Hazırlanıyor'),'muted');
+   add(c,'h3',b.label);if(b.retired_ms)add(c,'p','Eski sürüm · Yeni girişler kapalı · Geçmiş sonuç','muted');if(b.diagnostic_only)add(c,'p','Yeni bağımsız risk testi · Onaylanmış strateji değil','muted');add(c,'p',(b.market==='spot'?'SPOT':'VADELİ')+' · '+b.execution_policy.leverage+'× · '+(b.health||'Hazırlanıyor'),'muted');
    const metrics=add(c,'div','','lab-metrics');
    for(const [label,value,n]of [['Özkaynak',money(b.equity),pnl],['Serbest bakiye',money(b.cash),0],['Net K/Z',money(pnl),pnl],['Getiri','%'+fmt(pnl/100),pnl],['Bugün K/Z',money(Number(b.equity)-Number(b.period_start)),Number(b.equity)-Number(b.period_start)],['Komisyon',money(b.fees_total),-Number(b.fees_total)]]){const m=add(metrics,'div','','lab-metric');add(m,'small',label);add(m,'div',value,tone(n));}
    add(c,'p','Açık: '+Object.keys(b.positions).length+' · Kapanan: '+b.closed.length+' · Funding: '+money(b.funding_total));

@@ -29,6 +29,7 @@ SPECS={
  'WT15':('WaveTrend + 4sa trend · 15 dk','spot','15m','WT',1,'.02'),
  'SPOT_RSI15':('RSI kontrol · 15 dk','spot','15m','RSI',1,'.02'),
  'SQ5':('Squeeze / Pump · 5 dk','spot','5m','SQ',1,'.02'),
+ 'SCALP_RISK':('Scalping risk testi · 1 dk · 20×','futures','1m','SCALP_RISK',20,'.005'),
  'SCALP20':('RSI Scalping · 1 dk · 20×','futures','1m','SCALP',20,'.005'),
 }
 
@@ -41,6 +42,10 @@ def initial(ms):
         b=copy.deepcopy(fresh(ms,[])['books']['BASELINE'])
         b.update(label=label,market=market,interval=interval,rule=rule,stop_pct=stop,started_ms=ms,cursors={},decisions=[],daily_limit='OPEN',valuation_ms=0)
         b['execution_policy']=dict(POLICY,leverage=lev,fee_rate='.001' if market=='spot' else '.0005',slippage_rate='.001' if market=='spot' else '.0002')
+        b['execution_policy'].update(signal_interval=interval,trailing_stop_price_pct=stop)
+        if rule=='SCALP_RISK':
+            from zitar_next.scalping_risk import RULES
+            b.update(risk_rules=RULES.copy(),period_fees_start='0',diagnostic_only=True,approval='NOT_APPROVED_STRATEGY')
         books[key]=b
     return dict(schema='INDICATOR_LAB_V1',specs=SPECS,started_ms=ms,heartbeat_ms=ms,last_success_ms=None,state='STARTING',books=books,universe={},errors=[],real_orders=False)
 
@@ -79,11 +84,15 @@ def apply_book(b,market,analyses,ms,before_entry=None):
     if not set(b['positions']).issubset(quotes):b['health']='MISSING_POSITION_QUOTE';return
     mark(b,quotes);b['valuation_ms']=ms;b['health']='FUNDING_PENDING' if b['accounting_pending'] else 'OK'
     if b.get('retired_ms') or b.get('reset_pending'):return
+    if b['rule']=='SCALP_RISK':
+        b.setdefault('period_fees_start',b['fees_total'])
     if day(ms)!=b['period']:
         b['daily'].append(dict(date=b['period'],start=b['period_start'],end=b['equity'],return_pct=str((D(b['equity'])/D(b['period_start'])-1)*100),actual_rollover_ms=ms,quality=b['quality']))
         b.update(period=day(ms),period_start=b['equity'],slot=str(max(D(0),D(b['equity']))/10),daily_limit='OPEN',quality=[])
+        if b['rule']=='SCALP_RISK':b['period_fees_start']=b['fees_total']
     # Isolated high-leverage test stops taking entries after a 2% daily loss.
     if b['rule']=='SCALP' and D(b['equity'])<=D(b['period_start'])*D('.98'):b['daily_limit']='LOSS_STOP'
+    if b['rule']=='SCALP_RISK' and D(b['equity'])<=D(b['period_start'])*D('.99'):b['daily_limit']='LOSS_STOP'
     if b['daily_limit']=='LOSS_STOP':
         for symbol in list(b['positions']):close_position(b,symbol,quotes[symbol],ms,'DAILY_LOSS_STOP')
         mark(b,quotes);return
@@ -94,8 +103,8 @@ def apply_book(b,market,analyses,ms,before_entry=None):
         b['cursors'][symbol]=candle
         if ms-candle>min(120000,INTERVALS[b['interval']]):outcome='LATE_SIGNAL'
         else:
-            target=a[b['rule']];q=quotes[symbol];p=b['positions'].get(symbol)
-            exit_signal=p and (target==-p['direction'] or (b['rule']=='RSI' and target!=p['direction']) or (b['rule'] in ('RSI_BASE','RSI_CONFIRM') and (a['rsi']>=50 if p['direction']==1 else a['rsi']<=50)) or (b['rule']=='SCALP' and (a['wilder_rsi']>=50 if p['direction']==1 else a['wilder_rsi']<=50)))
+            target=a['SCALP' if b['rule']=='SCALP_RISK' else b['rule']];q=quotes[symbol];p=b['positions'].get(symbol)
+            exit_signal=p and (target==-p['direction'] or (b['rule']=='RSI' and target!=p['direction']) or (b['rule'] in ('RSI_BASE','RSI_CONFIRM') and (a['rsi']>=50 if p['direction']==1 else a['rsi']<=50)) or (b['rule'] in ('SCALP','SCALP_RISK') and (a['wilder_rsi']>=50 if p['direction']==1 else a['wilder_rsi']<=50)))
             if exit_signal:close_position(b,symbol,q,ms,'SIGNAL_EXIT');closed_now.add(symbol)
             if b['market']=='spot' and target<0:target=0
             if b['rule']=='WT' and target==1 and not a.get('higher_trend'):target=0
@@ -108,7 +117,11 @@ def apply_book(b,market,analyses,ms,before_entry=None):
             elif abs(D(q['funding_rate']))>D('.001'):outcome='FUNDING_FILTER'
             else:
                 blocked=before_entry(b,symbol,target,a,market[symbol],ms) if before_entry else None
-                outcome=blocked or open_position(b,symbol,target,q,market[symbol]['contract'],ms,b['rule'])
+                if blocked:outcome=blocked
+                elif b['rule']=='SCALP_RISK':
+                    from zitar_next.scalping_risk import enter
+                    outcome=enter(b,symbol,target,q,market[symbol]['contract'],ms,candle)
+                else:outcome=open_position(b,symbol,target,q,market[symbol]['contract'],ms,b['rule'])
                 if outcome=='OPENED':
                     p=b['positions'][symbol];p.update(timeframe=b['interval'],evidence=a,trailing_stop=str(D(p['entry'])*(1-D(b['stop_pct'])*target)))
         b['decisions'].append(dict(ms=ms,symbol=symbol,candle_ms=candle,result=outcome))
@@ -164,7 +177,8 @@ class Lab:
                 if key not in chosen:b.setdefault('retired_ms',ms)
         from zitar_market_controls_v1 import read as read_control
         s['entry_control']=read_control(self.base,'scalping')
-        if 'SCALP20' in s['books']:s['books']['SCALP20']['entries_paused']=s['entry_control']['paused']
+        for name in ('SCALP20','SCALP_RISK'):
+            if name in s['books']:s['books'][name]['entries_paused']=s['entry_control']['paused']
         from zitar_strategy_selection_v1 import prepare_reset,finish_reset
         s['active_strategy_names']=[n for n,b in s['books'].items() if not b.get('retired_ms')]
         prepare_reset(self.base,s,'scalping')
