@@ -3,8 +3,8 @@ const nav=document.querySelector('.nav');if(!nav||document.getElementById('posit
 const add=(parent,tag,text)=>{const e=document.createElement(tag);e.textContent=text;parent.append(e);return e;};
 const view=add(nav.parentElement,'section','');view.id='positionChartsView';view.className='panel';view.style.display='none';views.push('positionCharts');
 nav.after(view);
-add(view,'h2','Pozisyon grafikleri · Spot ve vadeli');
-add(view,'p','Giriş, güncel stop ve hesap değerleme fiyatı aynı grafikte. Vadeli mumlar mark fiyatıdır; spot mumlar işlem fiyatıdır. Günlük piyasa değişimi pozisyon kârı değildir.');
+add(view,'h2','Pozisyon grafikleri · Aktif vadeli hesaplar');
+add(view,'p','Giriş, güncel stop ve hesap değerleme fiyatı aynı grafikte. Binance Global vadeli mumlar mark fiyatıdır. Günlük piyasa değişimi pozisyon kârı değildir.');
 const controls=add(view,'div','');controls.className='actions';
 const label=add(controls,'label','Pozisyon '),select=add(label,'select','');select.setAttribute('aria-label','Grafikteki pozisyon');select.className='market-filter';
 const il=add(controls,'label','Mum süresi '),interval=add(il,'select','');interval.setAttribute('aria-label','Grafik mum süresi');interval.className='btn';
@@ -15,6 +15,18 @@ const refresh=add(controls,'button','Yenile');refresh.className='btn';
 const resetZoom=add(controls,'button','Grafiği sıfırla');resetZoom.className='btn';
 add(view,'p','Fare tekerleği: yakınlaştır / uzaklaştır · Basılı tutup sürükle: geçmişe git · Çift tık: görünümü sıfırla.');
 const status=add(view,'p','');status.setAttribute('role','status');const info=add(view,'div','');const plot=add(view,'div','');plot.style.overflowX='auto';
+const toolbar=add(view,'aside','');toolbar.setAttribute('aria-label','Grafik çizim araçları');toolbar.style.cssText='display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:#132033;border-radius:10px';plot.before(toolbar);
+let drawMode='pan',anchor=null,geometry=null;
+const toolButtons={};for(const [mode,title]of [['pan','Taşı'],['trend','Trend çizgisi'],['horizontal','Yatay çizgi'],['vertical','Dikey çizgi'],['measure','Ölçüm'],['delete','Çizim sil']]){const b=add(toolbar,'button',title);b.className='btn';b.onclick=()=>{drawMode=mode;anchor=null;for(const [k,z]of Object.entries(toolButtons))z.style.outline=k===mode?'2px solid #60a5fa':'';};toolButtons[mode]=b;}
+const color=add(toolbar,'input','');color.type='color';color.value='#a78bfa';color.setAttribute('aria-label','Çizgi rengi');
+const thick=add(toolbar,'select','');thick.setAttribute('aria-label','Çizgi kalınlığı');for(const v of [1,2,3,4]){const o=add(thick,'option',v+' px');o.value=v;}thick.value='2';
+const undo=add(toolbar,'button','Geri al');undo.className='btn';const clear=add(toolbar,'button','Çizimleri temizle');clear.className='btn';
+const layout=add(view,'div','');layout.className='chart-workspace';plot.before(layout);toolbar.style.cssText='padding:10px;background:#132033;border-radius:10px';toolbar.className='chart-toolbar';plot.className='chart-plot';layout.append(toolbar,plot);const chartStyle=document.createElement('style');chartStyle.textContent='.chart-workspace{display:flex;gap:12px}.chart-toolbar{display:flex;flex-direction:column;gap:8px;width:150px;flex-shrink:0}.chart-plot{flex:1;min-width:0}@media(max-width:600px){.chart-workspace{flex-direction:column}.chart-toolbar{width:auto;flex-direction:row;flex-wrap:wrap}}';document.head.append(chartStyle);
+const drawHint=add(view,'p','Trend/ölçüm için grafikte iki nokta seç; yatay/dikey çizgi için bir nokta. Çizimler işlem stopunu değiştirmez ve bu tarayıcıda saklanır.');
+const drawingKey=()=>{const p=current();return p?'zitar_chart_drawings_v1:'+p.market+':'+p.symbol+':'+interval.value:null;};
+function drawings(){try{const a=JSON.parse(localStorage.getItem(drawingKey())||'[]');return Array.isArray(a)?a.filter(d=>['trend','horizontal','vertical','measure'].includes(d.mode)&&Array.isArray(d.points)&&d.points.length===(['trend','measure'].includes(d.mode)?2:1)&&d.points.every(p=>Number.isFinite(p.time)&&Number.isFinite(p.price)&&p.price>0)&&/^#[0-9a-f]{6}$/i.test(d.color)&&[1,2,3,4].includes(d.width)).slice(-100):[];}catch(e){return [];}}
+function saveDrawings(a){const k=drawingKey();if(k){try{localStorage.setItem(k,JSON.stringify(a.slice(-100)));}catch(e){drawHint.textContent='Çizim saklanamadı; tarayıcı depolaması dolu olabilir.';}}draw();}
+undo.onclick=()=>{const a=drawings();a.pop();saveDrawings(a);};clear.onclick=()=>{anchor=null;saveDrawings([]);};
 const btn=add(nav,'button','Pozisyon grafikleri');btn.id='positionChartsBtn';btn.className='btn';
 const previous=showView;showView=function(v){previous(v);btn.classList.toggle('active',v==='positionCharts');};
 let items=[],bars=null,busy=false,loaded=0,requestNo=0;
@@ -23,7 +35,7 @@ plot.style.touchAction='none';
 function resetWindow(){visibleCount=Number(range.value);endOffset=0;draw();}
 function windowRows(){visibleCount=Math.min(bars.rows.length,Math.max(12,Math.round(visibleCount)));endOffset=Math.min(Math.max(0,Math.round(endOffset)),bars.rows.length-visibleCount);const end=bars.rows.length-endOffset;return bars.rows.slice(end-visibleCount,end);}
 plot.addEventListener('wheel',e=>{const svg=plot.querySelector('svg');if(!svg||!bars||drag)return;e.preventDefault();const box=svg.getBoundingClientRect(),ratio=Math.min(1,Math.max(0,(e.clientX-box.left-box.width*90/1100)/(box.width*835/1100)));const oldCount=visibleCount,start=bars.rows.length-endOffset-oldCount,anchor=start+ratio*oldCount;visibleCount=Math.min(bars.rows.length,Math.max(12,Math.round(oldCount*Math.exp(Math.max(-300,Math.min(300,e.deltaY))*.002))));endOffset=bars.rows.length-visibleCount-(anchor-ratio*visibleCount);draw();},{passive:false});
-plot.addEventListener('pointerdown',e=>{const svg=plot.querySelector('svg');if(!svg||!bars||e.button!==0)return;const box=svg.getBoundingClientRect();drag={id:e.pointerId,x:e.clientX,offset:endOffset,width:box.width*835/1100,count:visibleCount};plot.setPointerCapture(e.pointerId);e.preventDefault();});
+plot.addEventListener('pointerdown',e=>{const svg=plot.querySelector('svg');if(!svg||!bars||e.button!==0)return;if(drawMode!=='pan'){e.preventDefault();if(drawMode==='delete'){const i=e.target.dataset.drawingIndex;if(i!=null){const a=drawings();a.splice(Number(i),1);saveDrawings(a);}return;}if(!geometry)return;const box=svg.getBoundingClientRect(),px=(e.clientX-box.left)*1100/box.width,py=(e.clientY-box.top)*470/box.height;if(px<90||px>925||py<28||py>405)return;const point={time:geometry.first+(px-90)/835*geometry.duration,price:geometry.hi-(py-28)/377*(geometry.hi-geometry.lo)};if(drawMode==='horizontal'||drawMode==='vertical')saveDrawings([...drawings(),{mode:drawMode,points:[point],color:color.value,width:Number(thick.value)}]);else if(!anchor){anchor=point;drawHint.textContent='İlk nokta seçildi; ikinci noktayı seç.';}else{saveDrawings([...drawings(),{mode:drawMode,points:[anchor,point],color:color.value,width:Number(thick.value)}]);anchor=null;drawHint.textContent='Çizim eklendi.';}return;}const box=svg.getBoundingClientRect();drag={id:e.pointerId,x:e.clientX,offset:endOffset,width:box.width*835/1100,count:visibleCount};plot.setPointerCapture(e.pointerId);e.preventDefault();});
 plot.addEventListener('pointermove',e=>{if(!drag||drag.id!==e.pointerId)return;endOffset=drag.offset+(e.clientX-drag.x)/drag.width*drag.count;draw();});
 const stopDrag=()=>{drag=null;};plot.addEventListener('pointerup',stopDrag);plot.addEventListener('pointercancel',stopDrag);plot.addEventListener('lostpointercapture',stopDrag);plot.addEventListener('dblclick',resetWindow);resetZoom.onclick=resetWindow;
 const fmt=x=>x==null?'Kaydedilmemiş':Number(x).toLocaleString('tr-TR',{maximumFractionDigits:10});
@@ -49,11 +61,17 @@ const shape=(tag,attrs,text)=>{const e=document.createElementNS(svg.namespaceURI
 for(let i=0;i<=5;i++){const v=lo+(hi-lo)*i/5;shape('line',{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:'#26344c'});shape('text',{x:4,y:y(v)+4,fill:'#94a3b8','font-size':12},fmt(v));}
 rows.forEach((r,i)=>{const color=r.close>=r.open?'#22c55e':'#ef4444';shape('line',{x1:x(i),x2:x(i),y1:y(r.high),y2:y(r.low),stroke:color});const candle=shape('rect',{x:x(i)-Math.max(.5,w/rows.length*.3),y:Math.min(y(r.open),y(r.close)),width:Math.max(1,w/rows.length*.6),height:Math.max(1,Math.abs(y(r.close)-y(r.open))),fill:color,opacity:r.closed?1:.5});const title=document.createElementNS(svg.namespaceURI,'title');title.textContent=`${date(r.time)} · Açılış ${fmt(r.open)} · Yüksek ${fmt(r.high)} · Düşük ${fmt(r.low)} · Kapanış ${fmt(r.close)}${r.closed?'':' · Açık mum'}`;candle.append(title);});
 const opened=new Date(p.opened).getTime(),first=rows[0].time,last=rows.at(-1).time,step=rows.length>1?rows[1].time-first:3600000;
+geometry={first,lo,hi,duration:rows.length*step};
 const entryX=p.opened!=null&&Number.isFinite(opened)&&opened<=last+step?Math.max(L,Math.min(W-R,L+(opened-first)/(rows.length*step)*w)):null;
 let lastLabel=T-20;const levels=[['Giriş',p.entry,'#60a5fa'],['Güncel stop',p.stop,'#f59e0b'],['Hesap fiyatı',p.mark,'#e2e8f0']].filter(x=>x[1]!=null).sort((a,b)=>Number(b[1])-Number(a[1]));
 for(const[name,value,color]of levels){const startX=name==='Hesap fiyatı'?L:entryX;if(startX==null)continue;const actual=y(Number(value)),labelY=Math.max(actual,lastLabel+18);lastLabel=labelY;shape('line',{x1:startX,x2:W-R,y1:actual,y2:actual,stroke:color,'stroke-dasharray':'6 4','data-level':name});shape('line',{x1:W-R,x2:W-R+8,y1:actual,y2:labelY,stroke:color});shape('text',{x:W-R+10,y:labelY+4,fill:color,'font-size':12},name+' '+fmt(value));}
 
 if(Number.isFinite(opened)&&opened>=first&&opened<=last+step){const px=L+(opened-first)/(rows.length*step)*w;shape('line',{x1:px,x2:px,y1:T,y2:H-B,stroke:'#60a5fa','stroke-dasharray':'3 4'});shape('text',{x:px,y:H-B+18,fill:'#60a5fa','font-size':12},'Pozisyon açıldı');}else add(info,'p','Giriş zamanı gösterilen mumların dışında. Daha geniş gösterim veya 4h / 1d seçin.');
+drawings().forEach((d,i)=>{const point=d.points[0],second=d.points[1];const px=p=>L+(p.time-first)/(rows.length*step)*w;const attrs={stroke:d.color,'stroke-width':d.width,'data-drawing-index':i,'pointer-events':'stroke'};let line;
+if(d.mode==='horizontal')line=shape('line',{...attrs,x1:L,x2:W-R,y1:y(point.price),y2:y(point.price)});
+else if(d.mode==='vertical')line=shape('line',{...attrs,x1:px(point),x2:px(point),y1:T,y2:H-B});
+else if(second){line=shape('line',{...attrs,x1:px(point),x2:px(second),y1:y(point.price),y2:y(second.price)});if(d.mode==='measure')shape('text',{x:px(second),y:y(second.price)-10,fill:d.color,'font-size':14},((second.price/point.price-1)*100).toFixed(2)+'%');}
+if(line){const title=document.createElementNS(svg.namespaceURI,'title');title.textContent='Kullanıcı çizimi · işlemleri değiştirmez';line.append(title);}});
 shape('text',{x:L,y:H-12,fill:'#94a3b8','font-size':12},date(first));shape('text',{x:W-R,y:H-12,fill:'#94a3b8','font-size':12,'text-anchor':'end'},date(last));
 add(info,'p',`${rows.length} mum · ${bars.price_type} · Mum verisi alındı: ${date(bars.fetched_ms)}. Sarı çizgi yalnızca güncel stop; geçmiş stop hareketleri gösterilmez. Soluk mum henüz kapanmadı.`);
 }

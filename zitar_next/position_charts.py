@@ -23,7 +23,7 @@ def read_json(url):
 
 
 def candles(market, symbol, interval):
-    if market not in ('spot', 'futures') or not re.fullmatch(r'[A-Z0-9]{1,24}(?:USDT|TRY)', symbol) or interval not in INTERVALS:
+    if market != 'futures' or not re.fullmatch(r'[A-Z0-9]{1,24}(?:USDT|TRY)', symbol) or interval not in INTERVALS:
         raise ValueError('invalid chart selection')
     if market == 'futures' and not symbol.endswith('USDT'):
         raise ValueError('futures requires USDT')
@@ -33,7 +33,7 @@ def candles(market, symbol, interval):
         if cached and time.time() - cached['fetched_ms']/1000 < 60:
             return cached
     # Same spot exchange API host as the production quote reader. No currency conversion.
-    base = 'https://fapi.binance.com/fapi/v1/markPriceKlines' if market == 'futures' else 'https://api.binance.me/api/v3/klines'
+    base = 'https://fapi.binance.com/fapi/v1/markPriceKlines'
     page = read_json(base + '?' + urlencode(dict(symbol=symbol, interval=interval, limit=1000)))
     if not isinstance(page, list) or not page or len(page) > 1000:
         raise ValueError('candles unavailable')
@@ -69,25 +69,12 @@ def normalize(p, market, account, index):
 
 
 def positions(port):
-    rows, errors = [], []
-    # Existing public paper snapshots only. No portfolio file access or mutation.
-    for endpoint, market in [('futures-paper','futures'),('candidate-monitor','spot'),('dashboard','spot'),('snapshot','spot'),('rsi-repair',None),('bollinger-pair',None),('pa-v1','spot'),('rsi-timeframes',None),('momentum-experiment',None)]:
-        try:
-            d = read_json(f'http://127.0.0.1:{port}/api/{endpoint}')
-            if d.get('error'):raise ValueError('source unavailable')
-            groups = []
-            for name,b in d.get('books',d.get('strategies',{})).items():
-                ps = b.get('open_positions', b.get('positions', []))
-                if isinstance(ps, dict): ps = list(ps.values())
-                if isinstance(ps,list): groups.append((name,ps))
-            if endpoint == 'snapshot':
-                groups.append(('Master',list(d.get('master',{}).get('account',{}).get('positions',{}).values())))
-                for name,b in (d.get('comparison') or {}).get('books',{}).items():
-                    groups.append(('Karşılaştırma '+name,list(b.get('account',{}).get('positions',{}).values())))
-            for name,ps in groups:
-                for i,p in enumerate(ps):
-                    kind = market or ('spot' if p.get('symbol','').endswith('TRY') else 'futures')
-                    rows.append(normalize(p,kind,endpoint+' · '+name,i))
-        except (OSError,ValueError,TypeError,KeyError):
-            errors.append(endpoint)
-    return dict(positions=rows, unavailable=errors, served_ms=int(time.time()*1000), real_orders=False)
+    rows,errors=[],[]
+    try:
+        d=read_json(f'http://127.0.0.1:{port}/api/indicator-lab')
+        for name,b in d.get('books',{}).items():
+            if b.get('market')!='futures' or b.get('retired_ms'):continue
+            ps=b.get('positions',{})
+            for i,p in enumerate(ps.values()):rows.append(normalize(p,'futures',name,i))
+    except (OSError,ValueError,TypeError,KeyError):errors.append('indicator-lab')
+    return dict(positions=rows,unavailable=errors,served_ms=int(time.time()*1000),real_orders=False)
