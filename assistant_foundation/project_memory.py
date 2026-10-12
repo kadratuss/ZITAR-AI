@@ -23,6 +23,8 @@ def scope(base, session, project=None, private=False):
         elif project is not None:
             if not isinstance(project,str) or not 1<=len(project.strip())<=100 or any(ord(c)<32 for c in project):raise ValueError('INVALID_PROJECT')
             db.execute('INSERT OR REPLACE INTO bindings VALUES(?,?)',(session,project.strip()))
+            shared='project_'+hashlib.sha256(fold(project.strip()).encode()).hexdigest()
+            db.execute('INSERT OR REPLACE INTO bindings VALUES(?,?)',(shared,project.strip()))
         row=db.execute('SELECT project FROM bindings WHERE session=?',(session,)).fetchone()
     return row[0] if row else None
 

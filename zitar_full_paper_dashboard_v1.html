@@ -558,15 +558,19 @@ renderComparison=function(){comparisonCardsFirst();const body=E('comparisonConte
 </script><script>
 const zitarSession = localStorage.getItem('zitar_session_v1') || crypto.randomUUID();
 localStorage.setItem('zitar_session_v1', zitarSession);
+let sharedHistoryBusy=false,sharedHistorySignature=null;
 async function restoreZitarHistory(){
+  if(sharedHistoryBusy||document.getElementById('chatSend').disabled)return;sharedHistoryBusy=true;
   try {
     const response = await fetch('/api/chat-proxy/history?session_id='+encodeURIComponent(zitarSession));
     if(!response.ok) return;
     const data = await response.json();
+    if(document.getElementById('chatSend').disabled)return;const signature=JSON.stringify(data.turns||[]);if(signature===sharedHistorySignature)return;sharedHistorySignature=signature;document.getElementById('chatMessages').replaceChildren();
     for(const turn of data.turns || []){addChat('user',turn.question);addChat('zitar',turn.answer);attachAssistantReport(turn);if(turn.council_job_id && ['QUEUED','RUNNING','RETRY_WAIT'].includes(turn.council_state))watchCouncil(turn.council_job_id);}
-  } catch(e) { console.warn('Chat history unavailable', e); }
+  } catch(e) { console.warn('Chat history unavailable', e); }finally{sharedHistoryBusy=false}
 }
 restoreZitarHistory();
+setInterval(()=>{if(document.getElementById('chatView').style.display!=='none')restoreZitarHistory();},5000);
 </script><script>
 const councilWatching = new Set();
 async function watchCouncil(id){

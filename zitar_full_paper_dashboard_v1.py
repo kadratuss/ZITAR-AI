@@ -161,6 +161,10 @@ def make_server(base, port=5020):
         def do_GET(self):
             parsed = urlsplit(self.path)
             route, query = parsed.path, parse_qs(parsed.query)
+            if 'session_id' in query:
+                from assistant_foundation.conversations import conversation_session
+                try:query['session_id']=[conversation_session(base,query['session_id'][0])]
+                except ValueError:return self.send({'error':'Invalid session'},400)
             try:
                 if route == '/api/pa-v1':
                     from pa_v1.runtime import overview

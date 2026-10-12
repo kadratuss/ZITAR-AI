@@ -65,6 +65,8 @@ def pending_gaps(base):
                 for i, q, s in db.execute('SELECT id, question, status FROM gaps WHERE status="OPEN"')]
 
 def history(base, session):
+    from assistant_foundation.conversations import conversation_session
+    session=conversation_session(base,session)
     with connect(base) as db:
         rows = db.execute('SELECT payload FROM turns WHERE session=? ORDER BY id DESC LIMIT 100', (session,)).fetchall()
     turns = [json.loads(r[0]) for r in reversed(rows)]
@@ -87,13 +89,17 @@ def answer(base, question, session='default'):
         raise ValueError('Invalid session')
     with LOCK:
         question = question.strip()
+        from assistant_foundation.project_memory import handle as memory_handle,fold
+        scope_reply=memory_handle(base,session,question) if fold(question).startswith('ortak proje sec:') or fold(question)=='ozel sohbet hafizasina don' else None
+        from assistant_foundation.conversations import conversation_session
+        session=conversation_session(base,session)
         turns = history(base, session)
         from zitar_chat_preferences_v1 import handle, context
         preferences, preference_reply = handle(base, session, question)
         from zitar_tool_truth_v1 import status_question, recorded_status, guard_response
         search_query = None if greeting(question) else resolve_search(question, turns)
         from assistant_foundation.chat_tools import handle as handle_tool
-        tool_reply=handle_tool(base,session,question)
+        tool_reply=scope_reply if scope_reply is not None else handle_tool(base,session,question)
         if tool_reply is None:
             from assistant_foundation.natural_tools import route as route_natural_tool
             tool_reply=route_natural_tool(base,session,question)
