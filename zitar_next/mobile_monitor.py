@@ -39,11 +39,35 @@ class Monitor(BaseHTTPRequestHandler):
             self.send_error(503)
 
     def do_POST(self):
-        self.send_error(405, 'Mobile monitoring is read-only')
+        if self.path!='/api/chat-proxy/chat':
+            self.send_error(405,'Trading controls are disabled on mobile');return
+        if self.headers.get('Origin') not in ('https://zitar-kvm4.tail409f42.ts.net','http://127.0.0.1:8081'):
+            self.send_error(403,'Origin rejected');return
+        if self.headers.get('Transfer-Encoding'):
+            self.send_error(400);return
+        try:
+            length=int(self.headers.get('Content-Length','0'))
+            if not 0<length<=8192:raise ValueError('size')
+            body=self.rfile.read(length)
+            request=Request('http://127.0.0.1:8080/api/chat-proxy/chat',data=body,
+                headers={'Content-Type':'application/json','Origin':'http://127.0.0.1:8080'},method='POST')
+            try:response=build_opener(NoRedirect()).open(request,timeout=240)
+            except HTTPError as error:response=error
+            with response:
+                payload=response.read(20000001)
+                if len(payload)>20000000:raise ValueError('response size')
+                self.send_response(response.code)
+                self.send_header('Content-Type',response.headers.get('Content-Type','application/json'))
+                self.send_header('Content-Length',str(len(payload)));self.send_header('Cache-Control','no-store')
+                self.send_header('X-Content-Type-Options','nosniff');self.end_headers();self.wfile.write(payload)
+        except ValueError:self.send_error(400)
+        except OSError:self.send_error(503)
 
-    do_PUT = do_POST
-    do_DELETE = do_POST
-    do_PATCH = do_POST
+    def reject_mutation(self):self.send_error(405,'Trading controls are disabled on mobile')
+
+    do_PUT = reject_mutation
+    do_DELETE = reject_mutation
+    do_PATCH = reject_mutation
 
 
 if __name__ == '__main__':
