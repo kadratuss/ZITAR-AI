@@ -5,6 +5,7 @@ import uuid
 from contextlib import closing
 from pathlib import Path
 from assistant_foundation.exact_tools import calculate, validate_json
+from assistant_foundation.documents import summarize_text, create_report
 
 
 class Tasks:
@@ -16,7 +17,7 @@ class Tasks:
             db.execute('CREATE TABLE IF NOT EXISTS tasks(id TEXT PRIMARY KEY, tool TEXT, input TEXT, state TEXT, result TEXT, error TEXT)')
 
     def submit(self, tool, arguments):
-        if tool not in ('calculate', 'validate_json') or not isinstance(arguments, dict):
+        if tool not in ('calculate', 'validate_json', 'summarize_text', 'create_report') or not isinstance(arguments, dict):
             raise ValueError('INVALID_TASK')
         payload = json.dumps(arguments, allow_nan=False)
         if len(payload) > 100000: raise ValueError('TASK_TOO_LARGE')
@@ -43,7 +44,7 @@ class Tasks:
             if row is None: raise KeyError(identity)
             if row[2] == 'QUEUED':
                 try:
-                    function = {'calculate': calculate, 'validate_json': validate_json}[row[0]]
+                    function = {'calculate': calculate, 'validate_json': validate_json, 'summarize_text': summarize_text, 'create_report': create_report}[row[0]]
                     result = function(**json.loads(row[1]))
                     db.execute('UPDATE tasks SET state=?,result=? WHERE id=?',
                                ('SUCCEEDED', json.dumps(result, allow_nan=False), identity))

@@ -165,6 +165,11 @@ def make_server(base, port=5020):
                 if route == '/api/pa-v1':
                     from pa_v1.runtime import overview
                     return self.send(overview(base))
+                if route == '/api/assistant-artifact':
+                    from assistant_foundation.chat_tools import read_report
+                    try:raw=read_report(base,query.get('session_id',[''])[0],query.get('task_id',[''])[0])
+                    except (ValueError,KeyError):return self.send({'error':'Artifact not found'},404)
+                    self.send_response(200);self.send_header('Content-Type','text/plain; charset=utf-8');self.send_header('Content-Disposition','attachment; filename=zitar-rapor.txt');self.send_header('X-Content-Type-Options','nosniff');self.send_header('Cache-Control','no-store');self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw);return
                 if route == '/api/paper-reset':
                     from zitar_reset_control_v1 import status
                     return self.send(status(base))
