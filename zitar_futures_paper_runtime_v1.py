@@ -104,6 +104,7 @@ class Futures:
   return state
 
 def loop(base,once=False):
+ if (Path(base)/'zitar_two_rsi_only.flag').exists():return
  base=Path(base);lock=FileLock(base/'zitar_futures_paper_v1.lock')
  if not lock.acquire():return
  try:

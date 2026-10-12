@@ -205,7 +205,7 @@ class Lab:
                 snapshots[market]={};continue
             snapshots[market]={}
             active=[b for b in s['books'].values() if b['market']==market and not b.get('retired_ms')]
-            intervals={b['interval'] for b in active};intervals.update(('1h','15m'))
+            intervals={b['interval'] for b in active};intervals.update(('1h',) if (self.base/'zitar_two_rsi_only.flag').exists() else ('1h','15m'))
             if any(b['rule']=='WT' for b in active):intervals.add('4h')
             if not active and not self.experiment:
                 symbols=sorted({p['symbol'] for b in s['books'].values() if b['market']==market for p in list(b['positions'].values())+[p for p in b['closed'] if p.get('funding_pending')]})
@@ -248,13 +248,17 @@ class Lab:
                 available[symbol]=a
             apply_book(b,snapshots[b['market']],available,now)
             if b.get('health')!='OK':errors.append(b['label']+':'+b.get('health','UNKNOWN'))
-        try:self.experiment.cycle(snapshots,signals,s['universe'],now)
+        try:
+            if not (self.base/'zitar_two_rsi_only.flag').exists():self.experiment.cycle(snapshots,signals,s['universe'],now)
         except Exception as exc:errors.append('RESEARCH_EXPERIMENT:'+type(exc).__name__+':'+str(exc))
-        try:self.bollinger.cycle(snapshots,signals,s['universe'],now)
+        try:
+            if not (self.base/'zitar_two_rsi_only.flag').exists():self.bollinger.cycle(snapshots,signals,s['universe'],now)
         except Exception as exc:s['errors'].append('BOLLINGER_PAIR:'+str(exc))
-        try:self.repair.cycle(snapshots,signals,s['universe'],now)
+        try:
+            if not (self.base/'zitar_two_rsi_only.flag').exists():self.repair.cycle(snapshots,signals,s['universe'],now)
         except Exception as exc:s['errors'].append('RSI_REPAIR:'+str(exc))
-        try:self.momentum.cycle(snapshots,signals,s['universe'],now)
+        try:
+            if not (self.base/'zitar_two_rsi_only.flag').exists():self.momentum.cycle(snapshots,signals,s['universe'],now)
         except Exception as exc:errors.append('MOMENTUM_EXPERIMENT:'+type(exc).__name__+':'+str(exc))
         finish_reset(self.base,s,'scalping',now)
         s.update(heartbeat_ms=now,pid=os.getpid(),errors=errors,state='DEGRADED' if errors else 'WARMING' if ready<expected else 'RUNNING',ready_intervals=ready,expected_intervals=expected)
