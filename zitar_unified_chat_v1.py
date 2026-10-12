@@ -92,7 +92,11 @@ def answer(base, question, session='default'):
         preferences, preference_reply = handle(base, session, question)
         from zitar_tool_truth_v1 import status_question, recorded_status, guard_response
         search_query = None if greeting(question) else resolve_search(question, turns)
-        if preference_reply is not None:
+        from assistant_foundation.chat_tools import handle as handle_tool
+        tool_reply=handle_tool(base,session,question)
+        if tool_reply is not None:
+            result=tool_reply
+        elif preference_reply is not None:
             result = dict(route='CONVERSATION_PREFERENCE',source='PREFERENCE_MEMORY',grounded=False,answer=preference_reply)
         elif status_question(question):
             status = recorded_status(base,session)
