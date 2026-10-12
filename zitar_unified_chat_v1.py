@@ -94,6 +94,9 @@ def answer(base, question, session='default'):
         search_query = None if greeting(question) else resolve_search(question, turns)
         from assistant_foundation.chat_tools import handle as handle_tool
         tool_reply=handle_tool(base,session,question)
+        if tool_reply is None:
+            from assistant_foundation.natural_tools import route as route_natural_tool
+            tool_reply=route_natural_tool(base,session,question)
         if tool_reply is not None:
             result=tool_reply
         elif preference_reply is not None:
