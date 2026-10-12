@@ -1,0 +1,16 @@
+{
+  "schema": "ZITAR_GENERAL_ASSISTANT_CAPABILITIES_V1",
+  "review_date": "2026-10-12",
+  "production_changes": false,
+  "capabilities": [
+    {"name": "local_conversation", "state": "CONNECTED", "evidence": "dashboard chat proxy -> unified chat -> model provider -> local Ollama"},
+    {"name": "conversation_history", "state": "CONNECTED", "limit": "Last 12 turns supplied to model; broader persistent storage is separate."},
+    {"name": "communication_preferences", "state": "ISOLATED_TEST_PASSED", "scope": "Explicit session-scoped preferences; not general project memory."},
+    {"name": "research_queue", "state": "SOURCE_INSPECTED", "limit": "End-to-end research completion not tested in this baseline."},
+    {"name": "general_task_execution", "state": "NOT_CONNECTED", "evidence": "Active conversation system prompt denies tool authority."},
+    {"name": "exact_calculation", "state": "PROTOTYPE_TESTED", "production_connected": false},
+    {"name": "json_validation", "state": "PROTOTYPE_TESTED", "production_connected": false},
+    {"name": "self_improvement_loop", "state": "INCOMPLETE", "missing": ["general task evaluation", "independent candidate test", "reviewed activation", "rollback"]},
+    {"name": "model_fine_tuning", "state": "NOT_CONFIGURED", "evidence": "fine_tuned false in active model configuration"}
+  ]
+}
