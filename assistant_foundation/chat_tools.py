@@ -23,6 +23,9 @@ def expression(text):
  return visit(tree.body)
 
 def handle(base,session,question):
+ from assistant_foundation.project_memory import handle as handle_memory
+ memory_reply=handle_memory(base,session,question)
+ if memory_reply is not None:return memory_reply
  q=question.strip();n=normalized(q)
  if n.startswith('hesapla:') or n.startswith('hesapla '):
   text=q[len('hesapla'):].lstrip(' :')
