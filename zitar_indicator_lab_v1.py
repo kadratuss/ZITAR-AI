@@ -33,6 +33,10 @@ SPECS={
  'SCALP20':('RSI Scalping · 1 dk · 20×','futures','1m','SCALP',20,'.005'),
 }
 
+for rule,label in [('NEW_COIN','Coinrule kural uyarlaması'),('NEW_ST','SuperTrend ATR10 ×3 uyarlaması'),('NEW_SAR','Parabolic SAR uyarlaması')]:
+    for interval in ('5m','15m','1h','4h'):
+        SPECS[rule+'_'+interval]=(label+' · '+interval,'futures',interval,rule,3,'.02')
+
 if FUTURES_ONLY:
     SPECS={k:v for k,v in SPECS.items() if v[1]=='futures'}
 
@@ -46,6 +50,7 @@ def initial(ms):
         if rule=='SCALP_RISK':
             from zitar_next.scalping_risk import RULES
             b.update(risk_rules=RULES.copy(),period_fees_start='0',diagnostic_only=True,approval='NOT_APPROVED_STRATEGY')
+        if rule.startswith('NEW_'):b.update(diagnostic_only=True,approval='NOT_APPROVED_STRATEGY',source_parity='NOT_VERIFIED',adaptation='Shared 3x isolated model, 2% price safety trail, 10 equal slots; Coinrule long-only.')
         books[key]=b
     return dict(schema='INDICATOR_LAB_V1',specs=SPECS,started_ms=ms,heartbeat_ms=ms,last_success_ms=None,state='STARTING',books=books,universe={},errors=[],real_orders=False)
 
@@ -105,7 +110,9 @@ def apply_book(b,market,analyses,ms,before_entry=None):
         else:
             target=a['SCALP' if b['rule']=='SCALP_RISK' else b['rule']];q=quotes[symbol];p=b['positions'].get(symbol)
             exit_signal=p and (target==-p['direction'] or (b['rule']=='RSI' and target!=p['direction']) or (b['rule'] in ('RSI_BASE','RSI_CONFIRM') and (a['rsi']>=50 if p['direction']==1 else a['rsi']<=50)) or (b['rule'] in ('SCALP','SCALP_RISK') and (a['wilder_rsi']>=50 if p['direction']==1 else a['wilder_rsi']<=50)))
+            if b['rule']=='NEW_COIN' and p and a.get('coin_exit'):exit_signal=True
             if exit_signal:close_position(b,symbol,q,ms,'SIGNAL_EXIT');closed_now.add(symbol)
+            if exit_signal and b['rule'] in ('NEW_ST','NEW_SAR'):closed_now.discard(symbol)
             if b['market']=='spot' and target<0:target=0
             if b['rule']=='WT' and target==1 and not a.get('higher_trend'):target=0
             cap=1 if b['rule']=='SQ' else 10
@@ -213,7 +220,12 @@ class Lab:
                 for interval in sorted(intervals):
                     expected+=1;rows=self.candles(market,symbol,interval,ms)
                     if rows:
-                        try:signals[(market,symbol,interval)]=analyze(rows,ms,interval);ready+=1
+                        try:
+                            a=analyze(rows,ms,interval)
+                            if any(b['rule'].startswith('NEW_') for b in active):
+                                from zitar_next.open_strategy_signals import enrich
+                                a=enrich(rows,ms,interval,a)
+                            signals[(market,symbol,interval)]=a;ready+=1
                         except ValueError as e:errors.append(symbol+':'+str(e))
             def quote(symbol):
                 depth=mg(market,'depth',dict(symbol=symbol,limit=100),timeout=4);now=int(time.time()*1000)
