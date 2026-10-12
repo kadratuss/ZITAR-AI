@@ -101,6 +101,9 @@ def answer(base, question, session='default'):
         from assistant_foundation.chat_tools import handle as handle_tool
         tool_reply=scope_reply if scope_reply is not None else handle_tool(base,session,question)
         if tool_reply is None:
+            from assistant_foundation.recall import recall
+            tool_reply=recall(base,session,question)
+        if tool_reply is None:
             from assistant_foundation.natural_tools import route as route_natural_tool
             tool_reply=route_natural_tool(base,session,question)
         if tool_reply is not None:
