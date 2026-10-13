@@ -276,6 +276,11 @@ class Lab:
         s.update(heartbeat_ms=now,pid=os.getpid(),errors=errors,state='DEGRADED' if errors else 'WARMING' if ready<expected else 'RUNNING',ready_intervals=ready,expected_intervals=expected)
         if not errors and ready==expected:s['last_success_ms']=now
         atomic_json(self.path,s)
+        try:
+            from zitar_next.equity_samples import record
+            record(self.base,s)
+        except Exception as exc:
+            atomic_json(self.base/'zitar_equity_samples_error_v1.json',dict(ms=now,error=type(exc).__name__))
 
 def overview(base):
     path=Path(base)/STATE
