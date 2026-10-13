@@ -24,12 +24,12 @@ def chat(messages,role='conversation',json_mode=False,temperature=0.3,max_tokens
     config,identity=settings(base)
     model=config.get('roles',{}).get(role,config['model'])
     content=[dict(role='system',content=identity)]+list(messages)
-    payload=dict(model=model,messages=content,stream=False,
-                 options=dict(temperature=temperature,num_predict=max_tokens))
+    payload=dict(model=model,messages=content,stream=False,keep_alive='30m',
+                 options=dict(temperature=temperature,num_predict=min(max_tokens,300) if role=='conversation' else max_tokens,num_ctx=4096 if role in ('conversation','tool_planner') else 8192))
     if json_mode:payload['format']='json'
     request=urllib.request.Request(config['base_url'].rstrip('/')+'/api/chat',
           data=json.dumps(payload,ensure_ascii=False).encode(),headers={'Content-Type':'application/json'})
-    with urllib.request.urlopen(request,timeout=config['timeout_seconds']) as response:
+    with urllib.request.urlopen(request,timeout=max(180,config['timeout_seconds'])) as response:
         text=json.load(response).get('message',{}).get('content','').strip()
     if not text:raise ValueError('EMPTY_MODEL_RESPONSE')
     if json_mode:

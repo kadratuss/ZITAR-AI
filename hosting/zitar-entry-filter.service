@@ -1,0 +1,21 @@
+[Unit]
+Description=Independent bounded RSI-entry-filter research
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=zitar
+WorkingDirectory=/srv/zitar/runtime
+Environment=OMP_NUM_THREADS=1
+Environment=MKL_NUM_THREADS=1
+ExecStart=/srv/zitar/venv/bin/python -m zitar_next.entry_filter --root /srv/zitar/data/next --name 20261010-v2
+TimeoutStartSec=3600
+CPUQuota=50%
+MemoryMax=2G
+Nice=15
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/zitar/data/next/entry_filter_studies
+PrivateTmp=true

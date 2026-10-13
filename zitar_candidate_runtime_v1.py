@@ -231,6 +231,7 @@ def prepare(base):
         atomic_json(path,dict(started_utc=now().isoformat(),baseline_trade_ids=[r['trade_id'] for r in rows],initial_capital_try='10000.00',real_orders=False))
 
 def start_worker(base):
+    if (Path(base)/'zitar_futures_only.flag').exists():return
     import threading
     def run():
         guard=FileLock(Path(base)/'zitar_candidate_runtime_v1.lock')

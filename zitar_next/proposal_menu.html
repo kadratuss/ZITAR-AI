@@ -1,0 +1,122 @@
+<script>(()=>{
+const nav=document.querySelector('.nav');
+if(!nav||document.getElementById('proposalMenuBtn'))return;
+const button=document.createElement('button');button.id='proposalMenuBtn';button.className='btn';button.textContent='Strateji önerileri';
+nav.append(button);
+const view=document.createElement('section');view.id='strategyProposalsView';view.className='section';view.style.display='none';
+view.innerHTML='<div class="panel"><h2>AI strateji önerileri</h2><p class="summaryline">3x izole vadeli · İnsan onayı gerekli · Gerçek emir kapalı</p><p id="proposalMenuStatus" role="status">Yükleniyor…</p></div><div class="panel"><h2>30 günlük bağımsız ileri araştırma</h2><p class="summaryline">Sabit modeller · Saatlik yeni veri · Araştırma amaçlıdır; işlem hesabına etkinleştirme değildir.</p><div id="forwardStudyStatus">Yükleniyor…</div></div><div id="proposalMenuCards"></div>';
+const filterPanel=document.createElement('div');filterPanel.className='panel';filterPanel.innerHTML='<h2>RSI giriş filtresi deneyi</h2><p class="summaryline">BTC ve ETH · Bir yıllık saatlik geçmiş · 3x izole vadeli · 2.048 / 8.192 eğitim adımı karşılaştırması</p><div id="entryFilterStatus">Yükleniyor…</div>';view.insertBefore(filterPanel,view.lastChild);
+const opsPanel=document.createElement('div');opsPanel.className='panel';opsPanel.innerHTML='<h2>Sunucu çalışma kontrolü</h2><p class="summaryline">15 dakikada bir servis kontrolü · 24 saatlik gözlem · Ara kontroller kesintisiz erişim garantisi değildir.</p><div id="operationsWatchStatus">Yükleniyor…</div>';view.insertBefore(opsPanel,filterPanel);
+nav.after(view);views.push('strategyProposals');
+const chronology=document.createElement('div');chronology.className='panel';
+const dayLabel=document.createElement('label');dayLabel.textContent='Öneri günü (Türkiye saati) ';const dayFilter=document.createElement('input');dayFilter.type='date';dayFilter.setAttribute('aria-label','Öneri günü');dayLabel.append(dayFilter);
+const orderLabel=document.createElement('label');orderLabel.textContent=' Sıralama ';const dateOrder=document.createElement('select');dateOrder.setAttribute('aria-label','Öneri tarih sıralaması');
+for(const [value,text]of [['newest','En yeni önce'],['oldest','En eski önce']]){const option=document.createElement('option');option.value=value;option.textContent=text;dateOrder.append(option);}orderLabel.append(dateOrder);
+const clearDay=document.createElement('button');clearDay.className='btn';clearDay.textContent='Tüm günler';clearDay.onclick=()=>{dayFilter.value='';load();};dayFilter.onchange=()=>load();dateOrder.onchange=()=>load();chronology.append(dayLabel,orderLabel,clearDay);view.insertBefore(chronology,view.lastChild);
+const proposalTime=x=>{const t=Date.parse(x);return Number.isFinite(t)?t:null;};
+const localDay=x=>{const t=proposalTime(x);return t==null?'Tarih kaydı yok':new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Istanbul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(t));};
+const dateText=x=>{const t=proposalTime(x);return t==null?'Tarih kaydı yok':new Date(t).toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'});};
+const historyDate=x=>x?dateText(x.includes('T')?x:x.replace(' ','T')+'Z'):'Kaydedilmemiş';
+const nativeShow=showView;showView=function(v){nativeShow(v);button.classList.toggle('active',v==='strategyProposals')};
+button.onclick=()=>{showView('strategyProposals');load()};
+const node=(tag,text)=>{const n=document.createElement(tag);n.textContent=text;return n};
+const stateNames={PENDING:'Değerlendirme bekliyor',ACCEPTED:'Sanal test için kabul edildi',ACTIVE_PAPER:'Sanal test etkin',ARCHIVED:'Arşivlendi',REJECTED:'Reddedildi'};
+const reasons={
+BASELINE_ADVANTAGE_NOT_MET:'Mevcut karşılaştırma stratejilerini gerekli farkla geçemedi.',
+COST_STRESS_NOT_POSITIVE:'Komisyon ve kayma maliyetleri artırıldığında pozitif getiri sağlayamadı.',
+INSUFFICIENT_TRADES:'Güvenilir değerlendirme için yeterli sayıda işlem üretmedi. Sıfır işlem ve sıfır getiri, başarı sayılmaz.',
+DRAWDOWN_BUDGET_EXCEEDED:'Testte portföyün zirveden düşüşü izin verilen risk sınırını aştı.',
+TEST_PERIOD_OVERLAPS_PREVIOUS_ROUND:'Test dönemi önceki deneyle örtüşüyor. Daha önce kullanılmamış yeni bir test dönemi gerekiyor.',
+TEST_SAMPLE_TOO_SHORT:'Test için ayrılan veri dönemi yeterince uzun değil.',
+AT_LEAST_TWO_SEEDS_REQUIRED:'Sonucun tekrarlanabilirliği için en az iki farklı eğitim başlangıcı gerekiyor.',
+MODEL_LIQUIDATION_OCCURRED:'Vadeli testte tasfiye oluştu; risk koşulu sağlanmadı.',
+LONGER_WALK_FORWARD_HISTORY_REQUIRED:'Farklı geçmiş dönemlerde sınamak için daha uzun veri geçmişi gerekiyor.'};
+function explain(code){let context='Geçmiş veri testi';let key=code;if(key.startsWith('COMBINED_WALK_FORWARD_')){context='Birleşik strateji · farklı dönem testleri';key=key.slice(22)}else if(key.startsWith('WALK_FORWARD_')){context='Farklı dönem testleri';key=key.slice(13)}return context+': '+(reasons[key]||'Bu kontrolün açıklaması henüz tanımlanmamış; ayrıntılarda kontrol kodunu inceleyin.');}
+let token='',busy=false;
+async function loadOperations(){
+const box=document.getElementById('operationsWatchStatus');
+try{const response=await fetch('/api/operations-study',{cache:'no-store'});if(!response.ok)throw Error('Sunucu gözlem kaydı şu anda alınamıyor.');const data=await response.json();
+const names={OBSERVING_24H:'Gözlem sürüyor',ATTENTION_REQUIRED:'Kontrol gerekli',PLANNED_BACKUP:'Planlı yedekleme', '24H_SAMPLED_CHECKS_PASSED':'24 saatlik periyodik kontroller geçti'};
+box.replaceChildren(node('p',`${names[data.status]||'Durum bilinmiyor'} · ${data.observed_hours.toFixed(1)} / 24 saat`),node('p',`Son kontrol: ${new Date(data.updated_epoch*1000).toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'})} · ${(data.errors||[]).length} kontrol sorunu`));
+if(Date.now()/1000-data.updated_epoch>1800)box.append(node('p','Kontrol kaydı eski; güncel sağlıklı durum varsayılmamalı.'));
+}catch(e){box.replaceChildren(node('p',e.message));}
+}
+async function loadFilter(){
+const box=document.getElementById('entryFilterStatus');
+try{
+const response=await fetch('/api/entry-filter',{cache:'no-store'});if(!response.ok)throw Error('Giriş filtresi deney kaydı şu anda alınamıyor.');const data=await response.json();box.replaceChildren();
+if(data.state!=='COMPLETE'){box.append(node('p',data.state==='FAILED'?'Deney durdu; sonuç tamamlanmış sayılmaz.':`Deney sürüyor · ${data.completed?.length||0} / 4 veri kümesi tamamlandı · ${data.current||''} · ${data.phase==='TRAINING'?'Eğitim':'Veri hazırlığı'}`));return;}
+box.append(node('p','Dört geçmiş veri deneyi tamamlandı. Sonuçlar araştırma içindir; yeni piyasa testi ve üretim motoruyla eşlik henüz doğrulanmadığı için etkinleştirilemez.'));
+for(const r of data.results||[]){const section=node('section','');section.className='panel';section.append(node('h3',`${r.market==='futures'?'Vadeli · 3x izole':'Spot'} · ${r.symbol}`));
+const period=r.partitions.partitions.test;section.append(node('p',`${period.retained_rows} saatlik test mumu · UTC ${period.first_date} → ${period.last_date} · Doğrulamada seçilen eğitim: ${r.selected_budget.toLocaleString('tr-TR')} adım`));
+for(const [name,v] of [['RSI14',r.baselines.rsi],['RSI + AI giriş filtresi · oybirliği',r.unanimous.test],['Artırılmış maliyetle filtre',r.unanimous.stress]]){const line=node('p',`${name}: ${v.return_pct.toFixed(2)}% getiri · ${v.max_drawdown_pct.toFixed(2)}% en büyük düşüş · ${v.trades} dolum`);section.append(line);}
+section.append(node('p',`RSI'a göre net getiri farkı: ${r.delta_vs_rsi_pct.toFixed(2)} yüzde puan. Bu fark tek başına uygunluk değildir.`));
+for(const seed of r.seed_results||[])section.append(node('p',`Tohum ${seed.seed}: ${seed.test.return_pct.toFixed(2)}% · ${seed.test.trades} dolum`));
+section.append(node('p','AI yalnızca yeni girişe izin verir veya veto eder. Açık pozisyonda RSI tutma ve çıkış kararları korunur.'));box.append(section);}
+}catch(e){box.replaceChildren(node('p',e.message));}
+}
+async function loadStudy(){
+const box=document.getElementById('forwardStudyStatus');
+try{
+const response=await fetch('/api/forward-study',{cache:'no-store'});if(!response.ok)throw Error('İleri araştırma kaydı şu anda alınamıyor.');const data=await response.json();
+const date=value=>new Date(value.includes('T')?value:value.replace(' ','T')+'Z').toLocaleString('tr-TR',{timeZone:'Europe/Istanbul'});
+box.replaceChildren();
+const age=(Date.now()-Date.parse(data.updated))/3600000;
+box.append(node('p','Son güncelleme: '+date(data.updated)+(age>2?' · KAYIT ESKİ; servis kontrol edilmeli':'')));
+for(const r of data.reports||[]){
+const section=node('section','');section.className='panel';
+section.append(node('h3',(r.market==='futures'?'Vadeli · 3x izole':'Spot')+' · '+r.symbol),node('p','Dönem: '+date(r.start_utc)+' → '+date(r.end_utc)+' · Türkiye saati'),node('p',`${r.collected_bars} / 720 yeni saatlik mum · Model sabit`));
+const names={WAITING_FOR_NEW_BARS:'Yeni kapanmış mumlar bekleniyor',COLLECTING_FRESH_EVIDENCE:'Yeni verilerle araştırma sürüyor',WINDOW_ENDED_REVIEW_REQUIRED:'Dönem tamamlandı; insan değerlendirmesi gerekli',WINDOW_ENDED_INCOMPLETE_DATA:'Dönem bitti; veri eksik, sonuç tamamlanmış sayılmaz'};
+section.append(node('p',names[r.status]||'Durum tanımlanmamış'));
+const d=r.diagnostics||{};section.append(node('p',`Önceki test tanısı: ${d.unanimous_cash_bars??'—'} kararda iki model de nakitte · ${d.disagreement_bars??'—'} kararda model uyuşmazlığı`));
+if(r.test){const table=node('table','');const header=node('tr','');for(const h of ['Strateji','Net getiri','En büyük düşüş','Dolum'])header.append(node('th',h));table.append(header);
+for(const [arm,v] of Object.entries(r.test)){const tr=node('tr','');for(const text of [({zitar_hourly:'RSI14',learned_ppo:'PPO · oybirliği',combined:'Birleşik',cash:'Nakit',long:'Al ve tut',sma:'SMA'})[arm]||arm,v.return_pct.toFixed(2)+'%',v.max_drawdown_pct.toFixed(2)+'%',String(v.trades)])tr.append(node('td',text));table.append(tr)}
+const scroll=node('div','');scroll.style.overflowX='auto';scroll.append(table);section.append(scroll);section.append(node('p','Geçici araştırma sonucu: her değerlendirme son mumda sanal kapanış içerir. Bu sonuç uygunluk onayı değildir.'));
+}box.append(section);
+}
+}catch(e){box.replaceChildren(node('p',e.message));}
+}
+async function load(){
+if(busy||view.contains(document.activeElement)&&document.activeElement.tagName==='TEXTAREA')return;
+const status=document.getElementById('proposalMenuStatus'),cards=document.getElementById('proposalMenuCards');
+try{
+const response=await fetch('/zitar-next/api/state',{cache:'no-store'});if(!response.ok)throw Error('Öneriler alınamadı.');
+const data=await response.json();token=data.csrf;
+await Promise.all([loadStudy(),loadFilter(),loadOperations()]);
+status.textContent=`${(data.proposals||[]).length} aday · ${(data.proposals||[]).filter(p=>p.body.eligible&&p.state==='PENDING').length} onaya uygun · ${(data.active||[]).length} etkin sürüm`;
+cards.replaceChildren();
+const proposals=(data.proposals||[]).filter(p=>!dayFilter.value||localDay(p.created)===dayFilter.value).sort((a,b)=>{const at=proposalTime(a.created),bt=proposalTime(b.created);if(at==null)return bt==null?0:1;if(bt==null)return -1;return dateOrder.value==='oldest'?at-bt:bt-at;});
+status.textContent+=` · Gösterilen: ${proposals.length} · Tarihler Türkiye saatidir`;
+const newest=new Map();for(const p of data.proposals||[]){const k=[p.body.market,p.body.symbol,p.body.interval,p.body.strategy].join(':');const t=proposalTime(p.created);if(t!=null&&(!newest.has(k)||t>newest.get(k)))newest.set(k,t);}
+let lastDay=null;
+for(const p of proposals){
+const day=localDay(p.created);if(day!==lastDay){cards.append(node('h2',day));lastDay=day;}
+const b=p.body,card=node('article','');card.className='panel';
+card.dataset.created=p.created||'';
+const eligible=b.eligible===true&&!(b.issues||[]).length;
+card.style.borderColor=eligible?'#22c55e':'#d69e36';
+card.append(node('h3',`${b.market==='futures'?'Vadeli · 3x izole':'Spot'} · ${b.symbol} · ${b.interval}`),node('p',`${b.strategy} · ${stateNames[p.state]||'Durum bilinmiyor'}`));
+const created=proposalTime(p.created),age=created==null?null:Math.max(0,Date.now()-created),latest=created!=null&&created===newest.get([b.market,b.symbol,b.interval,b.strategy].join(':'));
+const ageText=age==null?'Yaşı bilinmiyor':age<3600000?Math.floor(age/60000)+' dakika önce':age<86400000?Math.floor(age/3600000)+' saat önce':Math.floor(age/86400000)+' gün önce';
+const calendar=node('p','Öneri oluşturuldu: '+dateText(p.created)+' · '+ageText+(latest?' · Bu stratejinin en son önerisi':'')+(age!=null&&age<86400000?' · Yeni (son 24 saat)':''));calendar.style.color='#93c5fd';calendar.style.fontWeight='700';card.append(calendar);
+const testPeriod=b.split?.partitions?.test;if(testPeriod)card.append(node('p','Geçmiş test dönemi: '+historyDate(testPeriod.first_date)+' → '+historyDate(testPeriod.last_date)+' · '+testPeriod.retained_timestamps+' mum · '+b.interval+' · Türkiye saati. Bu dönem önerinin oluşturulma tarihi değildir.'));
+const verdict=node('p',eligible?'● Geçmiş test eşiklerini geçti · Sanal test için uygun aday':'● Henüz uygun değil · Test koşulları karşılanmadı');verdict.style.color=eligible?'#4ade80':'#fbbf24';verdict.style.fontWeight='700';card.append(verdict);
+card.append(node('p','Yeşil durum geçmiş testlere dayanır; canlı piyasa başarısı veya kazanç garantisi değildir.'));
+const stages=node('div','');stages.className='panel';stages.append(node('h4','Test ve onay aşamaları'),node('p','1. Eğitim ve doğrulama → Ayrı geçmiş veri testi → Farklı dönemler ve artırılmış maliyetlerle sınama: '+(eligible?'eşikler geçti.':'tamamlanan değerlendirmede eşikler karşılanmadı.')),node('p','2. İnsan onayı: '+(['ACCEPTED','ACTIVE_PAPER','ARCHIVED'].includes(p.state)?'kabul kaydı mevcut.':p.state==='REJECTED'?'aday reddedildi.':'bekliyor; uygun olmayan aday kabul edilemez.')),node('p','3. Yeni piyasa verileriyle bağımsız sanal işlem testi: '+(p.state==='ACTIVE_PAPER'?'etkin; gerçek emir verilmez.':'bu aday için etkin değil.')),node('p','4. Gerçek işlem: kapalı. Sanal testi etkinleştirmek gerçek işlem izni vermez.'));card.append(stages);
+for(const r of b.combination?.seed_results||b.seed_results||[])card.append(node('p',`Tohum ${r.seed} · Test getirisi ${r.test.return_pct.toFixed(2)}% · En büyük düşüş ${r.test.max_drawdown_pct.toFixed(2)}% · ${r.test.trades} işlem`));
+card.append(node('h4',eligible?'Uygunluk sonucu':'Neden henüz önerilmiyor?'));
+const issues=node('ul','');for(const issue of b.issues||[])issues.append(node('li',explain(issue)));if(!issues.children.length)issues.append(node('li','Kayıtlı geçmiş test eşiklerinin tamamı karşılandı. Sonraki adım, insan onayıyla sanal işlem testidir.'));card.append(issues);
+const detail=node('details','');detail.append(node('summary','Test koşulları ve sınırlamalar'));for(const text of b.limitations||[])detail.append(node('p',text));detail.append(node('p','Öneri kimliği: '+p.id));card.append(detail);
+detail.append(node('p','Teknik kontrol kodları: '+((b.issues||[]).join(' · ')||'Yok')));
+const note=node('textarea','');note.placeholder='Kabul / ret / geri alma gerekçeniz';note.setAttribute('aria-label','Strateji karar açıklaması');note.style.width='100%';card.append(note);
+const actions=node('div','');actions.className='actions';
+for(const [kind,label,enabled] of [['ACCEPT','Sanal test için kabul et',p.state==='PENDING'&&eligible],['REJECT','Reddet',['PENDING','ACCEPTED'].includes(p.state)],['ACTIVATE','Bağımsız sanal testi başlat',p.state==='ACCEPTED'],['ROLLBACK','Bu sürüme geri dön',p.state==='ARCHIVED']]){
+const action=node('button',label);action.className='btn';action.disabled=!enabled;
+action.onclick=async()=>{if(!note.value.trim()){status.textContent='Karar açıklaması girin.';return;}busy=true;action.disabled=true;try{const result=await fetch('/zitar-next/api/decision',{method:'POST',headers:{'Content-Type':'application/json','X-Next-CSRF':token},body:JSON.stringify({id:p.id,decision:kind,note:note.value})});const answer=await result.json();if(!result.ok)throw Error(answer.error||'Karar kaydedilemedi.');note.value='';note.blur();}catch(e){status.textContent=e.message;return;}finally{busy=false;action.disabled=!enabled;}await load();};actions.append(action);
+}card.append(actions);cards.append(card);
+}
+if(!proposals.length)cards.append(node('p',dayFilter.value?'Seçilen günde öneri kaydı yok.':'Henüz tamamlanmış aday yok.'));
+}catch(e){status.textContent=e.message;}
+}
+setInterval(()=>{if(activeView==='strategyProposals')load()},15000);
+})();</script>

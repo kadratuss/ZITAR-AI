@@ -1,0 +1,19 @@
+[Unit]
+Description=ZITAR read-only research retrieval
+After=network-online.target
+
+[Service]
+User=zitar
+Group=zitar
+WorkingDirectory=/srv/zitar/runtime
+ExecStart=/srv/zitar/venv/bin/python -B /srv/zitar/runtime/zitar_research_rag_api_v1.py --host 127.0.0.1 --port 5012
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/zitar/runtime
+MemoryMax=1G
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,20 @@
+[Unit]
+Description=ZITAR read-only chat health service
+After=ollama.service
+Wants=ollama.service
+
+[Service]
+User=zitar
+Group=zitar
+WorkingDirectory=/srv/zitar/runtime
+ExecStart=/srv/zitar/venv/bin/python -B /srv/zitar/runtime/zitar_chat_api_v1_1.py
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/zitar/runtime
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target

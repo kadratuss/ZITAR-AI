@@ -141,7 +141,7 @@ def make_server(base, port=5020):
     from zitar_indicator_lab_v1 import start_worker as start_indicator_lab
     start_indicator_lab(base)
     from pa_v1.runtime import start_worker as start_pa_v1
-    start_pa_v1(base)
+    if not (base/'zitar_futures_only.flag').exists():start_pa_v1(base)
     cache = {'time':0, 'data':None}
     cache_lock = threading.Lock()
     class Handler(BaseHTTPRequestHandler):
@@ -161,10 +161,19 @@ def make_server(base, port=5020):
         def do_GET(self):
             parsed = urlsplit(self.path)
             route, query = parsed.path, parse_qs(parsed.query)
+            if 'session_id' in query:
+                from assistant_foundation.conversations import conversation_session
+                try:query['session_id']=[conversation_session(base,query['session_id'][0])]
+                except ValueError:return self.send({'error':'Invalid session'},400)
             try:
                 if route == '/api/pa-v1':
                     from pa_v1.runtime import overview
                     return self.send(overview(base))
+                if route == '/api/assistant-artifact':
+                    from assistant_foundation.chat_tools import read_report
+                    try:raw=read_report(base,query.get('session_id',[''])[0],query.get('task_id',[''])[0])
+                    except (ValueError,KeyError):return self.send({'error':'Artifact not found'},404)
+                    self.send_response(200);self.send_header('Content-Type','text/plain; charset=utf-8');self.send_header('Content-Disposition','attachment; filename=zitar-rapor.txt');self.send_header('X-Content-Type-Options','nosniff');self.send_header('Cache-Control','no-store');self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw);return
                 if route == '/api/paper-reset':
                     from zitar_reset_control_v1 import status
                     return self.send(status(base))

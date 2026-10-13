@@ -1,0 +1,10 @@
+[Unit]
+Description=Hourly fresh-data fixed-model research
+
+[Timer]
+OnCalendar=*-*-* *:12:00 UTC
+Persistent=true
+Unit=zitar-forward-study.service
+
+[Install]
+WantedBy=timers.target

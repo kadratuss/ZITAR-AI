@@ -14,6 +14,7 @@ from zitar_futures_funding_recovery_v1 import update_pending,reconcile_closed
 from zitar_indicator_lab_signals_v1 import analyze,INTERVALS
 
 STATE='zitar_indicator_lab_v1.json'
+FUTURES_ONLY=(Path(__file__).parent/'zitar_futures_only.flag').exists()
 # Label, market, closed signal interval, rule, leverage, trailing price distance.
 SPECS={
  'RSI_BASE_SPOT':('RSI kontrol · 1sa','spot','1h','RSI_BASE',1,'.02'),
@@ -28,8 +29,16 @@ SPECS={
  'WT15':('WaveTrend + 4sa trend · 15 dk','spot','15m','WT',1,'.02'),
  'SPOT_RSI15':('RSI kontrol · 15 dk','spot','15m','RSI',1,'.02'),
  'SQ5':('Squeeze / Pump · 5 dk','spot','5m','SQ',1,'.02'),
+ 'SCALP_RISK':('Scalping risk testi · 1 dk · 20×','futures','1m','SCALP_RISK',20,'.005'),
  'SCALP20':('RSI Scalping · 1 dk · 20×','futures','1m','SCALP',20,'.005'),
 }
+
+for rule,label in [('NEW_COIN','Coinrule kural uyarlaması'),('NEW_ST','SuperTrend ATR10 ×3 uyarlaması'),('NEW_SAR','Parabolic SAR uyarlaması')]:
+    for interval in ('5m','15m','1h','4h'):
+        SPECS[rule+'_'+interval]=(label+' · '+interval,'futures',interval,rule,3,'.02')
+
+if FUTURES_ONLY:
+    SPECS={k:v for k,v in SPECS.items() if v[1]=='futures'}
 
 def initial(ms):
     books={}
@@ -37,6 +46,11 @@ def initial(ms):
         b=copy.deepcopy(fresh(ms,[])['books']['BASELINE'])
         b.update(label=label,market=market,interval=interval,rule=rule,stop_pct=stop,started_ms=ms,cursors={},decisions=[],daily_limit='OPEN',valuation_ms=0)
         b['execution_policy']=dict(POLICY,leverage=lev,fee_rate='.001' if market=='spot' else '.0005',slippage_rate='.001' if market=='spot' else '.0002')
+        b['execution_policy'].update(signal_interval=interval,trailing_stop_price_pct=stop)
+        if rule=='SCALP_RISK':
+            from zitar_next.scalping_risk import RULES
+            b.update(risk_rules=RULES.copy(),period_fees_start='0',diagnostic_only=True,approval='NOT_APPROVED_STRATEGY')
+        if rule.startswith('NEW_'):b.update(diagnostic_only=True,approval='NOT_APPROVED_STRATEGY',source_parity='NOT_VERIFIED',adaptation='Shared 3x isolated model, 2% price safety trail, 10 equal slots; Coinrule long-only.')
         books[key]=b
     return dict(schema='INDICATOR_LAB_V1',specs=SPECS,started_ms=ms,heartbeat_ms=ms,last_success_ms=None,state='STARTING',books=books,universe={},errors=[],real_orders=False)
 
@@ -49,6 +63,8 @@ def cooling_down(book,symbol,candle):
 
 def apply_book(b,market,analyses,ms,before_entry=None):
     """Shared execution assumptions, isolated cash. Never trades an old candle."""
+    if FUTURES_ONLY and b.get('market')=='spot':
+        b.update(entries_paused=True,health='DISABLED_BY_USER');return
     quotes={s:d['quote'] for s,d in market.items() if 0<=ms-d['quote']['time']<=30000}
     closed_now=set()
     reconcile_closed(b,market,ms)
@@ -73,11 +89,15 @@ def apply_book(b,market,analyses,ms,before_entry=None):
     if not set(b['positions']).issubset(quotes):b['health']='MISSING_POSITION_QUOTE';return
     mark(b,quotes);b['valuation_ms']=ms;b['health']='FUNDING_PENDING' if b['accounting_pending'] else 'OK'
     if b.get('retired_ms') or b.get('reset_pending'):return
+    if b['rule']=='SCALP_RISK':
+        b.setdefault('period_fees_start',b['fees_total'])
     if day(ms)!=b['period']:
         b['daily'].append(dict(date=b['period'],start=b['period_start'],end=b['equity'],return_pct=str((D(b['equity'])/D(b['period_start'])-1)*100),actual_rollover_ms=ms,quality=b['quality']))
         b.update(period=day(ms),period_start=b['equity'],slot=str(max(D(0),D(b['equity']))/10),daily_limit='OPEN',quality=[])
+        if b['rule']=='SCALP_RISK':b['period_fees_start']=b['fees_total']
     # Isolated high-leverage test stops taking entries after a 2% daily loss.
     if b['rule']=='SCALP' and D(b['equity'])<=D(b['period_start'])*D('.98'):b['daily_limit']='LOSS_STOP'
+    if b['rule']=='SCALP_RISK' and D(b['equity'])<=D(b['period_start'])*D('.99'):b['daily_limit']='LOSS_STOP'
     if b['daily_limit']=='LOSS_STOP':
         for symbol in list(b['positions']):close_position(b,symbol,quotes[symbol],ms,'DAILY_LOSS_STOP')
         mark(b,quotes);return
@@ -88,9 +108,11 @@ def apply_book(b,market,analyses,ms,before_entry=None):
         b['cursors'][symbol]=candle
         if ms-candle>min(120000,INTERVALS[b['interval']]):outcome='LATE_SIGNAL'
         else:
-            target=a[b['rule']];q=quotes[symbol];p=b['positions'].get(symbol)
-            exit_signal=p and (target==-p['direction'] or (b['rule']=='RSI' and target!=p['direction']) or (b['rule'] in ('RSI_BASE','RSI_CONFIRM') and (a['rsi']>=50 if p['direction']==1 else a['rsi']<=50)) or (b['rule']=='SCALP' and (a['wilder_rsi']>=50 if p['direction']==1 else a['wilder_rsi']<=50)))
+            target=a['SCALP' if b['rule']=='SCALP_RISK' else b['rule']];q=quotes[symbol];p=b['positions'].get(symbol)
+            exit_signal=p and (target==-p['direction'] or (b['rule']=='RSI' and target!=p['direction']) or (b['rule'] in ('RSI_BASE','RSI_CONFIRM') and (a['rsi']>=50 if p['direction']==1 else a['rsi']<=50)) or (b['rule'] in ('SCALP','SCALP_RISK') and (a['wilder_rsi']>=50 if p['direction']==1 else a['wilder_rsi']<=50)))
+            if b['rule']=='NEW_COIN' and p and a.get('coin_exit'):exit_signal=True
             if exit_signal:close_position(b,symbol,q,ms,'SIGNAL_EXIT');closed_now.add(symbol)
+            if exit_signal and b['rule'] in ('NEW_ST','NEW_SAR'):closed_now.discard(symbol)
             if b['market']=='spot' and target<0:target=0
             if b['rule']=='WT' and target==1 and not a.get('higher_trend'):target=0
             cap=1 if b['rule']=='SQ' else 10
@@ -102,7 +124,11 @@ def apply_book(b,market,analyses,ms,before_entry=None):
             elif abs(D(q['funding_rate']))>D('.001'):outcome='FUNDING_FILTER'
             else:
                 blocked=before_entry(b,symbol,target,a,market[symbol],ms) if before_entry else None
-                outcome=blocked or open_position(b,symbol,target,q,market[symbol]['contract'],ms,b['rule'])
+                if blocked:outcome=blocked
+                elif b['rule']=='SCALP_RISK':
+                    from zitar_next.scalping_risk import enter
+                    outcome=enter(b,symbol,target,q,market[symbol]['contract'],ms,candle)
+                else:outcome=open_position(b,symbol,target,q,market[symbol]['contract'],ms,b['rule'])
                 if outcome=='OPENED':
                     p=b['positions'][symbol];p.update(timeframe=b['interval'],evidence=a,trailing_stop=str(D(p['entry'])*(1-D(b['stop_pct'])*target)))
         b['decisions'].append(dict(ms=ms,symbol=symbol,candle_ms=candle,result=outcome))
@@ -112,6 +138,10 @@ class Lab:
     def __init__(self,base):
         self.base=Path(base);self.path=self.base/STATE
         self.state=json.loads(self.path.read_text(encoding='utf-8')) if self.path.exists() else initial(int(time.time()*1000))
+        if FUTURES_ONLY:
+            self.state['books']={k:b for k,b in self.state['books'].items() if b.get('market')!='spot'}
+            self.state['specs']={k:v for k,v in self.state.get('specs',{}).items() if v[1]!='spot'}
+            self.state.setdefault('universe',{})['spot']=[]
         existing=self.state.get('specs',{})
         if any(k not in SPECS or list(v)!=list(SPECS[k]) for k,v in existing.items()):raise ValueError('LAB_SPEC_CHANGED_ARCHIVE_REQUIRED')
         if set(existing)!=set(SPECS):
@@ -154,7 +184,8 @@ class Lab:
                 if key not in chosen:b.setdefault('retired_ms',ms)
         from zitar_market_controls_v1 import read as read_control
         s['entry_control']=read_control(self.base,'scalping')
-        if 'SCALP20' in s['books']:s['books']['SCALP20']['entries_paused']=s['entry_control']['paused']
+        for name in ('SCALP20','SCALP_RISK'):
+            if name in s['books']:s['books'][name]['entries_paused']=s['entry_control']['paused']
         from zitar_strategy_selection_v1 import prepare_reset,finish_reset
         s['active_strategy_names']=[n for n,b in s['books'].items() if not b.get('retired_ms')]
         prepare_reset(self.base,s,'scalping')
@@ -169,7 +200,7 @@ class Lab:
             s['universe']=selected
         if not self.meta or ms-self.meta_ms>3600000:
             futures=contracts(all_symbols=True);spot={}
-            for row in mg('spot','exchangeInfo')['symbols']:
+            for row in ([] if FUTURES_ONLY else mg('spot','exchangeInfo')['symbols']):
                 if row.get('status')!='TRADING':continue
                 f={f['filterType']:f for f in row['filters']};lot=f['LOT_SIZE'];nf=f.get('NOTIONAL',f.get('MIN_NOTIONAL',{}))
                 spot[row['symbol']]=dict(step=lot['stepSize'],min_qty=lot['minQty'],max_qty=lot['maxQty'],min_notional=nf.get('minNotional','0'))
@@ -177,9 +208,11 @@ class Lab:
         premium={r['symbol']:r for r in fg('premiumIndex')}
         snapshots={};signals={};ready=expected=0
         for market,symbols in s['universe'].items():
+            if FUTURES_ONLY and market=='spot':
+                snapshots[market]={};continue
             snapshots[market]={}
             active=[b for b in s['books'].values() if b['market']==market and not b.get('retired_ms')]
-            intervals={b['interval'] for b in active};intervals.update(('1h','15m'))
+            intervals={b['interval'] for b in active};intervals.update(('1h',) if (self.base/'zitar_two_rsi_only.flag').exists() else ('1h','15m'))
             if any(b['rule']=='WT' for b in active):intervals.add('4h')
             if not active and not self.experiment:
                 symbols=sorted({p['symbol'] for b in s['books'].values() if b['market']==market for p in list(b['positions'].values())+[p for p in b['closed'] if p.get('funding_pending')]})
@@ -187,7 +220,12 @@ class Lab:
                 for interval in sorted(intervals):
                     expected+=1;rows=self.candles(market,symbol,interval,ms)
                     if rows:
-                        try:signals[(market,symbol,interval)]=analyze(rows,ms,interval);ready+=1
+                        try:
+                            a=analyze(rows,ms,interval)
+                            if any(b['rule'].startswith('NEW_') for b in active):
+                                from zitar_next.open_strategy_signals import enrich
+                                a=enrich(rows,ms,interval,a)
+                            signals[(market,symbol,interval)]=a;ready+=1
                         except ValueError as e:errors.append(symbol+':'+str(e))
             def quote(symbol):
                 depth=mg(market,'depth',dict(symbol=symbol,limit=100),timeout=4);now=int(time.time()*1000)
@@ -222,18 +260,27 @@ class Lab:
                 available[symbol]=a
             apply_book(b,snapshots[b['market']],available,now)
             if b.get('health')!='OK':errors.append(b['label']+':'+b.get('health','UNKNOWN'))
-        try:self.experiment.cycle(snapshots,signals,s['universe'],now)
+        try:
+            if not (self.base/'zitar_two_rsi_only.flag').exists():self.experiment.cycle(snapshots,signals,s['universe'],now)
         except Exception as exc:errors.append('RESEARCH_EXPERIMENT:'+type(exc).__name__+':'+str(exc))
-        try:self.bollinger.cycle(snapshots,signals,s['universe'],now)
+        try:
+            if not (self.base/'zitar_two_rsi_only.flag').exists():self.bollinger.cycle(snapshots,signals,s['universe'],now)
         except Exception as exc:s['errors'].append('BOLLINGER_PAIR:'+str(exc))
-        try:self.repair.cycle(snapshots,signals,s['universe'],now)
+        try:
+            if not (self.base/'zitar_two_rsi_only.flag').exists():self.repair.cycle(snapshots,signals,s['universe'],now)
         except Exception as exc:s['errors'].append('RSI_REPAIR:'+str(exc))
-        try:self.momentum.cycle(snapshots,signals,s['universe'],now)
+        try:
+            if not (self.base/'zitar_two_rsi_only.flag').exists():self.momentum.cycle(snapshots,signals,s['universe'],now)
         except Exception as exc:errors.append('MOMENTUM_EXPERIMENT:'+type(exc).__name__+':'+str(exc))
         finish_reset(self.base,s,'scalping',now)
         s.update(heartbeat_ms=now,pid=os.getpid(),errors=errors,state='DEGRADED' if errors else 'WARMING' if ready<expected else 'RUNNING',ready_intervals=ready,expected_intervals=expected)
         if not errors and ready==expected:s['last_success_ms']=now
         atomic_json(self.path,s)
+        try:
+            from zitar_next.equity_samples import record
+            record(self.base,s)
+        except Exception as exc:
+            atomic_json(self.base/'zitar_equity_samples_error_v1.json',dict(ms=now,error=type(exc).__name__))
 
 def overview(base):
     path=Path(base)/STATE
@@ -243,6 +290,12 @@ def overview(base):
     result['heartbeat_age_seconds']=age
     if not 0<=age<=60:
         result['recorded_state']=result.get('state');result['state']='STALE'
+    from zitar_next.scalping_diagnostics import report
+    for name in ('SCALP20','SCALP_RISK'):
+        if name in result['books']:result['books'][name]['diagnostics']=report(result['books'][name])
+    from zitar_next.scalping_diagnostics import report
+    for name in ('SCALP20','SCALP_RISK'):
+        if name in result['books']:result['books'][name]['diagnostics']=report(result['books'][name])
     return result
 
 def loop(base):

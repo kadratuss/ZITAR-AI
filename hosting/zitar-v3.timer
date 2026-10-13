@@ -1,0 +1,10 @@
+[Unit]
+Description=Existing V3 hourly close cycle at minute 03
+
+[Timer]
+OnCalendar=*-*-* *:03:00
+Persistent=true
+Unit=zitar-v3.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,29 @@
+[Unit]
+Description=ZITAR combined AI learning and approved paper observer
+After=network-online.target zitar-production.service
+Wants=network-online.target
+
+[Service]
+User=zitar
+Group=zitar
+WorkingDirectory=/srv/zitar/runtime
+ExecStartPre=/srv/zitar/venv/bin/python -m zitar_next.hosting check --base /srv/zitar/runtime --next-root /srv/zitar/data/next
+ExecStart=/srv/zitar/venv/bin/python -B -m zitar_next.worker --root /srv/zitar/data/next --steps 2048 --cycles 0 --pause 300
+Restart=on-failure
+RestartSec=30
+KillMode=control-group
+Environment=PYTHONUNBUFFERED=1
+Environment=OMP_NUM_THREADS=1
+Environment=MKL_NUM_THREADS=1
+Nice=10
+CPUQuota=100%
+MemoryHigh=1500M
+MemoryMax=2G
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/zitar/data/next
+
+[Install]
+WantedBy=multi-user.target

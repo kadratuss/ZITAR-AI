@@ -1,0 +1,8 @@
+[Unit]
+Description=Check ZITAR backup freshness and disk space
+OnFailure=zitar-backup-alert.service
+
+[Service]
+Type=oneshot
+ExecStart=/srv/zitar/venv/bin/python -m zitar_next.backup_monitor --directory /srv/zitar/backups
+WorkingDirectory=/srv/zitar/runtime

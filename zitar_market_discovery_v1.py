@@ -9,6 +9,7 @@ from zitar_paper_supervisor_v1 import FileLock
 CONFIG={'spot':{'url':'https://api.binance.me/api/v3/','quote':'TRY','notional':1000},'futures':{'url':'https://fapi.binance.com/fapi/v1/','quote':'USDT','notional':3000}}
 STABLE={'USDT','USDC','FDUSD','BUSD','DAI','TUSD','USDP'}
 def get(market,endpoint,params=None,timeout=10):
+    if market=='spot' and (Path(__file__).parent/'zitar_futures_only.flag').exists():raise ValueError('SPOT_DISABLED_BY_USER')
     if endpoint not in {'exchangeInfo','ticker/24hr','depth','klines'}:raise ValueError('PUBLIC_DATA_ONLY')
     url=CONFIG[market]['url']+endpoint+('?' +urllib.parse.urlencode(params) if params else '')
     for attempt in range(2):
@@ -84,6 +85,7 @@ class Discovery:
     def cycle(self):
         result=dict(schema='MARKET_DISCOVERY_V1',generated_ms=int(time.time()*1000),markets={},real_orders=False)
         for market in CONFIG:
+            if market=='spot' and (self.base/'zitar_futures_only.flag').exists():continue
             try:result['markets'][market]=self.scan(market)
             except Exception as exc:result['markets'][market]={'status':'ERROR','error':str(exc),'main':[],'rows':[],'radar':[]}
         result['completed_ms']=int(time.time()*1000);atomic_json(self.base/'zitar_market_discovery_v1.json',result);return result
